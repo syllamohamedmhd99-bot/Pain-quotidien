@@ -222,14 +222,14 @@ body:not(.dark) .auth-card {
     width: 100%;
     padding: 1rem;
     margin-top: 0.5rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color, #d4a373), var(--secondary-color, #faedcd));
+    color: #ffffff;
     border: none;
     border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 8px 16px -8px var(--primary);
+    box-shadow: 0 8px 16px -8px rgba(212, 163, 115, 0.5);
     position: relative;
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
