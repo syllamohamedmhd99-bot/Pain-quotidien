@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X } from 'lucide-react';
 import './Sidebar.css';
 
 const navItems = [
@@ -22,7 +22,7 @@ const navItems = [
     { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
 ];
 
-export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout }) {
+export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose }) {
     const location = useLocation();
     const [openSubmenu, setOpenSubmenu] = useState(null);
 
@@ -40,18 +40,31 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
         setOpenSubmenu(openSubmenu === name ? null : name);
     };
 
+    const handleLinkClick = () => {
+        if (onClose) onClose();
+    };
+
     return (
         <motion.aside
-            className="sidebar glass"
+            className={`sidebar glass ${isOpen ? 'open' : ''}`}
             initial={{ x: -280 }}
             animate={{ x: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
         >
-            <div className="sidebar-header">
-                <div className="logo-icon">
-                    <Croissant size={32} />
+            <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className="logo-icon">
+                        <Croissant size={32} />
+                    </div>
+                    <h2>Pain Quotidien</h2>
                 </div>
-                <h2>Pain Quotidien</h2>
+                <button
+                    className="close-sidebar-btn"
+                    onClick={onClose}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', display: 'none' }}
+                >
+                    <X size={24} />
+                </button>
             </div>
 
             <nav className="sidebar-nav">
@@ -87,7 +100,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                                                 >
                                                     {item.subItems.map(sub => (
                                                         <li key={sub.path}>
-                                                            <Link to={sub.path} className={`sub-nav-link ${location.pathname === sub.path ? 'active' : ''}`}>
+                                                            <Link to={sub.path} className={`sub-nav-link ${location.pathname === sub.path ? 'active' : ''}`} onClick={handleLinkClick}>
                                                                 <span>{sub.name}</span>
                                                             </Link>
                                                         </li>
@@ -97,7 +110,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                                         </AnimatePresence>
                                     </div>
                                 ) : (
-                                    <Link to={item.path} className={`nav-link ${isActive ? 'active' : ''}`}>
+                                    <Link to={item.path} className={`nav-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
                                         <Icon className="nav-icon" size={20} />
                                         <span>{item.name}</span>
                                         {isActive && (
@@ -129,11 +142,11 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                     </div>
                 </div>
 
-                <button onClick={toggleDarkMode} className="theme-toggle btn btn-outline">
+                <button onClick={toggleDarkMode} className="theme-toggle btn btn-outline" style={{ display: 'flex' }}>
                     {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                     <span>{darkMode ? 'Mode Clair' : 'Mode Sombre'}</span>
                 </button>
-                <button onClick={onLogout} className="logout-btn btn btn-outline">
+                <button onClick={() => { handleLinkClick(); onLogout(); }} className="logout-btn btn btn-outline" style={{ display: 'flex' }}>
                     <LogOut size={20} />
                     <span>Déconnexion</span>
                 </button>

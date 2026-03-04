@@ -216,3 +216,26 @@
     transform: scale(1.1);
     box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--text-primary);
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 1000;
+        margin: 0;
+        border-radius: 0;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .close-sidebar-btn {
+        display: block !important;
+    }
+}
