@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-import './UsersManagement.css'; // Optional, can use existing CRM.css
+import './CRM.css';
 
 export default function UsersManagement() {
     const [profiles, setProfiles] = useState([]);
