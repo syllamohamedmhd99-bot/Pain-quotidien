@@ -33,11 +33,13 @@ async function createUser(req, res) {
 
         // 1. Initialize Supabase Client with SERVICE_ROLE_KEY
         // The service role key bypasses RLS and allows creating users.
-        const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+        const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://rsczhjixffzqymauewpu.supabase.co';
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-        if (!supabaseUrl || !supabaseServiceKey) {
-            return res.status(500).json({ error: 'Server configuration error (missing keys)' });
+        if (!supabaseServiceKey) {
+            return res.status(500).json({
+                error: 'ERREUR CRITIQUE: La variable SUPABASE_SERVICE_ROLE_KEY est totalement introuvable sur Vercel. Veuillez vérifier vos paramètres Vercel -> Environment Variables.'
+            });
         }
 
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
