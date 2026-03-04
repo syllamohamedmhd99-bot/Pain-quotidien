@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet, ChefHat, ShieldCheck } from 'lucide-react';
 import './Sidebar.css';
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
     { name: 'Clients', path: '/clients', icon: Users },
     { name: 'Fournisseurs', path: '/suppliers', icon: Truck },
     { name: 'Dépenses', path: '/expenses', icon: Wallet },
+    { name: 'Production', path: '/production', icon: ChefHat },
     {
         name: 'Facturation',
         path: '/invoices',
@@ -20,11 +21,12 @@ const navItems = [
             { name: 'Créer Facture', path: '/invoices/new' },
         ]
     },
+    { name: 'Gestion Rôles', path: '/users', icon: ShieldCheck, adminOnly: true },
     { name: 'Mon Profil', path: '/profile', icon: User },
     { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
 ];
 
-export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose }) {
+export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose, profile }) {
     const location = useLocation();
     const [openSubmenu, setOpenSubmenu] = useState(null);
 
@@ -71,7 +73,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
 
             <nav className="sidebar-nav">
                 <ul>
-                    {navItems.map((item) => {
+                    {navItems.filter(item => !item.adminOnly || profile?.role === 'Administrateur').map((item) => {
                         const isActive = location.pathname === item.path || (item.subItems && item.subItems.some(sub => location.pathname === sub.path));
                         const Icon = item.icon;
                         const hasSubItems = !!item.subItems;

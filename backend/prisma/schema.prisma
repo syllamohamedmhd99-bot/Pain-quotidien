@@ -33,6 +33,7 @@ model Client {
   phone        String?
   address      String?
   status       String        @default("Actif")
+  points       Int           @default(0)
   user_id      String        @default("admin@boulangerie.local")
   updated_at   DateTime      @default(now())
   transactions Transaction[]
@@ -106,4 +107,16 @@ model Expense {
   supplier    Supplier? @relation(fields: [supplier_id], references: [id])
 
   @@map("expenses")
+}
+
+model ProductionLog {
+  id           Int      @id @default(autoincrement())
+  product_name String
+  quantity     Int
+  status       String   @default("Pending") // "Pending", "In Oven", "Ready"
+  user_id      String   @default("admin@boulangerie.local")
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+
+  @@map("production_logs")
 }

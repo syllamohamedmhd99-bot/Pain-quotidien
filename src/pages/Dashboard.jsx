@@ -25,12 +25,12 @@ export default function Dashboard() {
     const [products, setProducts] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [expenses, setExpenses] = useState([]);
-    const [viewType, setViewType] = useState('weekly'); // 'weekly' or 'monthly'
+    const [viewType, setViewType] = useState('weekly');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [trxRes, clientRes, prodRes, suppRes] = await Promise.all([
+                const [trxRes, clientRes, prodRes, suppRes, expRes] = await Promise.all([
                     supabase.from('transactions').select('*'),
                     supabase.from('clients').select('*'),
                     supabase.from('products').select('*'),
@@ -42,7 +42,7 @@ export default function Dashboard() {
                 if (clientRes.data) setClients(clientRes.data);
                 if (prodRes.data) setProducts(prodRes.data);
                 if (suppRes.data) setSuppliers(suppRes.data);
-                if (expensesRes.data) setExpenses(expensesRes.data);
+                if (expRes.data) setExpenses(expRes.data);
             } catch (error) {
                 console.error("Erreur de récupération des données:", error);
             }
@@ -51,7 +51,6 @@ export default function Dashboard() {
         fetchData();
     }, []);
 
-    // Helper: is today
     const isToday = (dateString) => {
         const today = new Date();
         const date = new Date(dateString);
@@ -60,7 +59,15 @@ export default function Dashboard() {
             date.getFullYear() === today.getFullYear();
     };
 
-    // Calculate Stats
+    // BI Calculations
+    const totalRevenue = (Array.isArray(transactions) ? transactions : [])
+        .reduce((sum, t) => sum + (t.total_amount || 0), 0);
+
+    const totalExpenses = (Array.isArray(expenses) ? expenses : [])
+        .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+    const netProfit = totalRevenue - totalExpenses;
+
     const totalSalesToday = (Array.isArray(transactions) ? transactions : [])
         .filter(t => isToday(t.date))
         .reduce((sum, t) => sum + (t.total_amount || 0), 0);
@@ -68,13 +75,25 @@ export default function Dashboard() {
     const todayOrdersCount = (Array.isArray(transactions) ? transactions : [])
         .filter(t => isToday(t.date)).length;
 
-    const newClientsToday = (Array.isArray(clients) ? clients : [])
-        .filter(c => isToday(c.created_at || Date.now())).length;
+    // Top Products Calculation
+    const getTopProducts = () => {
+        const productSales = {};
+        (Array.isArray(transactions) ? transactions : []).forEach(trx => {
+            if (trx.items && Array.isArray(trx.items)) {
+                trx.items.forEach(item => {
+                    const name = item.name || item.product_name;
+                    productSales[name] = (productSales[name] || 0) + (item.quantity || 1);
+                });
+            }
+        });
+        return Object.entries(productSales)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([name, qty]) => ({ name, qty }));
+    };
 
-    const totalStock = (Array.isArray(products) ? products : [])
-        .reduce((sum, p) => sum + (p.stock || 0), 0);
+    const topProducts = getTopProducts();
 
-    // Chart Data Calculation
     const getWeeklyData = () => {
         const result = [];
         const today = new Date();
@@ -83,7 +102,7 @@ export default function Dashboard() {
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(today.getDate() - i);
-            const label = `${days[d.getDay()]} ${d.getFullYear()}`;
+            const label = `${days[d.getDay()]}`;
 
             const daySales = (Array.isArray(transactions) ? transactions : [])
                 .filter(t => {
@@ -106,7 +125,7 @@ export default function Dashboard() {
 
         for (let i = 5; i >= 0; i--) {
             const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-            const label = `${months[d.getMonth()]} ${d.getFullYear()}`;
+            const label = `${months[d.getMonth()]}`;
 
             const monthSales = (Array.isArray(transactions) ? transactions : [])
                 .filter(t => {
@@ -125,24 +144,28 @@ export default function Dashboard() {
     const maxVal = Math.max(...chartData.map(d => d.value), 1000);
 
     const stats = [
-        { id: 1, title: "Ventes du Jour", value: `${totalSalesToday.toLocaleString()} GNF`, icon: TrendingUp, color: "var(--primary-color)", increase: "+0%" },
-        { id: 2, title: "Commandes", value: todayOrdersCount.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: "+0%" },
-        { id: 3, title: "Dépenses Totales", value: `${expenses.reduce((s, e) => s + (e.amount || 0), 0).toLocaleString()} GNF`, icon: DollarSign, color: "var(--danger-color)", increase: "Global" },
-        { id: 4, title: "Stock Critique", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--warning-color)", increase: "Alertes" },
-        { id: 5, title: "Produits", value: (Array.isArray(products) ? products.length : 0).toString(), icon: Croissant, color: "var(--accent-color)", increase: "Total" },
+        { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
+        { id: 2, title: "Ventes du Jour", value: `${totalSalesToday.toLocaleString()} GNF`, icon: TrendingUp, color: "var(--success-color)", increase: "+5%" },
+        { id: 3, title: "Commandes Jour", value: todayOrdersCount.toString(), icon: ShoppingBag, color: "var(--primary-color)", increase: "+2" },
+        { id: 4, title: "Stock Critique", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
     ];
 
     const stockAlerts = products.filter(p => p.stock <= (p.min_stock || 10)).slice(0, 5);
 
     return (
-        <div className="dashboard">
+        <motion.div
+            className="dashboard"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+        >
             <div className="dashboard-header">
                 <div>
                     <h1>Tableau de bord</h1>
-                    <p>Bienvenue, voici un aperçu de vos données en temps réel.</p>
+                    <p>Voici l'analyse de votre performance aujourd'hui.</p>
                 </div>
-                <button className="btn btn-primary">
-                    <ShoppingBag size={18} />
+                <button className="btn btn-primary" onClick={() => window.location.href = '/pos'}>
+                    <DollarSign size={18} />
                     Nouvelle Vente
                 </button>
             </div>
@@ -163,7 +186,7 @@ export default function Dashboard() {
                                     <h3 className="stat-title">{stat.title}</h3>
                                     <p className="stat-value">{stat.value}</p>
                                 </div>
-                                <div className="stat-icon" style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 15%, transparent)`, color: stat.color }}>
+                                <div className="stat-icon" style={{ backgroundColor: `color-mix(in srgb, ${stat.color} 12%, transparent)`, color: stat.color }}>
                                     <Icon size={24} />
                                 </div>
                             </div>
@@ -171,7 +194,7 @@ export default function Dashboard() {
                                 <span className={`badge ${isPositive ? 'badge-success' : 'badge-danger'}`}>
                                     {stat.increase}
                                 </span>
-                                <span className="stat-compare">par rapport à hier</span>
+                                <span className="stat-compare">croissance</span>
                             </div>
                         </motion.div>
                     );
@@ -180,20 +203,20 @@ export default function Dashboard() {
 
             <div className="dashboard-content">
                 <motion.div
-                    className="chart-section card"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="chart-section card glass"
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, duration: 0.7 }}
                 >
                     <div className="section-header">
-                        <h3>Évolution des Ventes</h3>
+                        <h3>Performance Commerciale</h3>
                         <select
-                            className="date-select btn-outline"
+                            className="date-select"
                             value={viewType}
                             onChange={(e) => setViewType(e.target.value)}
                         >
-                            <option value="weekly">Cette semaine</option>
-                            <option value="monthly">Ce mois</option>
+                            <option value="weekly">Hebdomadaire</option>
+                            <option value="monthly">Mensuel</option>
                         </select>
                     </div>
                     <div className="chart-container">
@@ -201,7 +224,7 @@ export default function Dashboard() {
                             <svg viewBox="0 0 700 250" className="line-chart-svg">
                                 <defs>
                                     <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="var(--primary-color)" stopOpacity="0.3" />
+                                        <stop offset="0%" stopColor="var(--primary-color)" stopOpacity="0.4" />
                                         <stop offset="100%" stopColor="var(--primary-color)" stopOpacity="0" />
                                     </linearGradient>
                                 </defs>
@@ -225,7 +248,7 @@ export default function Dashboard() {
                                             strokeLinejoin="round"
                                             initial={{ pathLength: 0 }}
                                             animate={{ pathLength: 1 }}
-                                            transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
+                                            transition={{ duration: 1.5, delay: 0.5 }}
                                         />
 
                                         {chartData.map((d, i) => (
@@ -240,7 +263,6 @@ export default function Dashboard() {
                                                 initial={{ scale: 0 }}
                                                 animate={{ scale: 1 }}
                                                 transition={{ delay: 1 + (i * 0.1) }}
-                                                title={`${d.label}: ${d.value.toLocaleString()} GNF`}
                                             />
                                         ))}
                                     </>
@@ -255,64 +277,61 @@ export default function Dashboard() {
                     </div>
                 </motion.div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '1' }}>
-                    {stockAlerts.length > 0 && (
-                        <motion.div
-                            className="stock-alerts card"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.5, duration: 0.5 }}
-                            style={{ borderLeft: '4px solid var(--danger-color)' }}
-                        >
-                            <div className="section-header">
-                                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--danger-color)' }}>
-                                    <AlertTriangle size={20} />
-                                    Alertes de Stock
-                                </h3>
-                                <button className="btn-outline btn-small" onClick={() => window.location.href = '/inventory'}>Voir</button>
-                            </div>
-                            <ul className="alert-list" style={{ listStyle: 'none', padding: 0, margin: '1rem 0 0 0' }}>
-                                {stockAlerts.map(product => (
-                                    <li key={product.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
-                                        <span>{product.name}</span>
-                                        <span className="text-danger" style={{ fontWeight: 'bold' }}>{product.stock} restants</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </motion.div>
-                    )}
-
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     <motion.div
-                        className="recent-orders card"
-                        initial={{ opacity: 0, x: 20 }}
+                        className="top-products card glass"
+                        initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.6, duration: 0.5 }}
+                        transition={{ delay: 0.4, duration: 0.7 }}
                     >
                         <div className="section-header">
-                            <h3>Commandes Récentes</h3>
-                            <button className="btn-outline btn-small">Voir tout</button>
+                            <h3>Top 5 Produits</h3>
+                        </div>
+                        <div className="top-products-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {topProducts.map((p, i) => (
+                                <div key={i} className="product-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div className="rank" style={{ width: '28px', height: '28px', background: 'var(--primary-color)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '0.8rem' }}>
+                                        {i + 1}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '600' }}>{p.name}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{p.qty} vendus</div>
+                                    </div>
+                                    <div className="progress-bar-bg" style={{ width: '60px', height: '6px', background: 'var(--bg-secondary)', borderRadius: '10px', overflow: 'hidden' }}>
+                                        <div className="progress" style={{ width: `${(p.qty / (topProducts[0].qty || 1)) * 100}%`, height: '100%', background: 'var(--primary-color)' }}></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        className="recent-orders card glass"
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5, duration: 0.7 }}
+                    >
+                        <div className="section-header">
+                            <h3>Ventes Récentes</h3>
+                            <button className="btn-outline btn-small" onClick={() => window.location.href = '/history'}>Voir plus</button>
                         </div>
                         <ul className="order-list">
-                            {(Array.isArray(transactions) ? transactions : []).slice(0, 5).map(trx => (
-                                <li key={trx.id} className="order-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
-                                    <div>
+                            {(Array.isArray(transactions) ? transactions : []).slice(0, 4).map(trx => (
+                                <li key={trx.id} className="order-item">
+                                    <div className="order-info">
                                         <p style={{ fontWeight: 'bold' }}>{trx.trx_id}</p>
-                                        <small style={{ color: 'var(--text-secondary)' }}>{new Date(trx.date).toLocaleString()}</small>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{new Date(trx.date).toLocaleDateString()}</p>
                                     </div>
-                                    <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                                    <div className="order-price">
                                         {(trx.total_amount || 0).toLocaleString()} GNF
                                     </div>
                                 </li>
                             ))}
-                            {(Array.isArray(transactions) ? transactions.length : 0) === 0 && (
-                                <li className="order-item" style={{ justifyContent: 'center', opacity: 0.5 }}>
-                                    <p>Aucune commande récente.</p>
-                                </li>
-                            )}
                         </ul>
                     </motion.div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
+

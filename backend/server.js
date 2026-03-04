@@ -279,6 +279,45 @@ app.delete('/api/expenses/:id', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
+// --- PRODUCTION LOGS ---
+app.get('/api/production', async (req, res, next) => {
+    try {
+        const logs = await prisma.productionLog.findMany({
+            where: { user_id: req.userId },
+            orderBy: { created_at: 'desc' }
+        });
+        res.json(logs);
+    } catch (err) { next(err); }
+});
+
+app.post('/api/production', async (req, res, next) => {
+    try {
+        const result = await handleInsert(prisma.productionLog, req.body, req.userId);
+        res.json(result);
+    } catch (err) { next(err); }
+});
+
+app.put('/api/production/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const log = await prisma.productionLog.update({
+            where: { id: parseInt(id), user_id: req.userId },
+            data: req.body
+        });
+        res.json(log);
+    } catch (err) { next(err); }
+});
+
+app.delete('/api/production/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await prisma.productionLog.delete({
+            where: { id: parseInt(id), user_id: req.userId }
+        });
+        res.json({ success: true });
+    } catch (err) { next(err); }
+});
+
 // --- STATS ---
 app.get('/api/stats', async (req, res, next) => {
     try {
@@ -320,13 +359,19 @@ app.get('/api/stats', async (req, res, next) => {
             orderBy: { date: 'asc' }
         });
 
+        // 5. Production Stats
+        const productionCount = await prisma.productionLog.count({
+            where: { user_id: req.userId, status: 'Ready' }
+        });
+
         res.json({
             revenue: totalRevenue,
             expenses: totalExpenses,
             profit: totalRevenue - totalExpenses,
             stockAlerts: stockAlerts,
             recentSales: recentSales,
-            salesCount: transactions.length
+            salesCount: transactions.length,
+            productionCount: productionCount
         });
     } catch (err) { next(err); }
 });

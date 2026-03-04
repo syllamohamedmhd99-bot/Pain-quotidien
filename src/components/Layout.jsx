@@ -6,27 +6,9 @@ import { supabase } from '../supabaseClient';
 import Sidebar from './Sidebar';
 import './Layout.css';
 
-export default function Layout({ children, darkMode, toggleDarkMode, theme, setTheme, onLogout }) {
+export default function Layout({ children, darkMode, toggleDarkMode, theme, setTheme, onLogout, profile }) {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [profile, setProfile] = useState(null);
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-                if (data) setProfile(data);
-            } catch (err) {
-                console.error("Layout: Error fetching profile", err);
-            }
-        };
-        fetchProfile();
-    }, []);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -41,6 +23,7 @@ export default function Layout({ children, darkMode, toggleDarkMode, theme, setT
                 onLogout={onLogout}
                 isOpen={isMobileMenuOpen}
                 onClose={closeMobileMenu}
+                profile={profile}
             />
 
             {/* Mobile Overlay */}

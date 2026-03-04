@@ -270,16 +270,26 @@ export default function Clients() {
                                         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label>Statut</label>
-                                    <select
-                                        value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                    >
-                                        <option value="Actif">Actif</option>
-                                        <option value="Inactif">Inactif</option>
-                                        <option value="Premium">Premium</option>
-                                    </select>
+                                <div className="form-group form-row">
+                                    <div className="input-half">
+                                        <label>Statut</label>
+                                        <select
+                                            value={formData.status}
+                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        >
+                                            <option value="Actif">Actif</option>
+                                            <option value="Inactif">Inactif</option>
+                                            <option value="Premium">Premium</option>
+                                        </select>
+                                    </div>
+                                    <div className="input-half">
+                                        <label>Points cumulés</label>
+                                        <input
+                                            type="number"
+                                            value={formData.points}
+                                            onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) || 0 })}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="modal-actions">
                                     <button type="button" className="btn btn-outline" onClick={handleCloseModal}>Annuler</button>

@@ -10,6 +10,8 @@ const posCategories = ["Tous", "Pains", "Viennoiseries", "Pâtisseries", "Boisso
 export default function POS() {
     const navigate = useNavigate();
     const [posProducts, setPosProducts] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [selectedClientId, setSelectedClientId] = useState("");
     const [cart, setCart] = useState([]);
     const [filter, setFilter] = useState("Tous");
     const [searchTerm, setSearchTerm] = useState("");
@@ -17,22 +19,22 @@ export default function POS() {
     const [isCheckout, setIsCheckout] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const { data, error } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('name');
-                if (error) throw error;
-                setPosProducts(data || []);
+                const [prodRes, clientRes] = await Promise.all([
+                    supabase.from('products').select('*').order('name'),
+                    supabase.from('clients').select('*').order('name')
+                ]);
+                if (prodRes.data) setPosProducts(prodRes.data);
+                if (clientRes.data) setClients(clientRes.data);
             } catch (error) {
-                console.error("Failed to fetch pos products:", error);
+                console.error("Failed to fetch pos data:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProducts();
+        fetchData();
     }, []);
 
     const filteredProducts = posProducts.filter(p => {
@@ -63,7 +65,10 @@ export default function POS() {
 
     const removeFromCart = (id) => setCart(prev => prev.filter(item => item.id !== id));
 
-    const clearCart = () => setCart([]);
+    const clearCart = () => {
+        setCart([]);
+        setSelectedClientId("");
+    };
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     const grandTotal = total;
@@ -84,7 +89,8 @@ export default function POS() {
                     total_amount: grandTotal,
                     tax: 0,
                     status: "Succès",
-                    description: `Achat en caisse`
+                    description: `Achat en caisse`,
+                    client_id: selectedClientId || null
                 }])
                 .select()
                 .single();
@@ -105,13 +111,29 @@ export default function POS() {
 
             if (itemsError) throw itemsError;
 
-            if (window.confirm(`Paiement de ${grandTotal.toLocaleString('fr-FR')} GNF validé avec succès !\n\nVoulez-vous imprimer la facture ?`)) {
+            // 3. Update Loyalty Points (1 point per 1000 GNF)
+            if (selectedClientId) {
+                const pointsEarned = Math.floor(grandTotal / 1000);
+                if (pointsEarned > 0) {
+                    const client = clients.find(c => c.id === parseInt(selectedClientId));
+                    await supabase
+                        .from('clients')
+                        .update({ points: (client.points || 0) + pointsEarned })
+                        .eq('id', selectedClientId);
+
+                    alert(`Paiement validé ! +${pointsEarned} points de fidélité ajoutés.`);
+                }
+            } else {
+                alert(`Paiement de ${grandTotal.toLocaleString('fr-FR')} GNF validé avec succès !`);
+            }
+
+            if (window.confirm("Voulez-vous imprimer la facture ?")) {
                 navigate(`/invoice/${trxData.id}`);
             }
 
             clearCart();
 
-            // Re-fetch products to update stock in UI (triggers will have updated it in DB)
+            // Re-fetch products to update stock in UI
             const { data: updatedProducts } = await supabase.from('products').select('*');
             if (updatedProducts) setPosProducts(updatedProducts);
 
@@ -183,6 +205,21 @@ export default function POS() {
                     <span className="cart-count badge badge-warning">{cart.reduce((sum, item) => sum + item.qty, 0)} items</span>
                 </div>
 
+                {/* Client Selection */}
+                <div className="client-selector" style={{ padding: '0 1.5rem 1rem' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>CLIENT (FIDÉLITÉ)</label>
+                    <select
+                        value={selectedClientId}
+                        onChange={(e) => setSelectedClientId(e.target.value)}
+                        style={{ width: '100%', padding: '0.7rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                    >
+                        <option value="">Client de passage</option>
+                        {clients.map(c => (
+                            <option key={c.id} value={c.id}>{c.name} ({c.points || 0} pts)</option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="cart-items-container">
                     {cart.length === 0 ? (
                         <div className="empty-cart">
@@ -244,3 +281,4 @@ export default function POS() {
         </div>
     );
 }
+

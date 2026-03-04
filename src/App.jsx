@@ -12,6 +12,8 @@ import Invoices from './pages/Invoices';
 import CreateInvoice from './pages/CreateInvoice';
 import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
+import Production from './pages/Production';
+import UsersManagement from './pages/UsersManagement';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -19,19 +21,46 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [theme, setTheme] = useState('default'); // 'default', 'matcha', 'ocean', 'berry'
   const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (data) setProfile(data);
+    } catch (error) {
+      console.error("Error fetching profile in App:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check active session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false);
+      if (session) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
+        if (session) {
+          fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+          setLoading(false);
+        }
       }
     );
 
@@ -57,6 +86,8 @@ function App() {
     return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>Chargement...</div>;
   }
 
+  const isAdmin = profile?.role === 'Administrateur';
+
   return (
     <Router>
       <Routes>
@@ -68,7 +99,7 @@ function App() {
         {/* All other pages wrapped in Layout */}
         <Route path="/*" element={
           session ? (
-            <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout}>
+            <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout} profile={profile}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/pos" element={<POS />} />
@@ -76,11 +107,15 @@ function App() {
                 <Route path="/clients" element={<Clients />} />
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/history" element={<History />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<Profile session={session} />} />
                 <Route path="/expenses" element={<Expenses />} />
+                <Route path="/production" element={<Production />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<CreateInvoice />} />
                 <Route path="/invoice/:id" element={<Invoice />} />
+
+                {/* Admin Only Routes */}
+                <Route path="/users" element={isAdmin ? <UsersManagement /> : <Navigate to="/" />} />
               </Routes>
             </Layout>
           ) : (
