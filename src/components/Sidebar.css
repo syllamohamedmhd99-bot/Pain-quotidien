@@ -224,11 +224,15 @@
         left: -100%;
         top: 0;
         bottom: 0;
+        width: 280px;
         height: 100vh;
         z-index: 1000;
         margin: 0;
         border-radius: 0;
         transition: left 0.3s ease;
+        background-color: var(--bg-color);
+        /* solid background */
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar.open {
@@ -236,6 +240,9 @@
     }
 
     .close-sidebar-btn {
-        display: block !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
     }
 }

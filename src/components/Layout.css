@@ -93,6 +93,10 @@
     height: 100%;
 }
 
+.mobile-menu-btn {
+    display: none;
+}
+
 /* --- Mobile Responsiveness --- */
 @media (max-width: 1024px) {
     .main-content {
@@ -110,5 +114,9 @@
 
     .search-input {
         width: 100%;
+    }
+
+    .mobile-menu-btn {
+        display: flex !important;
     }
 }

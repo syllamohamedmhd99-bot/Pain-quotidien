@@ -42,11 +42,11 @@ export default function Layout({ children, darkMode, toggleDarkMode, theme, setT
                 <header className="topbar glass">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
                         <button
-                            className="mobile-menu-btn"
+                            className="mobile-menu-btn btn btn-primary"
                             onClick={toggleMobileMenu}
-                            style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', display: 'none' }}
                         >
-                            <Menu size={24} />
+                            <Menu size={20} />
+                            <span>Menu</span>
                         </button>
                         <div className="topbar-search" style={{ flex: 1 }}>
                             <input type="text" placeholder="Rechercher des produits, commandes..." className="search-input" />
