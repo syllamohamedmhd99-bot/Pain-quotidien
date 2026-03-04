@@ -11,20 +11,33 @@ import Invoice from './pages/Invoice';
 import Invoices from './pages/Invoices';
 import CreateInvoice from './pages/CreateInvoice';
 import { useEffect, useState } from 'react';
+import { supabase } from './supabaseClient';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [theme, setTheme] = useState('default'); // 'default', 'matcha', 'ocean', 'berry'
-  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('isAuthenticated') === 'true');
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogin = () => {
-    localStorage.setItem('isAuthenticated', 'true');
-    setIsAuthenticated(true);
-  };
+  useEffect(() => {
+    // Check active session on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    setIsAuthenticated(false);
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   useEffect(() => {
@@ -38,17 +51,21 @@ function App() {
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
+  if (loading) {
+    return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>Chargement...</div>;
+  }
+
   return (
     <Router>
       <Routes>
         {/* Full screen auth page without Layout */}
         <Route path="/auth" element={
-          !isAuthenticated ? <Auth onLogin={handleLogin} /> : <Navigate to="/" />
+          !session ? <Auth onLogin={() => { }} /> : <Navigate to="/" />
         } />
 
         {/* All other pages wrapped in Layout */}
         <Route path="/*" element={
-          isAuthenticated ? (
+          session ? (
             <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />

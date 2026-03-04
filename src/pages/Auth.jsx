@@ -2,20 +2,56 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, LogIn, UserPlus, Croissant } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import './Auth.css';
 
 export default function Auth({ onLogin }) {
     const [isLogin, setIsLogin] = useState(true);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
     const navigate = useNavigate();
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
+        setErrorMsg('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onLogin();
-        navigate('/');
+        setLoading(true);
+        setErrorMsg('');
+
+        try {
+            if (isLogin) {
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (error) throw error;
+                // session is handled by onAuthStateChange in App.jsx
+                navigate('/');
+            } else {
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                        }
+                    }
+                });
+                if (error) throw error;
+                alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                setIsLogin(true);
+            }
+        } catch (error) {
+            setErrorMsg(error.message || 'Une erreur est survenue');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Animation variants for the form container
@@ -101,6 +137,16 @@ export default function Auth({ onLogin }) {
                     </p>
                 </div>
 
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{ color: 'var(--danger-color)', backgroundColor: 'color-mix(in srgb, var(--danger-color) 10%, transparent)', padding: '0.8rem', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center', fontSize: '0.9rem' }}
+                    >
+                        {errorMsg}
+                    </motion.div>
+                )}
+
                 <AnimatePresence mode="wait">
                     <motion.form
                         key={isLogin ? 'login-form' : 'register-form'}
@@ -119,6 +165,8 @@ export default function Auth({ onLogin }) {
                                     className="auth-input"
                                     placeholder="Nom complet"
                                     required
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
                                 />
                             </div>
                         )}
@@ -130,6 +178,8 @@ export default function Auth({ onLogin }) {
                                 className="auth-input"
                                 placeholder="Adresse email"
                                 required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
 
@@ -140,6 +190,8 @@ export default function Auth({ onLogin }) {
                                 className="auth-input"
                                 placeholder="Mot de passe"
                                 required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
 
@@ -152,9 +204,10 @@ export default function Auth({ onLogin }) {
                             className="auth-submit"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
+                            disabled={loading}
                         >
                             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                {isLogin ? (
+                                {loading ? 'Chargement...' : isLogin ? (
                                     <><LogIn size={20} /> Se connecter</>
                                 ) : (
                                     <><UserPlus size={20} /> S'inscrire</>
