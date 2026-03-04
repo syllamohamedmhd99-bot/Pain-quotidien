@@ -1,0 +1,326 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Font Families */
+  --font-primary: 'Outfit', sans-serif;
+
+  /* Light Theme Colors (Bakery Inspired) */
+  --bg-color: #fdfbf7;
+  --bg-secondary: #f4ecdf;
+  --text-primary: #2d241d;
+  --text-secondary: #5a4b3c;
+
+  --primary-color: #d4a373;
+  /* Golden Wheat */
+  --primary-hover: #b88656;
+  --secondary-color: #faedcd;
+  /* Cream */
+  --accent-color: #ccd5ae;
+  /* Match Green / Sage */
+
+  --danger-color: #e07a5f;
+  /* Terracotta red */
+  --success-color: #81b29a;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(253, 251, 247, 0.7);
+  --glass-border: rgba(212, 163, 115, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(45, 36, 29, 0.05);
+
+  --card-bg: #ffffff;
+  --border-color: #eaddcf;
+
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Dark Mode Theme */
+.dark {
+  --bg-color: #1a1614;
+  --bg-secondary: #26211e;
+  --text-primary: #fdfbf7;
+  --text-secondary: #c9b9a8;
+
+  --primary-color: #e6b981;
+  --primary-hover: #f0c999;
+  --secondary-color: #382e25;
+  --accent-color: #9cb071;
+
+  --danger-color: #f28b72;
+  --success-color: #94c4ab;
+
+  --glass-bg: rgba(26, 22, 20, 0.7);
+  --glass-border: rgba(230, 185, 129, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+  --card-bg: #221d1a;
+  --border-color: #382e25;
+}
+
+/* Theme: Matcha Green */
+.theme-matcha {
+  --primary-color: #8da47e;
+  --primary-hover: #7b916c;
+  --bg-color: #f5f8f3;
+  --glass-border: rgba(141, 164, 126, 0.2);
+}
+
+.dark.theme-matcha {
+  --primary-color: #9cb071;
+  --primary-hover: #b0c289;
+  --bg-color: #1a1e19;
+  --glass-border: rgba(156, 176, 113, 0.1);
+}
+
+/* Theme: Ocean Blue */
+.theme-ocean {
+  --primary-color: #6096b4;
+  --primary-hover: #4e829e;
+  --bg-color: #f2f7f9;
+  --glass-border: rgba(96, 150, 180, 0.2);
+}
+
+.dark.theme-ocean {
+  --primary-color: #72a8c6;
+  --primary-hover: #8dbbda;
+  --bg-color: #161c20;
+  --glass-border: rgba(114, 168, 198, 0.1);
+}
+
+/* Theme: Berry Purple */
+.theme-berry {
+  --primary-color: #9a7197;
+  --primary-hover: #855e81;
+  --bg-color: #f8f4f8;
+  --glass-border: rgba(154, 113, 151, 0.2);
+}
+
+.dark.theme-berry {
+  --primary-color: #ad84aa;
+  --primary-hover: #c49ec0;
+  --bg-color: #1a161a;
+  --glass-border: rgba(173, 132, 170, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* Utilitaires Premium */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: var(--transition-smooth);
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  border: none;
+  transition: var(--transition-smooth);
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(212, 163, 115, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(212, 163, 115, 0.4);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: color-mix(in srgb, var(--secondary-color) 90%, black);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  background-color: var(--bg-secondary);
+}
+
+/* Status Badges */
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: color-mix(in srgb, var(--success-color) 20%, transparent);
+  color: var(--success-color);
+}
+
+.badge-warning {
+  background-color: color-mix(in srgb, var(--primary-color) 20%, transparent);
+  color: var(--primary-color);
+}
+
+.badge-danger {
+  background-color: color-mix(in srgb, var(--danger-color) 20%, transparent);
+  color: var(--danger-color);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Print Styles */
+@media print {
+
+  .sidebar,
+  .topbar,
+  .btn,
+  .btn-icon,
+  .action-btn,
+  .crm-controls,
+  .inventory-controls,
+  .close-btn,
+  .modal-overlay,
+  .modal-actions,
+  .search-box,
+  button {
+    display: none !important;
+  }
+
+  .app-layout {
+    display: block !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .page-container {
+    padding: 0 !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #eee !important;
+    margin-bottom: 20px !important;
+    break-inside: avoid;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: black !important;
+  }
+
+  .inventory-grid,
+  .crm-grid {
+    display: block !important;
+  }
+
+  .inventory-card,
+  .crm-card {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    border: 1px solid #ccc !important;
+  }
+}

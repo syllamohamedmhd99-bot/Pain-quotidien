@@ -1,0 +1,179 @@
+.create-invoice-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    padding: 0;
+}
+
+.invoice-form {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.8rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.items-table th {
+    text-align: left;
+    padding: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.items-table td {
+    padding: 0.5rem 1rem;
+}
+
+.items-table input {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.item-total {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.btn-remove {
+    background-color: color-mix(in srgb, var(--danger-color) 10%, transparent);
+    color: var(--danger-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-remove:hover:not(:disabled) {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-remove:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-add-item {
+    align-self: flex-start;
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-color);
+}
+
+.totals-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.total-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.grand-total {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    font-weight: 800;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+
+@media (max-width: 768px) {
+    .invoice-form {
+        padding: 1.5rem;
+    }
+
+    .form-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2rem;
+    }
+
+    .items-table th:nth-child(3),
+    .items-table td:nth-child(3),
+    .items-table th:nth-child(4),
+    .items-table td:nth-child(4) {
+        display: none;
+    }
+}

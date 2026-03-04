@@ -1,0 +1,174 @@
+.invoice-view {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+.invoice-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.invoice-paper {
+    padding: 3rem;
+    background: white;
+    color: #2d241d;
+    box-shadow: var(--glass-shadow);
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #f4ecdf;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand-logo {
+    font-size: 3rem;
+}
+
+.brand h1 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.invoice-meta {
+    text-align: right;
+}
+
+.invoice-meta h2 {
+    font-size: 2rem;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    color: #888;
+}
+
+.invoice-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.info-block h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #888;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 3rem;
+}
+
+.invoice-table th {
+    background: #fdfbf7;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #eee;
+    font-size: 0.9rem;
+}
+
+.invoice-table td {
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.invoice-total {
+    margin-left: auto;
+    width: 300px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.grand-total {
+    border-bottom: none;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding-top: 1.5rem;
+}
+
+.invoice-footer {
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    position: relative;
+}
+
+.invoice-stamp {
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    transform: rotate(-15deg);
+    border: 3px solid var(--success-color);
+    color: var(--success-color);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 900;
+    opacity: 0.6;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .invoice-view {
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .app-layout {
+        display: block !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .invoice-paper {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    body {
+        background: white;
+    }
+}

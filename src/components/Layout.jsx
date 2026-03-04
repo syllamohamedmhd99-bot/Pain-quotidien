@@ -1,0 +1,46 @@
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import './Layout.css';
+
+export default function Layout({ children, darkMode, toggleDarkMode, theme, setTheme, onLogout }) {
+    const location = useLocation();
+
+    return (
+        <div className="app-layout">
+            <Sidebar darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={onLogout} />
+
+            <main className="main-content">
+                <header className="topbar glass">
+                    <div className="topbar-search">
+                        <input type="text" placeholder="Rechercher des produits, commandes..." className="search-input" />
+                    </div>
+                    <div className="topbar-actions">
+                        <div className="user-profile">
+                            <div className="avatar">A</div>
+                            <div className="user-info">
+                                <span className="user-name">Admin</span>
+                                <span className="user-role">Gérant</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="page-container">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={location.pathname}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="page-content"
+                        >
+                            {children}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </main>
+        </div>
+    );
+}
