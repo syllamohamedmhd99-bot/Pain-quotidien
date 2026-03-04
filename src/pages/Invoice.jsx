@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Printer, ArrowLeft, Receipt } from 'lucide-react';
+import { Printer, ArrowLeft, Receipt, Download, Share2 } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 import './Invoice.css';
 
 export default function Invoice() {
@@ -53,21 +54,58 @@ export default function Invoice() {
         window.print();
     };
 
+    const handleDownloadPDF = () => {
+        const element = document.getElementById('invoice-content');
+        const opt = {
+            margin: 10,
+            filename: `Facture_${transaction.trx_id}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    };
+
+    const handleShare = async () => {
+        const textMessage = `*Facture Pain Quotidien*\nN°: ${transaction.trx_id}\nTotal: ${transaction.total_amount.toLocaleString()} GNF\nDate: ${new Date(transaction.date).toLocaleDateString('fr-FR')}\n\nMerci de votre confiance !`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Facture ${transaction.trx_id}`,
+                    text: textMessage,
+                });
+            } catch (err) {
+                console.error("Partage annulé ou échoué:", err);
+            }
+        } else {
+            alert("Votre navigateur ne supporte pas le partage direct. Vous pouvez télécharger la facture en PDF pour l'envoyer.");
+        }
+    };
+
     if (loading) return <div className="loading">Chargement de la facture...</div>;
     if (!transaction) return <div className="error">Facture non trouvée.</div>;
 
     return (
         <div className="invoice-view">
-            <div className="invoice-actions no-print">
+            <div className="invoice-actions no-print" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 <button className="btn btn-outline" onClick={() => navigate(-1)}>
                     <ArrowLeft size={18} /> Retour
                 </button>
-                <button className="btn btn-primary" onClick={handlePrint}>
-                    <Printer size={18} /> Imprimer la Facture
-                </button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+                    <button className="btn btn-outline" onClick={handleShare} title="Envoyer par WhatsApp, Email, etc.">
+                        <Share2 size={18} /> Envoyer
+                    </button>
+                    <button className="btn btn-outline" onClick={handleDownloadPDF} title="Télécharger en PDF">
+                        <Download size={18} /> Télécharger
+                    </button>
+                    <button className="btn btn-primary" onClick={handlePrint} title="Imprimer">
+                        <Printer size={18} /> Imprimer
+                    </button>
+                </div>
             </div>
 
-            <div className="invoice-paper card glass">
+            <div className="invoice-paper card glass" id="invoice-content">
                 <div className="invoice-header">
                     <div className="brand">
                         <div className="brand-logo">🥖</div>
