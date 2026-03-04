@@ -1,13 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 import Sidebar from './Sidebar';
 import './Layout.css';
 
 export default function Layout({ children, darkMode, toggleDarkMode, theme, setTheme, onLogout }) {
     const location = useLocation();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error;
+                if (data) setProfile(data);
+            } catch (err) {
+                console.error("Layout: Error fetching profile", err);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -53,13 +72,17 @@ export default function Layout({ children, darkMode, toggleDarkMode, theme, setT
                         </div>
                     </div>
                     <div className="topbar-actions">
-                        <div className="user-profile">
-                            <div className="avatar">A</div>
+                        <Link to="/profile" className="user-profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            {profile?.avatar_url ? (
+                                <img src={profile.avatar_url} alt="Avatar" className="avatar" style={{ objectFit: 'cover' }} />
+                            ) : (
+                                <div className="avatar">{profile?.full_name?.[0] || profile?.user_id?.[0]?.toUpperCase() || 'A'}</div>
+                            )}
                             <div className="user-info">
-                                <span className="user-name">Admin</span>
-                                <span className="user-role">Gérant</span>
+                                <span className="user-name">{profile?.full_name || 'Utilisateur'}</span>
+                                <span className="user-role">{profile?.role || 'Gérant'}</span>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </header>
 

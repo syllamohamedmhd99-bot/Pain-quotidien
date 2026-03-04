@@ -10,6 +10,8 @@ import Auth from './pages/Auth';
 import Invoice from './pages/Invoice';
 import Invoices from './pages/Invoices';
 import CreateInvoice from './pages/CreateInvoice';
+import Profile from './pages/Profile';
+import Expenses from './pages/Expenses';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -74,6 +76,8 @@ function App() {
                 <Route path="/clients" element={<Clients />} />
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/history" element={<History />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/expenses" element={<Expenses />} />
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<CreateInvoice />} />
                 <Route path="/invoice/:id" element={<Invoice />} />

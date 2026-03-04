@@ -18,9 +18,10 @@ export default function Inventory() {
     const [editingProduct, setEditingProduct] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
-        category: "Pains",
+        category: "Pain", // Changed from "Pains" to "Pain"
         price: "",
         stock: "",
+        min_stock: 10, // Added min_stock
         status: "En stock",
         image: ""
     });
@@ -75,8 +76,9 @@ export default function Inventory() {
             setFormData({
                 name: product.name,
                 category: product.category,
-                price: product.price,
-                stock: product.stock,
+                price: parseFloat(product.price), // Parse to float
+                stock: parseInt(product.stock), // Parse to int
+                min_stock: parseInt(product.min_stock || 10), // Parse to int, default to 10
                 status: product.status,
                 image: product.image || ""
             });
@@ -84,9 +86,10 @@ export default function Inventory() {
             setEditingProduct(null);
             setFormData({
                 name: "",
-                category: "Pains",
+                category: "Pain", // Changed from "Pains" to "Pain"
                 price: "",
                 stock: "",
+                min_stock: 10, // Default for new product
                 status: "En stock",
                 image: ""
             });
@@ -117,6 +120,7 @@ export default function Inventory() {
             ...formData,
             price: Number(formData.price),
             stock: Number(formData.stock),
+            min_stock: Number(formData.min_stock), // Include min_stock in payload
             updated_at: new Date().toISOString()
         };
 
@@ -209,17 +213,15 @@ export default function Inventory() {
                         >
                             <div className="product-image">
                                 <img src={product.image || "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400"} alt={product.name} />
-                                <span className={`status-pill ${product.status === "En stock" ? "status-success" :
-                                    product.status === "Faible" ? "status-warning" : "status-danger"
-                                    }`}>
-                                    {product.status}
+                                <span className={`status-pill ${product.stock <= 0 ? 'status-danger' : (product.stock <= product.min_stock ? 'status-warning' : 'status-success')}`}>
+                                    {product.stock <= 0 ? 'Rupture' : (product.stock <= product.min_stock ? 'Stock Faible' : 'En stock')}
                                 </span>
                             </div>
 
                             <div className="product-info">
                                 <div className="product-meta">
                                     <span className="product-category">{product.category}</span>
-                                    <div className="product-actions">
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button className="action-btn" onClick={() => handleOpenModal(product)}><Edit2 size={16} /></button>
                                         <button className="action-btn delete-action" onClick={() => handleDelete(product.id)}><Trash2 size={16} /></button>
                                     </div>
@@ -230,8 +232,10 @@ export default function Inventory() {
                                 <div className="product-details">
                                     <div className="price-tag">{product.price.toLocaleString('fr-FR')} GNF</div>
                                     <div className="stock-info">
-                                        <span className="stock-label">Stock:</span>
-                                        <span className="stock-count">{product.stock}</span>
+                                        <span className="stock-label">Stock disponible</span>
+                                        <span className={`stock-count ${product.stock <= product.min_stock ? 'text-danger' : ''}`}>
+                                            {product.stock} {product.category === 'Pain' ? 'unités' : 'kg'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -292,6 +296,15 @@ export default function Inventory() {
                                     </div>
                                 </div>
                                 <div className="form-group form-row">
+                                    <div className="input-half">
+                                        <label>Seuil d'alerte (Min)</label>
+                                        <input
+                                            type="number"
+                                            required
+                                            value={formData.min_stock}
+                                            onChange={(e) => setFormData({ ...formData, min_stock: e.target.value })}
+                                        />
+                                    </div>
                                     <div className="input-half">
                                         <label>Catégorie</label>
                                         <select

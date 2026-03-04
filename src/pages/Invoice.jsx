@@ -100,26 +100,28 @@ export default function Invoice() {
                     )}
                 </div>
 
-                <table className="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Désignation</th>
-                            <th className="text-right">Prix Unitaire</th>
-                            <th className="text-center">Qté</th>
-                            <th className="text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, idx) => (
-                            <tr key={idx}>
-                                <td>{item.products?.name || "Produit inconnu"}</td>
-                                <td className="text-right">{item.unit_price.toLocaleString()} GNF</td>
-                                <td className="text-center">{item.quantity}</td>
-                                <td className="text-right">{(item.unit_price * item.quantity).toLocaleString()} GNF</td>
+                <div className="table-responsive">
+                    <table className="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Désignation</th>
+                                <th className="text-right">Prix Unitaire</th>
+                                <th className="text-center">Qté</th>
+                                <th className="text-right">Total</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {items.map((item, idx) => (
+                                <tr key={idx}>
+                                    <td>{item.products?.name || "Produit inconnu"}</td>
+                                    <td className="text-right">{item.unit_price.toLocaleString()} GNF</td>
+                                    <td className="text-center">{item.quantity}</td>
+                                    <td className="text-right">{(item.unit_price * item.quantity).toLocaleString()} GNF</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
                 <div className="invoice-total">
                     <div className="total-row">

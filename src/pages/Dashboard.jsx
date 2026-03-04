@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ShoppingBag, TrendingUp, Croissant, Users, Truck } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Croissant, Users, Truck, AlertTriangle, ArrowRight, DollarSign } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import './Dashboard.css';
@@ -24,6 +24,7 @@ export default function Dashboard() {
     const [clients, setClients] = useState([]);
     const [products, setProducts] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
+    const [expenses, setExpenses] = useState([]);
     const [viewType, setViewType] = useState('weekly'); // 'weekly' or 'monthly'
 
     useEffect(() => {
@@ -33,13 +34,15 @@ export default function Dashboard() {
                     supabase.from('transactions').select('*'),
                     supabase.from('clients').select('*'),
                     supabase.from('products').select('*'),
-                    supabase.from('suppliers').select('*')
+                    supabase.from('suppliers').select('*'),
+                    supabase.from('expenses').select('*')
                 ]);
 
                 if (trxRes.data) setTransactions(trxRes.data);
                 if (clientRes.data) setClients(clientRes.data);
                 if (prodRes.data) setProducts(prodRes.data);
                 if (suppRes.data) setSuppliers(suppRes.data);
+                if (expensesRes.data) setExpenses(expensesRes.data);
             } catch (error) {
                 console.error("Erreur de récupération des données:", error);
             }
@@ -124,10 +127,12 @@ export default function Dashboard() {
     const stats = [
         { id: 1, title: "Ventes du Jour", value: `${totalSalesToday.toLocaleString()} GNF`, icon: TrendingUp, color: "var(--primary-color)", increase: "+0%" },
         { id: 2, title: "Commandes", value: todayOrdersCount.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: "+0%" },
-        { id: 3, title: "Produits en Stock", value: totalStock.toString(), icon: Croissant, color: "var(--accent-color)", increase: "+0%" },
-        { id: 4, title: "Nouveaux Clients", value: newClientsToday.toString(), icon: Users, color: "var(--danger-color)", increase: "+0%" },
-        { id: 5, title: "Fournisseurs", value: (Array.isArray(suppliers) ? suppliers.length : 0).toString(), icon: Truck, color: "var(--warning-color)", increase: "+0%" }
+        { id: 3, title: "Dépenses Totales", value: `${expenses.reduce((s, e) => s + (e.amount || 0), 0).toLocaleString()} GNF`, icon: DollarSign, color: "var(--danger-color)", increase: "Global" },
+        { id: 4, title: "Stock Critique", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--warning-color)", increase: "Alertes" },
+        { id: 5, title: "Produits", value: (Array.isArray(products) ? products.length : 0).toString(), icon: Croissant, color: "var(--accent-color)", increase: "Total" },
     ];
+
+    const stockAlerts = products.filter(p => p.stock <= (p.min_stock || 10)).slice(0, 5);
 
     return (
         <div className="dashboard">
@@ -203,7 +208,6 @@ export default function Dashboard() {
 
                                 {chartData.length > 1 && (
                                     <>
-                                        {/* Area under the curve */}
                                         <motion.path
                                             d={`M 0 250 ${chartData.map((d, i) => `L ${(i * (700 / (chartData.length - 1)))} ${250 - (d.value / (maxVal || 1) * 200)}`).join(' ')} L 700 250 Z`}
                                             fill="url(#chartGradient)"
@@ -212,7 +216,6 @@ export default function Dashboard() {
                                             transition={{ duration: 1, delay: 0.5 }}
                                         />
 
-                                        {/* The line curve */}
                                         <motion.path
                                             d={`M 0 ${250 - (chartData[0].value / (maxVal || 1) * 200)} ${chartData.map((d, i) => `L ${(i * (700 / (chartData.length - 1)))} ${250 - (d.value / (maxVal || 1) * 200)}`).join(' ')}`}
                                             fill="none"
@@ -225,7 +228,6 @@ export default function Dashboard() {
                                             transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
                                         />
 
-                                        {/* Data points */}
                                         {chartData.map((d, i) => (
                                             <motion.circle
                                                 key={i}
@@ -253,35 +255,63 @@ export default function Dashboard() {
                     </div>
                 </motion.div>
 
-                <motion.div
-                    className="recent-orders card"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6, duration: 0.5 }}
-                >
-                    <div className="section-header">
-                        <h3>Commandes Récentes</h3>
-                        <button className="btn-outline btn-small">Voir tout</button>
-                    </div>
-                    <ul className="order-list">
-                        {(Array.isArray(transactions) ? transactions : []).slice(0, 5).map(trx => (
-                            <li key={trx.id} className="order-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
-                                <div>
-                                    <p style={{ fontWeight: 'bold' }}>{trx.trx_id}</p>
-                                    <small style={{ color: 'var(--text-color-light)' }}>{new Date(trx.date).toLocaleString()}</small>
-                                </div>
-                                <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                                    {(trx.total_amount || 0).toLocaleString()} GNF
-                                </div>
-                            </li>
-                        ))}
-                        {(Array.isArray(transactions) ? transactions.length : 0) === 0 && (
-                            <li className="order-item" style={{ justifyContent: 'center', opacity: 0.5 }}>
-                                <p>Aucune commande récente.</p>
-                            </li>
-                        )}
-                    </ul>
-                </motion.div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '1' }}>
+                    {stockAlerts.length > 0 && (
+                        <motion.div
+                            className="stock-alerts card"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5, duration: 0.5 }}
+                            style={{ borderLeft: '4px solid var(--danger-color)' }}
+                        >
+                            <div className="section-header">
+                                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--danger-color)' }}>
+                                    <AlertTriangle size={20} />
+                                    Alertes de Stock
+                                </h3>
+                                <button className="btn-outline btn-small" onClick={() => window.location.href = '/inventory'}>Voir</button>
+                            </div>
+                            <ul className="alert-list" style={{ listStyle: 'none', padding: 0, margin: '1rem 0 0 0' }}>
+                                {stockAlerts.map(product => (
+                                    <li key={product.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
+                                        <span>{product.name}</span>
+                                        <span className="text-danger" style={{ fontWeight: 'bold' }}>{product.stock} restants</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+                    )}
+
+                    <motion.div
+                        className="recent-orders card"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6, duration: 0.5 }}
+                    >
+                        <div className="section-header">
+                            <h3>Commandes Récentes</h3>
+                            <button className="btn-outline btn-small">Voir tout</button>
+                        </div>
+                        <ul className="order-list">
+                            {(Array.isArray(transactions) ? transactions : []).slice(0, 5).map(trx => (
+                                <li key={trx.id} className="order-item" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
+                                    <div>
+                                        <p style={{ fontWeight: 'bold' }}>{trx.trx_id}</p>
+                                        <small style={{ color: 'var(--text-secondary)' }}>{new Date(trx.date).toLocaleString()}</small>
+                                    </div>
+                                    <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                                        {(trx.total_amount || 0).toLocaleString()} GNF
+                                    </div>
+                                </li>
+                            ))}
+                            {(Array.isArray(transactions) ? transactions.length : 0) === 0 && (
+                                <li className="order-item" style={{ justifyContent: 'center', opacity: 0.5 }}>
+                                    <p>Aucune commande récente.</p>
+                                </li>
+                            )}
+                        </ul>
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

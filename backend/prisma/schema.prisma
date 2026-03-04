@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Product {
+  id          Int               @id @default(autoincrement())
+  name        String
+  category    String
+  price       Float
+  stock       Int
+  min_stock   Int               @default(10)
+  status      String
+  image       String?
+  user_id     String            @default("admin@boulangerie.local")
+  updated_at  DateTime          @default(now())
+  items       TransactionItem[]
+
+  @@map("products")
+}
+
+model Client {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+  status       String        @default("Actif")
+  user_id      String        @default("admin@boulangerie.local")
+  updated_at   DateTime      @default(now())
+  transactions Transaction[]
+
+  @@map("clients")
+}
+
+model Supplier {
+  id         Int       @id @default(autoincrement())
+  name       String
+  type       String
+  email      String?
+  phone      String?
+  rating     Float     @default(5.0)
+  status     String    @default("Actif")
+  user_id    String    @default("admin@boulangerie.local")
+  updated_at DateTime  @default(now())
+  expenses   Expense[]
+
+  @@map("suppliers")
+}
+
+model Transaction {
+  id           Int               @id @default(autoincrement())
+  trx_id       String            @unique
+  type         String
+  total_amount Float
+  tax          Float             @default(0)
+  status       String
+  description  String?
+  user_id      String            @default("admin@boulangerie.local")
+  date         DateTime          @default(now())
+  client_id    Int?
+  client       Client?           @relation(fields: [client_id], references: [id])
+  items        TransactionItem[]
+
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id             Int         @id @default(autoincrement())
+  transaction_id Int
+  product_id     Int
+  quantity       Int
+  unit_price     Float
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  product        Product     @relation(fields: [product_id], references: [id])
+
+  @@map("transaction_items")
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  user_id    String   @unique
+  full_name  String?
+  avatar_url String?
+  role       String   @default("Administrateur")
+  updated_at DateTime @default(now())
+
+  @@map("profiles")
+}
+
+model Expense {
+  id          Int       @id @default(autoincrement())
+  category    String
+  amount      Float
+  date        DateTime  @default(now())
+  description String?
+  supplier_id Int?
+  user_id     String    @default("admin@boulangerie.local")
+  supplier    Supplier? @relation(fields: [supplier_id], references: [id])
+
+  @@map("expenses")
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet } from 'lucide-react';
 import './Sidebar.css';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
     { name: 'Inventaire', path: '/inventory', icon: Wheat },
     { name: 'Clients', path: '/clients', icon: Users },
     { name: 'Fournisseurs', path: '/suppliers', icon: Truck },
+    { name: 'Dépenses', path: '/expenses', icon: Wallet },
     {
         name: 'Facturation',
         path: '/invoices',
@@ -19,6 +20,7 @@ const navItems = [
             { name: 'Créer Facture', path: '/invoices/new' },
         ]
     },
+    { name: 'Mon Profil', path: '/profile', icon: User },
     { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
 ];
 
