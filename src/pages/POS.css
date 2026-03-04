@@ -301,3 +301,29 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 1024px) {
+    .pos-layout {
+        flex-direction: column;
+        height: auto;
+        gap: 1rem;
+        overflow: visible;
+    }
+
+    .pos-products-section {
+        overflow: visible;
+    }
+
+    .pos-grid {
+        overflow-y: visible;
+        padding-bottom: 1rem;
+    }
+
+    .pos-cart-section {
+        width: 100%;
+        height: auto;
+        min-height: 400px;
+        /* give it some height since it is now stacked */
+    }
+}
