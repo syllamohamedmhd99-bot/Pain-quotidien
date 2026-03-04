@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X } from 'lucide-react';
+import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X, Plus } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './CRM.css';
 
@@ -12,6 +12,10 @@ export default function UsersManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProfile, setEditingProfile] = useState(null);
     const [selectedRole, setSelectedRole] = useState("Staff");
+
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [newUser, setNewUser] = useState({ fullName: '', email: '', password: '', role: 'Staff' });
+    const [isCreating, setIsCreating] = useState(false);
 
     const fetchProfiles = async () => {
         setLoading(true);
@@ -69,6 +73,40 @@ export default function UsersManagement() {
         }
     };
 
+    const handleCreateUser = async (e) => {
+        e.preventDefault();
+        setIsCreating(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Vous n'êtes pas connecté.");
+
+            const response = await fetch('/api/createUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify(newUser)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erreur inconnue");
+            }
+
+            alert("Utilisateur créé avec succès !");
+            setIsCreateModalOpen(false);
+            setNewUser({ fullName: '', email: '', password: '', role: 'Staff' });
+            fetchProfiles();
+        } catch (error) {
+            console.error("Create User Error:", error);
+            alert("Erreur: " + error.message);
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
     return (
         <div className="crm-page">
             <div className="crm-header">
@@ -94,6 +132,10 @@ export default function UsersManagement() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+                <button className="btn btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+                    <Plus size={20} />
+                    <span>Créer un utilisateur</span>
+                </button>
             </div>
 
             <motion.div className="crm-grid" layout>
@@ -198,6 +240,74 @@ export default function UsersManagement() {
                                     <button type="button" className="btn btn-outline" onClick={handleCloseModal}>Annuler</button>
                                     <button type="submit" className="btn btn-primary">
                                         Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Modal for Create User */}
+            <AnimatePresence>
+                {isCreateModalOpen && (
+                    <div className="modal-overlay">
+                        <motion.div
+                            className="modal-content glass card"
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            style={{ maxWidth: '400px' }}
+                        >
+                            <button className="close-btn action-btn" onClick={() => setIsCreateModalOpen(false)}>
+                                <X size={20} />
+                            </button>
+                            <h2>Créer un utilisateur</h2>
+
+                            <form onSubmit={handleCreateUser} className="modal-form">
+                                <div className="form-group">
+                                    <label>Nom complet</label>
+                                    <input
+                                        type="text" required
+                                        value={newUser.fullName}
+                                        onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Email</label>
+                                    <input
+                                        type="email" required
+                                        value={newUser.email}
+                                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Mot de passe</label>
+                                    <input
+                                        type="password" required minLength="6"
+                                        value={newUser.password}
+                                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Rôle</label>
+                                    <select
+                                        value={newUser.role}
+                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                                        style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                    >
+                                        <option value="Staff">Staff</option>
+                                        <option value="Administrateur">Administrateur</option>
+                                    </select>
+                                </div>
+
+                                <div className="modal-actions" style={{ marginTop: '2rem' }}>
+                                    <button type="button" className="btn btn-outline" onClick={() => setIsCreateModalOpen(false)}>Annuler</button>
+                                    <button type="submit" className="btn btn-primary" disabled={isCreating}>
+                                        {isCreating ? 'Création...' : 'Créer'}
                                     </button>
                                 </div>
                             </form>
