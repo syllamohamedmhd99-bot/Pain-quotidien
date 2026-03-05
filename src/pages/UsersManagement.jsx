@@ -275,7 +275,7 @@ export default function UsersManagement() {
                                             </div>
                                         </label>
 
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.8rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                                             {availablePages.map(page => (
                                                 <label key={page.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                                                     <input
@@ -288,7 +288,7 @@ export default function UsersManagement() {
                                                 </label>
                                             ))}
                                         </div>
-                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.8rem', lineHeight: 1.4 }}>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0.8rem 0 0', lineHeight: 1.4 }}>
                                             Cochez les pages que cet utilisateur est autorisé à voir dans son menu.
                                         </p>
                                     </div>
