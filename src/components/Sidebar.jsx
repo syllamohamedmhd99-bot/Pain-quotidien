@@ -21,7 +21,6 @@ const navItems = [
             { name: 'Créer Facture', path: '/invoices/new' },
         ]
     },
-    { name: 'Gestion Rôles', path: '/users', icon: ShieldCheck, adminOnly: true },
     { name: 'Mon Profil', path: '/profile', icon: User },
     { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
 ];
@@ -77,23 +76,6 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                         // 1. Check Admin Only
                         if (item.adminOnly && profile?.role !== 'Administrateur') return false;
 
-                        // 2. Check Permissions for Staff
-                        if (profile?.role === 'Staff' && Array.isArray(profile.permissions)) {
-                            // Si c'est le Dashboard ou Profil, on laisse toujours (ou on peut les mettre dans les permissions)
-                            if (item.path === '/' || item.path === '/profile') return true;
-
-                            // Vérifier si le path principal est dans les permissions
-                            let hasAccess = profile.permissions.includes(item.path);
-
-                            // Si l'item a des sous-menus, on vérifie si au moins un sous-menu est autorisé
-                            if (!hasAccess && item.subItems) {
-                                hasAccess = item.subItems.some(sub => profile.permissions.includes(sub.path));
-                            }
-
-                            return hasAccess;
-                        }
-
-                        // Par défaut, si c'est admin ou permissions non définies, on affiche (sauf adminOnly géré plus haut)
                         return true;
 
                     }).map((item) => {
@@ -126,7 +108,6 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                                                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                                                 >
                                                     {item.subItems
-                                                        .filter(sub => profile?.role === 'Administrateur' || !Array.isArray(profile?.permissions) || profile.permissions.includes(sub.path))
                                                         .map(sub => (
                                                             <li key={sub.path}>
                                                                 <Link to={sub.path} className={`sub-nav-link ${location.pathname === sub.path ? 'active' : ''}`} onClick={handleLinkClick}>
