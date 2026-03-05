@@ -127,7 +127,7 @@ export default function POS() {
                 alert(`Paiement de ${grandTotal.toLocaleString('fr-FR')} GNF validé avec succès !`);
             }
 
-            if (window.confirm("Voulez-vous imprimer le reçu ?")) {
+            if (window.confirm("Voulez-vous imprimer la facture ?")) {
                 navigate(`/invoice/${trxData.id}`);
             }
 
