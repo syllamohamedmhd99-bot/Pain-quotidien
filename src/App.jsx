@@ -13,6 +13,7 @@ import CreateInvoice from './pages/CreateInvoice';
 import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
 import Production from './pages/Production';
+import Reports from './pages/Reports';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -112,7 +113,9 @@ function App() {
                 <Route path="/invoices" element={<Invoices />} />
                 <Route path="/invoices/new" element={<CreateInvoice />} />
                 <Route path="/invoice/:id" element={<Invoice />} />
+                <Route path="/reports" element={<Reports />} />
               </Routes>
+
             </Layout>
           ) : (
             <Navigate to="/auth" />

@@ -19,6 +19,7 @@ const navItems = [
         subItems: [
             { name: 'Historique', path: '/invoices' },
             { name: 'Créer Facture', path: '/invoices/new' },
+            { name: 'Rapports', path: '/reports' }
         ]
     },
     { name: 'Mon Profil', path: '/profile', icon: User },
