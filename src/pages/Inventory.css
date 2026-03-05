@@ -268,7 +268,32 @@
     .category-filters {
         overflow-x: auto;
         padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
     }
+
+    .category-filters::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari, etc. */
+    }
+}
+
+/* Gestion du défilement horizontal des tableaux pour le mobile */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
 }
 
 /* Modal Styles */

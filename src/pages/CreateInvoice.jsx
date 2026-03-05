@@ -107,7 +107,8 @@ export default function CreateInvoice() {
 
             if (itemsError) throw itemsError;
 
-            navigate(`/invoice/${trxData.id}`);
+            // Naviguer et demander le téléchargement + impression automatique
+            navigate(`/invoice/${trxData.id}`, { state: { autoPrintAndDownload: true } });
         } catch (error) {
             console.error("Error creating invoice:", error);
             alert("Erreur lors de la création de la facture : " + error.message);

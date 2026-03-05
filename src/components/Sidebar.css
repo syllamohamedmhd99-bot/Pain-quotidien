@@ -8,6 +8,8 @@
     position: sticky;
     top: 20px;
     z-index: 100;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .sidebar-header {

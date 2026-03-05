@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { Printer, ArrowLeft, Receipt, Download, Share2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
@@ -8,6 +8,7 @@ import './Invoice.css';
 export default function Invoice() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [transaction, setTransaction] = useState(null);
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -51,6 +52,20 @@ export default function Invoice() {
 
         fetchInvoiceData();
     }, [id]);
+
+    useEffect(() => {
+        // Lancer automatiquement le téléchargement et l'impression si demandé
+        if (!loading && transaction && location.state?.autoPrintAndDownload) {
+            // Nettoyer l'état pour ne pas recommencer au rechargement de la page
+            window.history.replaceState({}, document.title);
+
+            // Attendre un court instant pour que le rendu soit parfait avant de générer le PDF
+            setTimeout(async () => {
+                await handleDownloadPDF();
+                handlePrint();
+            }, 500);
+        }
+    }, [loading, transaction, location.state]);
 
     const handlePrint = () => {
         window.print();

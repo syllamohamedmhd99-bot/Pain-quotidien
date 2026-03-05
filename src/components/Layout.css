@@ -97,6 +97,10 @@
     padding-bottom: 2rem;
 }
 
+.mobile-menu-btn {
+    display: none;
+}
+
 @media (max-width: 1024px) {
     .main-content {
         max-width: 100%;
@@ -104,12 +108,28 @@
         padding: 20px;
     }
 
+    .mobile-menu-btn {
+        display: flex;
+    }
+
     .topbar {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: 1.5rem;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
         top: 0;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 0;
+    }
+
+    .topbar-search {
+        display: none;
+        /* Cacher la recherche sur petit mobile pour gagner de la place */
+    }
+
+    .mobile-menu-btn span {
+        display: none;
+        /* Cacher le texte 'Menu' sur mobile pour ne garder que l'icône */
     }
 
     .search-input {

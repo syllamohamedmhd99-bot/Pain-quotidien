@@ -65,7 +65,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                 <button
                     className="close-sidebar-btn"
                     onClick={onClose}
-                    style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', display: 'none' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
                 >
                     <X size={24} />
                 </button>
