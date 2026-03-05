@@ -213,4 +213,10 @@
         flex-direction: column;
         align-items: flex-start;
     }
+
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1rem;
+    }
 }

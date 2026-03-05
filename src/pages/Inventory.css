@@ -277,6 +277,12 @@
         display: none;
         /* Chrome, Safari, etc. */
     }
+
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+    }
 }
 
 /* Gestion du défilement horizontal des tableaux pour le mobile */

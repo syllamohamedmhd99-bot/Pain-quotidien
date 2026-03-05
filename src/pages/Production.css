@@ -141,3 +141,12 @@
     color: var(--text-primary);
     font-family: inherit;
 }
+
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+        width: 95%;
+    }
+}
