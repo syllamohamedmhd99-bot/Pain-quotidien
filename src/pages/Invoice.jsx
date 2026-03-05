@@ -12,6 +12,8 @@ export default function Invoice() {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [isDownloading, setIsDownloading] = useState(false);
+
     useEffect(() => {
         const fetchInvoiceData = async () => {
             if (!id) return;
@@ -54,16 +56,27 @@ export default function Invoice() {
         window.print();
     };
 
-    const handleDownloadPDF = () => {
-        const element = document.getElementById('invoice-content');
-        const opt = {
-            margin: 10,
-            filename: `Facture_${transaction.trx_id}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+    const handleDownloadPDF = async () => {
+        setIsDownloading(true);
+        try {
+            const element = document.getElementById('invoice-content');
+            const opt = {
+                margin: 10,
+                filename: `Facture_${transaction.trx_id}.pdf`,
+                image: { type: 'jpeg', quality: 0.90 }, // Reduced quality slightly for speed
+                html2canvas: { scale: 1.5, useCORS: true }, // Lowered scale for better performance, added CORS for external images if any
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // html2pdf returns a promise if used this way
+            await html2pdf().set(opt).from(element).save();
+
+        } catch (error) {
+            console.error("Erreur lors de la génération du PDF:", error);
+            alert("Une erreur est survenue lors de la création du PDF.");
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
     const handleShare = async () => {
@@ -96,8 +109,14 @@ export default function Invoice() {
                     <button className="btn btn-outline" onClick={handleShare} title="Envoyer par WhatsApp, Email, etc.">
                         <Share2 size={18} /> Envoyer
                     </button>
-                    <button className="btn btn-outline" onClick={handleDownloadPDF} title="Télécharger en PDF">
-                        <Download size={18} /> Télécharger
+                    <button
+                        className="btn btn-outline"
+                        onClick={handleDownloadPDF}
+                        title="Télécharger en PDF"
+                        disabled={isDownloading}
+                        style={{ opacity: isDownloading ? 0.7 : 1, cursor: isDownloading ? 'wait' : 'pointer' }}
+                    >
+                        <Download size={18} /> {isDownloading ? "Génération..." : "Télécharger"}
                     </button>
                     <button className="btn btn-primary" onClick={handlePrint} title="Imprimer">
                         <Printer size={18} /> Imprimer
