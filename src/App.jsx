@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
 const ProtectedRoute = ({ children, requiredPath, profile }) => {
-  if (!profile) return children;
+  if (!profile) return null;
   if (profile.role === 'Administrateur') return children;
 
   if (profile.role === 'Staff' && Array.isArray(profile.permissions)) {
@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children, requiredPath, profile }) => {
     }
   }
 
-  return <Navigate to="/" />;
+  return <Navigate to="/" replace />;
 };
 
 function App() {
