@@ -24,6 +24,12 @@ const navItems = [
     },
     { name: 'Mon Profil', path: '/profile', icon: User },
     { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
+    {
+        name: 'Administration',
+        path: '/admin/users',
+        icon: ShieldCheck,
+        adminOnly: true
+    },
 ];
 
 export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose, profile }) {

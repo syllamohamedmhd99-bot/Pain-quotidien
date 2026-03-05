@@ -14,6 +14,8 @@ import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
 import Production from './pages/Production';
 import Reports from './pages/Reports';
+import UsersManagement from './pages/UsersManagement';
+import UserDetail from './pages/UserDetail';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -114,6 +116,17 @@ function App() {
                 <Route path="/invoices/new" element={<CreateInvoice />} />
                 <Route path="/invoice/:id" element={<Invoice />} />
                 <Route path="/reports" element={<Reports />} />
+
+                {/* Admin Only Routes */}
+                {isAdmin && (
+                  <>
+                    <Route path="/admin/users" element={<UsersManagement />} />
+                    <Route path="/admin/user/:id" element={<UserDetail />} />
+                  </>
+                )}
+
+                {/* Redirect unknown routes */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
 
             </Layout>
