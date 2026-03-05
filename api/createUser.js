@@ -75,7 +75,13 @@ async function createUser(req, res) {
 
         if (createError) {
             console.error("Auth Admin Create Error:", createError);
-            return res.status(400).json({ error: createError.message });
+            let errorMessage = createError.message;
+            if (errorMessage === "A user with this email address has already been registered") {
+                errorMessage = "Un compte avec cette adresse e-mail existe déjà.";
+            } else if (errorMessage.includes("Password should be at least")) {
+                errorMessage = "Le mot de passe doit contenir au moins 6 caractères.";
+            }
+            return res.status(400).json({ error: errorMessage });
         }
 
         // 4. Create the profile in the profiles table

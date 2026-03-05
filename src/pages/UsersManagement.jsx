@@ -12,6 +12,19 @@ export default function UsersManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProfile, setEditingProfile] = useState(null);
     const [selectedRole, setSelectedRole] = useState("Staff");
+    const [selectedPermissions, setSelectedPermissions] = useState([]); // Nouveau state pour les permissions
+
+    const availablePages = [
+        { id: '/pos', name: 'Encaissement' },
+        { id: '/inventory', name: 'Inventaire' },
+        { id: '/clients', name: 'Clients' },
+        { id: '/suppliers', name: 'Fournisseurs' },
+        { id: '/expenses', name: 'Dépenses' },
+        { id: '/production', name: 'Production' },
+        { id: '/invoices', name: 'Facturation (Historique)' },
+        { id: '/invoices/new', name: 'Créer Facture' },
+        { id: '/history', name: 'Historique Activité' },
+    ];
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [newUser, setNewUser] = useState({ fullName: '', email: '', password: '', role: 'Staff' });
@@ -46,6 +59,12 @@ export default function UsersManagement() {
     const handleOpenModal = (profile) => {
         setEditingProfile(profile);
         setSelectedRole(profile.role || "Staff");
+        // Initialiser les permissions à partir de la BDD, sinon tout cocher par défaut pour le staff
+        let perms = profile.permissions;
+        if (!Array.isArray(perms)) {
+            perms = availablePages.map(p => p.id); // Par défaut on donne accès à tout si non défini
+        }
+        setSelectedPermissions(perms);
         setIsModalOpen(true);
     };
 
@@ -54,22 +73,37 @@ export default function UsersManagement() {
         setEditingProfile(null);
     };
 
+    const togglePermission = (pageId) => {
+        setSelectedPermissions(prev =>
+            prev.includes(pageId)
+                ? prev.filter(id => id !== pageId)
+                : [...prev, pageId]
+        );
+    };
+
+    const selectAllPermissions = () => setSelectedPermissions(availablePages.map(p => p.id));
+    const deselectAllPermissions = () => setSelectedPermissions([]);
+
     const handleUpdateRole = async (e) => {
         e.preventDefault();
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update({ role: selectedRole, updated_at: new Date().toISOString() })
+                .update({
+                    role: selectedRole,
+                    permissions: selectedRole === 'Administrateur' ? [] : selectedPermissions, // Les admins on ignore leurs permissions
+                    updated_at: new Date().toISOString()
+                })
                 .eq('id', editingProfile.id);
 
             if (error) throw error;
 
-            alert(`Rôle mis à jour avec succès pour ${editingProfile.full_name || editingProfile.user_id}`);
+            alert(`Rôles et permissions mis à jour avec succès pour ${editingProfile.full_name || editingProfile.user_id}`);
             fetchProfiles();
             handleCloseModal();
         } catch (error) {
             console.error(error);
-            alert("Erreur lors de la mise à jour du rôle.");
+            alert("Erreur lors de la mise à jour : " + error.message);
         }
     };
 
@@ -86,7 +120,7 @@ export default function UsersManagement() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify(newUser)
+                body: JSON.stringify({ ...newUser, defaultPermissions: availablePages.map(p => p.id) }) // On passe les permissions par défaut si besoin
             });
 
             const data = await response.json();
@@ -95,7 +129,7 @@ export default function UsersManagement() {
                 throw new Error(data.error || "Erreur inconnue");
             }
 
-            alert("Utilisateur créé avec succès !");
+            alert("Utilisateur créé avec succès ! Pensez à configurer ses permissions si c'est un Staff.");
             setIsCreateModalOpen(false);
             setNewUser({ fullName: '', email: '', password: '', role: 'Staff' });
             fetchProfiles();
@@ -184,7 +218,7 @@ export default function UsersManagement() {
 
                             <div className="crm-card-footer" style={{ justifyContent: 'flex-end' }}>
                                 <button className="btn btn-outline btn-small" onClick={() => handleOpenModal(profile)}>
-                                    Modifier le rôle
+                                    Modifier rôles & permissions
                                 </button>
                             </div>
                         </motion.div>
@@ -207,12 +241,12 @@ export default function UsersManagement() {
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            style={{ maxWidth: '400px' }}
+                            style={{ maxWidth: '450px', maxHeight: '90vh', overflowY: 'auto' }}
                         >
                             <button className="close-btn action-btn" onClick={handleCloseModal}>
                                 <X size={20} />
                             </button>
-                            <h2>Modifier le rôle</h2>
+                            <h2>Modifier le compte</h2>
 
                             <div style={{ marginBottom: '1.5rem', marginTop: '1rem', color: 'var(--text-secondary)' }}>
                                 Utilisateur : <strong style={{ color: 'var(--text-primary)' }}>{editingProfile?.full_name || editingProfile?.user_id}</strong>
@@ -220,7 +254,7 @@ export default function UsersManagement() {
 
                             <form onSubmit={handleUpdateRole} className="modal-form">
                                 <div className="form-group">
-                                    <label>Rôle d'accès</label>
+                                    <label>Rôle principal</label>
                                     <select
                                         value={selectedRole}
                                         onChange={(e) => setSelectedRole(e.target.value)}
@@ -229,12 +263,36 @@ export default function UsersManagement() {
                                         <option value="Staff">Staff (Accès restreint)</option>
                                         <option value="Administrateur">Administrateur (Accès total)</option>
                                     </select>
-                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineHeight: 1.4 }}>
-                                        {selectedRole === 'Administrateur'
-                                            ? "Les administrateurs peuvent voir cette page, modifier les prix et supprimer des données."
-                                            : "Le Staff peut utiliser le point de vente et voir les stocks, mais sans droits de modification globaux."}
-                                    </p>
                                 </div>
+
+                                {selectedRole === 'Staff' && (
+                                    <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                                        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <span>Permissions d'accès</span>
+                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                <button type="button" onClick={selectAllPermissions} style={{ fontSize: '0.75rem', padding: '4px 8px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer' }}>Tout</button>
+                                                <button type="button" onClick={deselectAllPermissions} style={{ fontSize: '0.75rem', padding: '4px 8px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '4px', cursor: 'pointer' }}>Aucun</button>
+                                            </div>
+                                        </label>
+
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                            {availablePages.map(page => (
+                                                <label key={page.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedPermissions.includes(page.id)}
+                                                        onChange={() => togglePermission(page.id)}
+                                                        style={{ width: '16px', height: '16px', accentColor: 'var(--primary-color)' }}
+                                                    />
+                                                    {page.name}
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.8rem', lineHeight: 1.4 }}>
+                                            Cochez les pages que cet utilisateur est autorisé à voir dans son menu.
+                                        </p>
+                                    </div>
+                                )}
 
                                 <div className="modal-actions" style={{ marginTop: '2rem' }}>
                                     <button type="button" className="btn btn-outline" onClick={handleCloseModal}>Annuler</button>

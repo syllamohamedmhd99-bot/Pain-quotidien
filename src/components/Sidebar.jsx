@@ -73,7 +73,30 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
 
             <nav className="sidebar-nav">
                 <ul>
-                    {navItems.filter(item => !item.adminOnly || profile?.role === 'Administrateur').map((item) => {
+                    {navItems.filter(item => {
+                        // 1. Check Admin Only
+                        if (item.adminOnly && profile?.role !== 'Administrateur') return false;
+
+                        // 2. Check Permissions for Staff
+                        if (profile?.role === 'Staff' && Array.isArray(profile.permissions)) {
+                            // Si c'est le Dashboard ou Profil, on laisse toujours (ou on peut les mettre dans les permissions)
+                            if (item.path === '/' || item.path === '/profile') return true;
+
+                            // Vérifier si le path principal est dans les permissions
+                            let hasAccess = profile.permissions.includes(item.path);
+
+                            // Si l'item a des sous-menus, on vérifie si au moins un sous-menu est autorisé
+                            if (!hasAccess && item.subItems) {
+                                hasAccess = item.subItems.some(sub => profile.permissions.includes(sub.path));
+                            }
+
+                            return hasAccess;
+                        }
+
+                        // Par défaut, si c'est admin ou permissions non définies, on affiche (sauf adminOnly géré plus haut)
+                        return true;
+
+                    }).map((item) => {
                         const isActive = location.pathname === item.path || (item.subItems && item.subItems.some(sub => location.pathname === sub.path));
                         const Icon = item.icon;
                         const hasSubItems = !!item.subItems;
@@ -102,13 +125,15 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                                                     exit={{ height: 0, opacity: 0 }}
                                                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                                                 >
-                                                    {item.subItems.map(sub => (
-                                                        <li key={sub.path}>
-                                                            <Link to={sub.path} className={`sub-nav-link ${location.pathname === sub.path ? 'active' : ''}`} onClick={handleLinkClick}>
-                                                                <span>{sub.name}</span>
-                                                            </Link>
-                                                        </li>
-                                                    ))}
+                                                    {item.subItems
+                                                        .filter(sub => profile?.role === 'Administrateur' || !Array.isArray(profile?.permissions) || profile.permissions.includes(sub.path))
+                                                        .map(sub => (
+                                                            <li key={sub.path}>
+                                                                <Link to={sub.path} className={`sub-nav-link ${location.pathname === sub.path ? 'active' : ''}`} onClick={handleLinkClick}>
+                                                                    <span>{sub.name}</span>
+                                                                </Link>
+                                                            </li>
+                                                        ))}
                                                 </motion.ul>
                                             )}
                                         </AnimatePresence>
