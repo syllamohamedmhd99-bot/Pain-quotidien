@@ -18,6 +18,24 @@ import UserDetail from './pages/UserDetail';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
+const ProtectedRoute = ({ children, requiredPath, profile }) => {
+  if (!profile) return children;
+  if (profile.role === 'Administrateur') return children;
+
+  if (profile.role === 'Staff' && Array.isArray(profile.permissions)) {
+    if (profile.permissions.includes(requiredPath)) {
+      return children;
+    }
+
+    // Special logic for nested invoices
+    if (requiredPath.startsWith('/invoice/') && profile.permissions.includes('/invoices')) {
+      return children;
+    }
+  }
+
+  return <Navigate to="/" />;
+};
+
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [theme, setTheme] = useState('default'); // 'default', 'matcha', 'ocean', 'berry'
@@ -103,17 +121,18 @@ function App() {
             <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout} profile={profile}>
               <Routes>
                 <Route path="/" element={<Dashboard profile={profile} />} />
-                <Route path="/pos" element={<POS />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/suppliers" element={<Suppliers />} />
-                <Route path="/history" element={<History />} />
                 <Route path="/profile" element={<Profile session={session} />} />
-                <Route path="/expenses" element={<Expenses />} />
-                <Route path="/production" element={<Production />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/invoices/new" element={<CreateInvoice />} />
-                <Route path="/invoice/:id" element={<Invoice />} />
+
+                <Route path="/pos" element={<ProtectedRoute requiredPath="/pos" profile={profile}><POS /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute requiredPath="/inventory" profile={profile}><Inventory /></ProtectedRoute>} />
+                <Route path="/clients" element={<ProtectedRoute requiredPath="/clients" profile={profile}><Clients /></ProtectedRoute>} />
+                <Route path="/suppliers" element={<ProtectedRoute requiredPath="/suppliers" profile={profile}><Suppliers /></ProtectedRoute>} />
+                <Route path="/history" element={<ProtectedRoute requiredPath="/history" profile={profile}><History /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute requiredPath="/expenses" profile={profile}><Expenses /></ProtectedRoute>} />
+                <Route path="/production" element={<ProtectedRoute requiredPath="/production" profile={profile}><Production /></ProtectedRoute>} />
+                <Route path="/invoices" element={<ProtectedRoute requiredPath="/invoices" profile={profile}><Invoices /></ProtectedRoute>} />
+                <Route path="/invoices/new" element={<ProtectedRoute requiredPath="/invoices/new" profile={profile}><CreateInvoice /></ProtectedRoute>} />
+                <Route path="/invoice/:id" element={<ProtectedRoute requiredPath="/invoice/:id" profile={profile}><Invoice /></ProtectedRoute>} />
 
                 {/* Admin Only Routes */}
                 <Route path="/users" element={isAdmin ? <UsersManagement /> : <Navigate to="/" />} />
