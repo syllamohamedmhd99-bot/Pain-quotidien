@@ -86,20 +86,36 @@ export default function Profile() {
     };
 
     const handleDeleteStaffs = async () => {
-        const confirm = window.confirm("ATTENTION : Cela va supprimer TOUS les profils ayant le rôle 'Staff' de la base de données. Êtes-vous sûr ?");
+        const confirm = window.confirm("ATTENTION : Cela va supprimer DÉFINITIVEMENT TOUS les profils ayant le rôle 'Staff' de la base de données. Êtes-vous sûr ?");
         if (!confirm) return;
 
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .delete()
-                .eq('role', 'Staff');
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Vous n'êtes pas connecté.");
 
-            if (error) throw error;
-            alert("Tous les utilisateurs 'Staff' ont été supprimés de la base de données !");
+            setSaving(true);
+            const response = await fetch('/api/deleteStaffs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Réponse API:", data);
+                throw new Error(data.error || "Erreur lors de la suppression via l'API");
+            }
+
+            alert(data.message || "Tous les utilisateurs 'Staff' ont été supprimés de la base de données !");
+            window.location.reload();
         } catch (error) {
             console.error("Erreur de suppression:", error);
-            alert("Erreur lors de la suppression.");
+            alert("Erreur lors de la suppression : " + error.message);
+        } finally {
+            setSaving(false);
         }
     };
 
