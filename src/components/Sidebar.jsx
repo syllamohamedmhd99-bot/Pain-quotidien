@@ -60,7 +60,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                     <div className="logo-icon">
                         <Croissant size={32} />
                     </div>
-                    <h2>Pain Quotidien</h2>
+                    <h2>Pain Doré</h2>
                 </div>
                 <button
                     className="close-sidebar-btn"

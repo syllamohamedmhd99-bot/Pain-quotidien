@@ -95,7 +95,7 @@ export default function Invoice() {
     };
 
     const handleShare = async () => {
-        const textMessage = `*Facture Pain Quotidien*\nN°: ${transaction.trx_id}\nTotal: ${transaction.total_amount.toLocaleString()} GNF\nDate: ${new Date(transaction.date).toLocaleDateString('fr-FR')}\n\nMerci de votre confiance !`;
+        const textMessage = `*Facture Pain Doré*\nN°: ${transaction.trx_id}\nTotal: ${transaction.total_amount.toLocaleString()} GNF\nDate: ${new Date(transaction.date).toLocaleDateString('fr-FR')}\n\nMerci de votre confiance !`;
 
         if (navigator.share) {
             try {
@@ -144,7 +144,7 @@ export default function Invoice() {
                     <div className="brand">
                         <div className="brand-logo">🥖</div>
                         <div>
-                            <h1>Pain Quotidien</h1>
+                            <h1>Pain Doré</h1>
                             <p>Boulangerie Artisanale & Pâtisserie</p>
                         </div>
                     </div>
@@ -158,7 +158,7 @@ export default function Invoice() {
                 <div className="invoice-info">
                     <div className="info-block">
                         <h3>Émetteur</h3>
-                        <p><strong>Pain Quotidien SARL</strong></p>
+                        <p><strong>Pain Doré SARL</strong></p>
                         <p>Conakry, Guinée</p>
                         <p>Tél: +224 00 00 00 00</p>
                     </div>

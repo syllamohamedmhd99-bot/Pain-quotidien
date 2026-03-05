@@ -183,7 +183,7 @@ export default function Reports() {
                     <div className="report-brand">
                         <div className="brand-icon">🥖</div>
                         <div className="brand-text">
-                            <h2>Le Pain Quotidien</h2>
+                            <h2>Le Pain Doré</h2>
                             <p>Rapport d'Activité Officiel</p>
                         </div>
                     </div>
@@ -282,7 +282,7 @@ export default function Reports() {
                         </div>
 
                         <div className="report-footer">
-                            <p>Document généré automatiquement par l'application <strong>Le Pain Quotidien</strong>.</p>
+                            <p>Document généré automatiquement par l'application <strong>Le Pain Doré</strong>.</p>
                             <div className="report-signature">
                                 <div style={{ textAlign: 'right' }}>
                                     {reporterName && (

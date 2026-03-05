@@ -133,7 +133,7 @@ export default function Auth({ onLogin }) {
                         {isLogin ? 'Bon retour !' : 'Rejoignez-nous'}
                     </motion.h2>
                     <p className="auth-subtitle">
-                        {isLogin ? 'Connectez-vous pour gérer votre boulangerie' : 'Créez votre compte Pain Quotidien'}
+                        {isLogin ? 'Connectez-vous pour gérer votre boulangerie' : 'Créez votre compte Pain Doré'}
                     </p>
                 </div>
 
