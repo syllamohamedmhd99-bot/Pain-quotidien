@@ -87,22 +87,43 @@ export default function UsersManagement() {
     const handleUpdateRole = async (e) => {
         e.preventDefault();
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    role: selectedRole,
-                    permissions: selectedRole === 'Administrateur' ? [] : selectedPermissions, // Les admins on ignore leurs permissions
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', editingProfile.id);
+            const updateData = {
+                role: selectedRole,
+                permissions: selectedRole === 'Administrateur' ? [] : selectedPermissions, // Les admins on ignore leurs permissions
+                updated_at: new Date().toISOString()
+            };
 
-            if (error) throw error;
+            console.log("Données envoyées pour l'update API:", updateData, "pour l'user:", editingProfile.id);
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Vous n'êtes pas connecté.");
+
+            const response = await fetch('/api/updateUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    targetUserId: editingProfile.id,
+                    updateData: updateData
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Réponse API erreur:", data);
+                throw new Error(data.error || "Erreur lors de la mise à jour via l'API");
+            }
+
+            console.log("Réponse API Succès:", data);
 
             alert(`Rôles et permissions mis à jour avec succès pour ${editingProfile.full_name || editingProfile.user_id}`);
-            fetchProfiles();
+            await fetchProfiles(); // Utiliser await pour s'assurer que les données sont rechargées
             handleCloseModal();
         } catch (error) {
-            console.error(error);
+            console.error("Erreur complète lors de l'update:", error);
             alert("Erreur lors de la mise à jour : " + error.message);
         }
     };
