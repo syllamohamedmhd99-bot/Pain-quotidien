@@ -85,6 +85,24 @@ export default function Profile() {
         }
     };
 
+    const handleDeleteStaffs = async () => {
+        const confirm = window.confirm("ATTENTION : Cela va supprimer TOUS les profils ayant le rôle 'Staff' de la base de données. Êtes-vous sûr ?");
+        if (!confirm) return;
+
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('role', 'Staff');
+
+            if (error) throw error;
+            alert("Tous les utilisateurs 'Staff' ont été supprimés de la base de données !");
+        } catch (error) {
+            console.error("Erreur de suppression:", error);
+            alert("Erreur lors de la suppression.");
+        }
+    };
+
     if (loading) return <div className="loading">Chargement du profil...</div>;
 
     return (
@@ -168,6 +186,18 @@ export default function Profile() {
                         >
                             Annuler
                         </button>
+
+                        {profile.role === 'Administrateur' && (
+                            <button
+                                type="button"
+                                className="btn"
+                                style={{ background: 'var(--danger-color)', color: 'white', border: 'none' }}
+                                onClick={handleDeleteStaffs}
+                            >
+                                Supprimer tous les Staffs
+                            </button>
+                        )}
+
                         <button
                             type="submit"
                             className="btn btn-primary"
