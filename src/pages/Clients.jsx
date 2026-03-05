@@ -47,26 +47,37 @@ export default function Clients() {
     );
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) return;
+        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?\nNote: Ses transactions passées seront conservées mais ne seront plus liées à son nom.")) return;
 
         try {
-            // 1. Dissocier le client de ses transactions (éviter l'erreur de clé étrangère)
-            await supabase
+            // 1. D'abord, on essaie de dissocier le client de ses transactions
+            const { error: updateError } = await supabase
                 .from('transactions')
                 .update({ client_id: null })
                 .eq('client_id', id);
 
+            if (updateError) {
+                console.warn("Dissociation partially failed or column is NOT NULL:", updateError);
+            }
+
             // 2. Supprimer le client
-            const { error } = await supabase
+            const { error: deleteError } = await supabase
                 .from('clients')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (deleteError) {
+                if (deleteError.code === '23503') {
+                    throw new Error("Ce client ne peut pas être supprimé car il est lié à des documents comptables indispensables. Vous pouvez le marquer comme 'Inactif' à la place.");
+                }
+                throw deleteError;
+            }
+
             setClients(clients.filter(c => c.id !== id));
+            alert("Client supprimé avec succès.");
         } catch (err) {
-            console.error(err);
-            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
+            console.error("Delete client error:", err);
+            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
         }
     };
 

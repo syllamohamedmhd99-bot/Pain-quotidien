@@ -141,7 +141,7 @@ export default function UsersManagement() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${session.access_token}`
                 },
-                body: JSON.stringify({ ...newUser, defaultPermissions: availablePages.map(p => p.id) }) // On passe les permissions par défaut si besoin
+                body: JSON.stringify({ ...newUser, defaultPermissions: availablePages.map(p => p.id) })
             });
 
             const data = await response.json();
@@ -159,6 +159,46 @@ export default function UsersManagement() {
             alert("Erreur: " + error.message);
         } finally {
             setIsCreating(false);
+        }
+    };
+
+    const handleDeleteAllStaffs = async () => {
+        if (!window.confirm("Êtes-vous ABSOLUMENT sûr de vouloir supprimer TOUS les comptes Staff ?\nCette action supprimera également leur accès et sera irréversible.")) {
+            return;
+        }
+
+        const secondConfirmation = window.prompt("Tapez 'SUPPRIMER' pour confirmer la suppression groupée :");
+        if (secondConfirmation !== 'SUPPRIMER') {
+            alert("Action annulée.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("Vous n'êtes pas connecté.");
+
+            const response = await fetch('/api/deleteStaffs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erreur lors de la suppression groupée");
+            }
+
+            alert(data.message || "Tous les comptes Staff ont été supprimés.");
+            fetchProfiles();
+        } catch (error) {
+            console.error("Delete All Staffs Error:", error);
+            alert("Erreur: " + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -187,10 +227,16 @@ export default function UsersManagement() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className="btn btn-primary" onClick={() => setIsCreateModalOpen(true)}>
-                    <Plus size={20} />
-                    <span>Créer un utilisateur</span>
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button className="btn btn-outline" onClick={handleDeleteAllStaffs} style={{ color: 'var(--danger-color)', borderColor: 'var(--danger-color)' }}>
+                        <Trash2 size={20} />
+                        <span>Supprimer tous les Staffs</span>
+                    </button>
+                    <button className="btn btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+                        <Plus size={20} />
+                        <span>Créer un utilisateur</span>
+                    </button>
+                </div>
             </div>
 
             <motion.div className="crm-grid" layout>

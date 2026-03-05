@@ -50,26 +50,37 @@ export default function Suppliers() {
     );
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce fournisseur ?")) return;
+        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce fournisseur ?\nNote: Ses dépenses passées resteront enregistrées.")) return;
 
         try {
-            // 1. Dissocier le fournisseur de ses dépenses (pour éviter l'erreur de clé étrangère)
-            await supabase
+            // 1. D'abord, on essaie de dissocier le fournisseur de ses dépenses
+            const { error: updateError } = await supabase
                 .from('expenses')
                 .update({ supplier_id: null })
                 .eq('supplier_id', id);
 
+            if (updateError) {
+                console.warn("Dissociation from expenses partially failed:", updateError);
+            }
+
             // 2. Supprimer le fournisseur
-            const { error } = await supabase
+            const { error: deleteError } = await supabase
                 .from('suppliers')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (deleteError) {
+                if (deleteError.code === '23503') {
+                    throw new Error("Ce fournisseur ne peut pas être supprimé car il est lié à des dépenses enregistrées. Vous pouvez le marquer comme 'Inactif' à la place.");
+                }
+                throw deleteError;
+            }
+
             setSuppliers(suppliers.filter(s => s.id !== id));
+            alert("Fournisseur supprimé avec succès.");
         } catch (err) {
-            console.error(err);
-            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
+            console.error("Delete supplier error:", err);
+            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
         }
     };
 

@@ -54,26 +54,39 @@ export default function Inventory() {
     });
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
+        if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?\nNote: Le produit sera retiré de l'inventaire mais restera visible dans l'historique des ventes.")) return;
 
         try {
-            // 1. Dissocier le produit de ses lignes de transaction
-            await supabase
+            // 1. D'abord, on essaie de dissocier dans transaction_items
+            const { error: updateError } = await supabase
                 .from('transaction_items')
                 .update({ product_id: null })
                 .eq('product_id', id);
 
+            // Si l'erreur est liée à une contrainte NOT NULL, on peut soit laisser tel quel (bloqué) 
+            // ou informer l'utilisateur. Ici on continue car certains items peuvent ne pas être liés.
+            if (updateError) {
+                console.warn("Dissociation partially failed or column is NOT NULL:", updateError);
+            }
+
             // 2. Supprimer le produit
-            const { error } = await supabase
+            const { error: deleteError } = await supabase
                 .from('products')
                 .delete()
                 .eq('id', id);
 
-            if (error) throw error;
+            if (deleteError) {
+                if (deleteError.code === '23503') {
+                    throw new Error("Ce produit ne peut pas être supprimé car il est lié à des factures existantes. Vous pouvez modifier son stock à 0 à la place.");
+                }
+                throw deleteError;
+            }
+
             setProducts(products.filter(p => p.id !== id));
+            alert("Produit supprimé avec succès.");
         } catch (err) {
-            console.error(err);
-            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
+            console.error("Delete product error:", err);
+            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
         }
     };
 
