@@ -46,11 +46,11 @@ export default function Invoices() {
         <div className="invoices-page">
             <div className="page-header">
                 <div>
-                    <h1>Facturation</h1>
-                    <p>Gérez vos factures de vente et suivez les paiements.</p>
+                    <h1>Encaissements</h1>
+                    <p>Gérez vos reçus de vente et suivez les paiements.</p>
                 </div>
                 <button className="btn btn-primary" onClick={() => navigate('/invoices/new')}>
-                    <Plus size={18} /> Nouvelle Facture
+                    <Plus size={18} /> Nouvel Encaissement
                 </button>
             </div>
 
@@ -134,7 +134,7 @@ export default function Invoices() {
                 {filteredInvoices.length === 0 && !loading && (
                     <div className="empty-state">
                         <Receipt size={48} />
-                        <p>Aucune facture trouvée.</p>
+                        <p>Aucun reçu trouvé.</p>
                     </div>
                 )}
             </div>

@@ -13,12 +13,12 @@ const navItems = [
     { name: 'Dépenses', path: '/expenses', icon: Wallet },
     { name: 'Production', path: '/production', icon: ChefHat },
     {
-        name: 'Facturation',
+        name: 'Encaissements',
         path: '/invoices',
         icon: Receipt,
         subItems: [
             { name: 'Historique', path: '/invoices' },
-            { name: 'Créer Facture', path: '/invoices/new' },
+            { name: 'Saisie Manuelle', path: '/invoices/new' },
             { name: 'Rapports', path: '/reports' }
         ]
     },

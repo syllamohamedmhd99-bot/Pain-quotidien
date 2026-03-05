@@ -62,7 +62,7 @@ export default function Invoice() {
             const element = document.getElementById('invoice-content');
             const opt = {
                 margin: 10,
-                filename: `Facture_${transaction.trx_id}.pdf`,
+                filename: `Recu_${transaction.trx_id}.pdf`,
                 image: { type: 'jpeg', quality: 0.90 }, // Reduced quality slightly for speed
                 html2canvas: { scale: 1.5, useCORS: true }, // Lowered scale for better performance, added CORS for external images if any
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -80,12 +80,12 @@ export default function Invoice() {
     };
 
     const handleShare = async () => {
-        const textMessage = `*Facture Pain Quotidien*\nN°: ${transaction.trx_id}\nTotal: ${transaction.total_amount.toLocaleString()} GNF\nDate: ${new Date(transaction.date).toLocaleDateString('fr-FR')}\n\nMerci de votre confiance !`;
+        const textMessage = `*Reçu Pain Quotidien*\nN°: ${transaction.trx_id}\nTotal: ${transaction.total_amount.toLocaleString()} GNF\nDate: ${new Date(transaction.date).toLocaleDateString('fr-FR')}\n\nMerci de votre confiance !`;
 
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: `Facture ${transaction.trx_id}`,
+                    title: `Reçu ${transaction.trx_id}`,
                     text: textMessage,
                 });
             } catch (err) {
@@ -96,8 +96,8 @@ export default function Invoice() {
         }
     };
 
-    if (loading) return <div className="loading">Chargement de la facture...</div>;
-    if (!transaction) return <div className="error">Facture non trouvée.</div>;
+    if (loading) return <div className="loading">Chargement du reçu...</div>;
+    if (!transaction) return <div className="error">Reçu non trouvé.</div>;
 
     return (
         <div className="invoice-view">
@@ -134,7 +134,7 @@ export default function Invoice() {
                         </div>
                     </div>
                     <div className="invoice-meta">
-                        <h2>FACTURE</h2>
+                        <h2>REÇU DE PAIEMENT</h2>
                         <p><strong>N°:</strong> {transaction.trx_id}</p>
                         <p><strong>Date:</strong> {new Date(transaction.date).toLocaleString('fr-FR')}</p>
                     </div>
@@ -149,7 +149,7 @@ export default function Invoice() {
                     </div>
                     {transaction.clients && (
                         <div className="info-block">
-                            <h3>Client</h3>
+                            <h3>Client (Payeur)</h3>
                             <p><strong>{transaction.clients.name}</strong></p>
                             {transaction.clients.email && <p>{transaction.clients.email}</p>}
                             {transaction.clients.phone && <p>{transaction.clients.phone}</p>}
@@ -192,7 +192,7 @@ export default function Invoice() {
                         </div>
                     )}
                     <div className="total-row grand-total">
-                        <span>Total à payer</span>
+                        <span>Total réglé</span>
                         <span>{transaction.total_amount.toLocaleString()} GNF</span>
                     </div>
                 </div>

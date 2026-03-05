@@ -110,7 +110,7 @@ export default function CreateInvoice() {
             navigate(`/invoice/${trxData.id}`);
         } catch (error) {
             console.error("Error creating invoice:", error);
-            alert("Erreur lors de la création de la facture : " + error.message);
+            alert("Erreur lors de l'enregistrement : " + error.message);
         } finally {
             setSubmitting(false);
         }
@@ -125,20 +125,19 @@ export default function CreateInvoice() {
                     <button className="btn-back" onClick={() => navigate(-1)}>
                         <ArrowLeft size={20} /> Retour
                     </button>
-                    <h1>Créer une Facture Manuelle</h1>
-                    <p>Remplissez les détails pour générer une nouvelle facture.</p>
+                    <h1>Enregistrement Manuel d'Encaissement</h1>
+                    <p>Remplissez les détails pour générer une preuve de paiement.</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="invoice-form card glass">
                 <div className="form-section">
-                    <h3><User size={18} /> Informations Client</h3>
+                    <h3><User size={18} /> Client / Payeur</h3>
                     <div className="form-group">
                         <label>Sélectionner le Client</label>
                         <select
                             value={selectedClient}
                             onChange={(e) => setSelectedClient(e.target.value)}
-                            required
                             className="select-input full-width"
                         >
                             <option value="">-- Choisir un client --</option>
@@ -237,7 +236,7 @@ export default function CreateInvoice() {
                         <button type="submit" className="btn btn-primary" disabled={submitting}>
                             {submitting ? "Génération..." : (
                                 <>
-                                    <Save size={18} /> Générer et Enregistrer
+                                    <Save size={18} /> Enregistrer et Valider
                                 </>
                             )}
                         </button>
