@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './CRM.css';
 
 export default function UsersManagement() {
+    const navigate = useNavigate();
     const [profiles, setProfiles] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
@@ -284,7 +286,7 @@ export default function UsersManagement() {
                             </div>
 
                             <div className="crm-card-footer" style={{ justifyContent: 'space-between', gap: '0.5rem' }}>
-                                <button className="btn btn-outline btn-small" onClick={() => window.location.href = `/users/${profile.id}`} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+                                <button className="btn btn-outline btn-small" onClick={() => navigate(`/admin/user/${profile.id}`)} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>
                                     Détails & Instructions
                                 </button>
                                 <button className="btn btn-primary btn-small" onClick={() => handleOpenModal(profile)} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>

@@ -57,7 +57,7 @@ export default function UserDetail() {
             } catch (error) {
                 console.error("Erreur lors de la récupération :", error);
                 alert("Impossible de charger les détails de l'utilisateur : " + error.message);
-                navigate('/users');
+                navigate('/admin/users');
             } finally {
                 setLoading(false);
             }
@@ -110,7 +110,7 @@ export default function UserDetail() {
             }
 
             alert("Utilisateur supprimé avec succès.");
-            navigate('/users');
+            navigate('/admin/users');
         } catch (error) {
             console.error("Delete User Error:", error);
             alert("Erreur lors de la suppression : " + error.message);
@@ -126,7 +126,7 @@ export default function UserDetail() {
         <div className="crm-page">
             <div className="crm-header" style={{ alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className="btn-icon" onClick={() => navigate('/users')} style={{ padding: '0.5rem', background: 'var(--bg-secondary)' }}>
+                    <button className="btn-icon" onClick={() => navigate('/admin/users')} style={{ padding: '0.5rem', background: 'var(--bg-secondary)' }}>
                         <ArrowLeft size={20} />
                     </button>
                     <div>
