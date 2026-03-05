@@ -57,6 +57,13 @@ export default function Inventory() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return;
 
         try {
+            // 1. Dissocier le produit de ses lignes de transaction
+            await supabase
+                .from('transaction_items')
+                .update({ product_id: null })
+                .eq('product_id', id);
+
+            // 2. Supprimer le produit
             const { error } = await supabase
                 .from('products')
                 .delete()
@@ -66,7 +73,7 @@ export default function Inventory() {
             setProducts(products.filter(p => p.id !== id));
         } catch (err) {
             console.error(err);
-            alert("Erreur lors de la suppression");
+            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
         }
     };
 

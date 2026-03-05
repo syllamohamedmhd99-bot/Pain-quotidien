@@ -53,6 +53,13 @@ export default function Suppliers() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce fournisseur ?")) return;
 
         try {
+            // 1. Dissocier le fournisseur de ses dépenses (pour éviter l'erreur de clé étrangère)
+            await supabase
+                .from('expenses')
+                .update({ supplier_id: null })
+                .eq('supplier_id', id);
+
+            // 2. Supprimer le fournisseur
             const { error } = await supabase
                 .from('suppliers')
                 .delete()
@@ -62,7 +69,7 @@ export default function Suppliers() {
             setSuppliers(suppliers.filter(s => s.id !== id));
         } catch (err) {
             console.error(err);
-            alert("Erreur lors de la suppression");
+            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
         }
     };
 

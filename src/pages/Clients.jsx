@@ -50,6 +50,13 @@ export default function Clients() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) return;
 
         try {
+            // 1. Dissocier le client de ses transactions (éviter l'erreur de clé étrangère)
+            await supabase
+                .from('transactions')
+                .update({ client_id: null })
+                .eq('client_id', id);
+
+            // 2. Supprimer le client
             const { error } = await supabase
                 .from('clients')
                 .delete()
@@ -59,7 +66,7 @@ export default function Clients() {
             setClients(clients.filter(c => c.id !== id));
         } catch (err) {
             console.error(err);
-            alert("Erreur lors de la suppression");
+            alert("Erreur lors de la suppression : " + (err.message || err.details || ""));
         }
     };
 
