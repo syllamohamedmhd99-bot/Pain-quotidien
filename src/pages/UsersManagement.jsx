@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X, Plus } from 'lucide-react';
+import { Search, UserCog, ShieldAlert, Mail, Shield, CheckCircle, X, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './CRM.css';
 
