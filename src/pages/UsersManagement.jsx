@@ -237,9 +237,12 @@ export default function UsersManagement() {
                                 </div>
                             </div>
 
-                            <div className="crm-card-footer" style={{ justifyContent: 'flex-end' }}>
-                                <button className="btn btn-outline btn-small" onClick={() => handleOpenModal(profile)}>
-                                    Modifier rôles & permissions
+                            <div className="crm-card-footer" style={{ justifyContent: 'space-between', gap: '0.5rem' }}>
+                                <button className="btn btn-outline btn-small" onClick={() => window.location.href = `/users/${profile.id}`} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+                                    Détails & Instructions
+                                </button>
+                                <button className="btn btn-primary btn-small" onClick={() => handleOpenModal(profile)} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>
+                                    Modifier permissions
                                 </button>
                             </div>
                         </motion.div>

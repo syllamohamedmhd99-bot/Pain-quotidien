@@ -19,7 +19,7 @@ const itemVariants = {
     visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export default function Dashboard() {
+export default function Dashboard({ profile }) {
     const [transactions, setTransactions] = useState([]);
     const [clients, setClients] = useState([]);
     const [products, setProducts] = useState([]);
@@ -169,6 +169,33 @@ export default function Dashboard() {
                     Nouvelle Vente
                 </button>
             </div>
+
+            {profile?.instructions && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    style={{
+                        background: 'color-mix(in srgb, var(--primary-color) 10%, transparent)',
+                        border: '1px solid var(--primary-color)',
+                        padding: '1.5rem',
+                        borderRadius: '12px',
+                        marginBottom: '2rem',
+                        display: 'flex',
+                        gap: '1rem',
+                        alignItems: 'flex-start'
+                    }}
+                >
+                    <div style={{ background: 'var(--primary-color)', color: 'white', padding: '0.5rem', borderRadius: '50%' }}>
+                        <AlertTriangle size={24} />
+                    </div>
+                    <div>
+                        <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)', fontSize: '1.2rem' }}>Message de l'Administrateur</h3>
+                        <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                            {profile.instructions}
+                        </p>
+                    </div>
+                </motion.div>
+            )}
 
             <motion.div
                 className="stats-grid"

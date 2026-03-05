@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
 import Production from './pages/Production';
 import UsersManagement from './pages/UsersManagement';
+import UserDetail from './pages/UserDetail';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -101,7 +102,7 @@ function App() {
           session ? (
             <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout} profile={profile}>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Dashboard profile={profile} />} />
                 <Route path="/pos" element={<POS />} />
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/clients" element={<Clients />} />
@@ -116,6 +117,7 @@ function App() {
 
                 {/* Admin Only Routes */}
                 <Route path="/users" element={isAdmin ? <UsersManagement /> : <Navigate to="/" />} />
+                <Route path="/users/:id" element={isAdmin ? <UserDetail /> : <Navigate to="/" />} />
               </Routes>
             </Layout>
           ) : (
