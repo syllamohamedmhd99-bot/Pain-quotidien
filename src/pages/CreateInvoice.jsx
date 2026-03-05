@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Save, ArrowLeft, User, Package, Calculator, Receipt } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, User, Package, Calculator, Receipt, Printer } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './CreateInvoice.css';
 
@@ -234,9 +234,9 @@ export default function CreateInvoice() {
                             Annuler
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={submitting}>
-                            {submitting ? "Génération..." : (
+                            {submitting ? "Traitement..." : (
                                 <>
-                                    <Save size={18} /> Générer et Enregistrer
+                                    <Printer size={18} /> Télécharger et Imprimer
                                 </>
                             )}
                         </button>
