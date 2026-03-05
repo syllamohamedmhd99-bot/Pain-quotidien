@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Printer, Download, Share2, Calendar as CalendarIcon, Filter, DollarSign, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { Printer, Download, Share2, Calendar as CalendarIcon, Filter, DollarSign, TrendingUp, TrendingDown, Clock, User, ChefHat } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import html2pdf from 'html2pdf.js'; // Importer html2pdf dynamique
 import './Reports.css';
@@ -10,6 +10,8 @@ export default function Reports() {
     const [expenses, setExpenses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("month"); // "today", "week", "month", "year"
+    const [reporterName, setReporterName] = useState("");
+    const [reporterRole, setReporterRole] = useState("");
 
     const reportRef = useRef(); // Référence à la zone imprimable/téléchargeable
 
@@ -139,16 +141,38 @@ export default function Reports() {
                     </div>
                 </div>
 
-                <div className="reports-filters card">
+                <div className="reports-filters card" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
                     <div className="filter-group">
                         <Filter size={18} />
-                        <span>Période d'analyse :</span>
+                        <span>Analyse :</span>
                         <select value={period} onChange={(e) => setPeriod(e.target.value)} className="select-input">
                             <option value="today">Aujourd'hui</option>
                             <option value="week">7 derniers jours</option>
                             <option value="month">30 derniers jours</option>
                             <option value="year">Cette année</option>
                         </select>
+                    </div>
+                    <div className="filter-group">
+                        <User size={18} />
+                        <input
+                            type="text"
+                            placeholder="Nom du responsable"
+                            value={reporterName}
+                            onChange={(e) => setReporterName(e.target.value)}
+                            className="select-input"
+                            style={{ minWidth: '180px' }}
+                        />
+                    </div>
+                    <div className="filter-group">
+                        <ChefHat size={18} />
+                        <input
+                            type="text"
+                            placeholder="Poste / Titre"
+                            value={reporterRole}
+                            onChange={(e) => setReporterRole(e.target.value)}
+                            className="select-input"
+                            style={{ minWidth: '150px' }}
+                        />
                     </div>
                 </div>
             </div>
@@ -259,7 +283,22 @@ export default function Reports() {
 
                         <div className="report-footer">
                             <p>Document généré automatiquement par l'application <strong>Le Pain Quotidien</strong>.</p>
-                            <p>Signature du responsable : __________________________</p>
+                            <div className="report-signature">
+                                <div style={{ textAlign: 'right' }}>
+                                    {reporterName && (
+                                        <p style={{ margin: 0, fontWeight: 'bold', color: '#0f172a' }}>
+                                            {reporterName}
+                                        </p>
+                                    )}
+                                    {reporterRole && (
+                                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
+                                            {reporterRole}
+                                        </p>
+                                    )}
+                                    <div style={{ borderBottom: '1px solid #e2e8f0', width: '200px', marginTop: '2rem', marginLeft: 'auto' }}></div>
+                                    <p style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>Signature du responsable</p>
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}
