@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import Expenses from './pages/Expenses';
 import Production from './pages/Production';
 import Reports from './pages/Reports';
+import ProductionCosts from './pages/ProductionCosts';
 import UsersManagement from './pages/UsersManagement';
 import UserDetail from './pages/UserDetail';
 import { useEffect, useState } from 'react';
@@ -127,6 +128,7 @@ function App() {
                 <Route path="/suppliers" element={<ProtectedRoute path="/suppliers"><Suppliers /></ProtectedRoute>} />
                 <Route path="/history" element={<ProtectedRoute path="/history"><History /></ProtectedRoute>} />
                 <Route path="/expenses" element={<ProtectedRoute path="/expenses"><Expenses /></ProtectedRoute>} />
+                <Route path="/production-costs" element={<ProtectedRoute path="/production-costs"><ProductionCosts /></ProtectedRoute>} />
                 <Route path="/production" element={<ProtectedRoute path="/production"><Production /></ProtectedRoute>} />
 
                 {/* Facturation et ses sous-pages */}

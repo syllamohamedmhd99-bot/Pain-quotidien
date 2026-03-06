@@ -10,8 +10,16 @@ const navItems = [
     { name: 'Inventaire', path: '/inventory', icon: Wheat },
     { name: 'Clients', path: '/clients', icon: Users },
     { name: 'Fournisseurs', path: '/suppliers', icon: Truck },
-    { name: 'Dépenses', path: '/expenses', icon: Wallet },
     { name: 'Production', path: '/production', icon: ChefHat },
+    {
+        name: 'Charges',
+        path: '/expenses',
+        icon: Wallet,
+        subItems: [
+            { name: 'Charges Générales', path: '/expenses' },
+            { name: 'Charges Production', path: '/production-costs' }
+        ]
+    },
     {
         name: 'Facturation',
         path: '/invoices',
