@@ -50,15 +50,23 @@ export default function Salaries() {
     const handleAddSalary = async (e) => {
         e.preventDefault();
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+
             const payload = {
                 employee_name: formData.employee_name,
                 amount: parseFloat(formData.amount),
                 period: formData.period,
                 status: formData.status,
-                date: new Date(formData.date).toISOString()
+                date: new Date(formData.date).toISOString(),
+                user_id: user?.id
             };
 
             const { error } = await supabase.from('salaries').insert([payload]);
+
+            if (error) {
+                alert("Erreur lors de l'enregistrement: " + error.message);
+                throw error;
+            }
 
             if (!error) {
                 setIsModalOpen(false);

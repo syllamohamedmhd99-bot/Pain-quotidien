@@ -61,15 +61,23 @@ export default function Expenses() {
     const handleAddExpense = async (e) => {
         e.preventDefault();
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+
             const payload = {
                 category: formData.category,
                 amount: parseFloat(formData.amount),
                 description: formData.description,
                 supplier_id: formData.supplier_id ? parseInt(formData.supplier_id) : null,
-                date: new Date(formData.date).toISOString()
+                date: new Date(formData.date).toISOString(),
+                user_id: user?.id
             };
 
             const { data, error } = await supabase.from('expenses').insert([payload]);
+
+            if (error) {
+                alert("Erreur lors de l'enregistrement: " + error.message);
+                throw error;
+            }
 
             if (!error) {
                 setIsModalOpen(false);
