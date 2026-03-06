@@ -324,6 +324,16 @@ a:hover {
   color: #ef4444;
 }
 
+.badge-info {
+  background-color: rgba(58, 134, 255, 0.12);
+  color: #3a86ff;
+}
+
+.badge-berry {
+  background-color: rgba(154, 113, 151, 0.12);
+  color: #9a7197;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

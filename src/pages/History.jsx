@@ -71,6 +71,16 @@ export default function History() {
 
     const filters = ["Tous", "Vente", "Achat", "Inventaire", "CRM"];
 
+    const getPaymentBadgeClass = (mode) => {
+        switch (mode) {
+            case 'Espèce': return 'badge-success';
+            case 'Orange Money': return 'badge-warning';
+            case 'Virement bancaire': return 'badge-info';
+            case 'Chèque': return 'badge-berry';
+            default: return 'badge-neutral';
+        }
+    };
+
     const filteredLogs = logs.filter(log => {
         const matchesType = filterType === "Tous" || log.type === filterType;
         const matchesSearch = log.desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -149,7 +159,7 @@ export default function History() {
                                     </div>
                                     <div className="status-action-group" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                         {log.paymentMode && (
-                                            <span className="badge badge-outline" style={{ border: '1px solid var(--border-color)', opacity: 0.8, fontSize: '0.7rem' }}>
+                                            <span className={`badge ${getPaymentBadgeClass(log.paymentMode)}`} style={{ fontSize: '0.7rem', textTransform: 'none' }}>
                                                 {log.paymentMode}
                                             </span>
                                         )}
