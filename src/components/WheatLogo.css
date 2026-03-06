@@ -5,78 +5,14 @@
     overflow: visible;
 }
 
-.wheat-svg-bouquet {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
-.stalk-group {
-    transform-origin: 50px 95px;
+.site-logo-img {
+    display: block;
+    /* mix-blend-mode: multiply; Only if we had a white background, but we have transparency now */
+    filter: drop-shadow(0 2px 4px rgba(45, 36, 29, 0.1));
     transition: var(--transition-smooth);
 }
 
-.stalk-middle {
-    animation: sway-middle 5s ease-in-out infinite;
-}
-
-.stalk-left {
-    animation: sway-left 6s ease-in-out infinite;
-    opacity: 0.85;
-}
-
-.stalk-right {
-    animation: sway-right 5.5s ease-in-out infinite;
-    opacity: 0.85;
-}
-
-@keyframes sway-middle {
-
-    0%,
-    100% {
-        transform: rotate(-1.5deg);
-    }
-
-    50% {
-        transform: rotate(1.5deg);
-    }
-}
-
-@keyframes sway-left {
-
-    0%,
-    100% {
-        transform: rotate(-2deg) scale(0.98);
-    }
-
-    50% {
-        transform: rotate(2deg) scale(1);
-    }
-}
-
-@keyframes sway-right {
-
-    0%,
-    100% {
-        transform: rotate(-2.5deg) scale(0.98);
-    }
-
-    50% {
-        transform: rotate(2.5deg) scale(1.02);
-    }
-}
-
-/* Subtle grain pulse glow */
-.stalk-group circle {
-    animation: grain-glow 3s ease-in-out infinite alternate;
-}
-
-@keyframes grain-glow {
-    from {
-        filter: brightness(1);
-    }
-
-    to {
-        filter: brightness(1.2) drop-shadow(0 0 2px rgba(255, 215, 0, 0.4));
-    }
+.wheat-logo-container:hover .site-logo-img {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 12px rgba(45, 36, 29, 0.15));
 }
