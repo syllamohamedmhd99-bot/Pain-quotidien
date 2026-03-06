@@ -99,12 +99,11 @@ async function deleteUser(req, res) {
         const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
 
         if (deleteError) {
-            console.error("Auth Delete Error:", deleteError);
-            // Si la suppression échoue, c'est probablement car une contrainte NOT NULL bloque toujours
+            console.error("Auth Delete ERROR:", deleteError);
             return res.status(500).json({
-                error: 'Échec de suppression Supabase: ' + deleteError.message,
-                details: "Cela arrive souvent quand l'utilisateur est lié à des factures ou dépenses qui ne peuvent pas être dissociées (colonnes obligatoires).",
-                code: deleteError.code
+                error: `Erreur Supabase Auth: ${deleteError.message}`,
+                details: "La suppression a été rejetée par la base de données. Il reste probablement des données (transactions, stocks) liées à cet utilisateur que le système n'a pas pu détacher.",
+                supabaseError: deleteError
             });
         }
 

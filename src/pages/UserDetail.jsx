@@ -235,8 +235,8 @@ export default function UserDetail() {
                         </div>
                     </div>
 
-                    {/* Zone Danger */}
-                    {profile.role !== 'Administrateur' && (
+                    {/* Zone Danger - Autoriser la suppression si ce n'est pas nous-même */}
+                    {profile.id !== (supabase.auth.getUser()?.id) && (
                         <div className="card" style={{ border: '1px solid color-mix(in srgb, var(--danger-color) 30%, transparent)', background: 'color-mix(in srgb, var(--danger-color) 5%, transparent)', padding: '1.5rem' }}>
                             <h3 style={{ color: 'var(--danger-color)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem', marginBottom: '1rem' }}>
                                 <AlertCircle size={18} />

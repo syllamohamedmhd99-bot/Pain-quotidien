@@ -335,6 +335,34 @@ export default function UsersManagement() {
                                 <button className="btn btn-primary btn-small" onClick={() => handleOpenModal(profile)} style={{ flex: 1, padding: '0.5rem', display: 'flex', justifyContent: 'center' }}>
                                     Modifier permissions
                                 </button>
+                                <button
+                                    className="btn btn-small"
+                                    onClick={async () => {
+                                        const { data: { user } } = await supabase.auth.getUser();
+                                        if (profile.id === user?.id) return alert("Vous ne pouvez pas vous supprimer vous-même.");
+
+                                        if (!window.confirm(`Supprimer définitivement ${profile.full_name || 'cet utilisateur'} ?`)) return;
+
+                                        try {
+                                            const { data: { session } } = await supabase.auth.getSession();
+                                            const response = await fetch('/api/deleteUser', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                                                body: JSON.stringify({ targetUserId: profile.id })
+                                            });
+                                            if (response.ok) {
+                                                alert("Utilisateur supprimé.");
+                                                fetchProfiles();
+                                            } else {
+                                                const err = await response.json();
+                                                alert("Erreur: " + err.error);
+                                            }
+                                        } catch (e) { alert("Erreur: " + e.message); }
+                                    }}
+                                    style={{ background: 'var(--danger-color)', color: 'white', padding: '0.5rem', borderRadius: '8px' }}
+                                >
+                                    <Trash2 size={16} />
+                                </button>
                             </div>
                         </motion.div>
                     ))}
