@@ -235,18 +235,28 @@ export default function UsersManagement() {
                     <button className="btn btn-outline" onClick={async () => {
                         try {
                             const { data: { session } } = await supabase.auth.getSession();
-                            if (!session) return alert("Session manquante");
+                            if (!session) return alert("ERREUR : Vous n'êtes pas connecté (Session absente).");
+
                             const res = await fetch('/api/checkConfig', {
                                 headers: { 'Authorization': `Bearer ${session.access_token}` }
                             });
+
+                            if (!res.ok) {
+                                const text = await res.text();
+                                return alert(`ERREUR SERVEUR (${res.status}) :\nL'API de diagnostic n'a pas pu être contactée.\n\nNote: Assurez-vous d'avoir poussé vos changements sur GitHub et que Vercel a fini le déploiement.`);
+                            }
+
                             const data = await res.json();
+                            if (!data.results) throw new Error("Réponse API malformée.");
+
                             alert(`DIAGNOSTIC SERVEUR :\n` +
                                 `- Clé Service Role : ${data.results.hasServiceKey ? 'OK (Configurée)' : 'ABSENTE (ERREUR)'}\n` +
                                 `- Connexion DB : ${data.results.dbConnection}\n` +
                                 `- Votre Rôle : ${data.results.isAdmin}\n\n` +
-                                `Note: Si Clé ABSENTE ou Profil manquant, la suppression échouera.`);
+                                `Note: Si la Clé est ABSENTE, mettez à jour les variables d'environnement sur Vercel.`);
                         } catch (e) {
-                            alert("Erreur diagnostic : " + e.message);
+                            console.error("Diagnostic error:", e);
+                            alert("ERREUR CRITIQUE :\n" + e.message);
                         }
                     }} style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}>
                         <Shield size={20} />
