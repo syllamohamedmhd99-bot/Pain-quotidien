@@ -1,0 +1,27 @@
+.wheat-logo-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheat-stalk {
+    position: absolute;
+    transform-origin: bottom center;
+    color: var(--primary-color, #c68b59);
+}
+
+.stalk-1 {
+    transform: rotate(-25deg) translateX(-2px);
+    opacity: 0.8;
+}
+
+.stalk-2 {
+    transform: rotate(0deg) translateY(-2px);
+    z-index: 2;
+}
+
+.stalk-3 {
+    transform: rotate(25deg) translateX(2px);
+    opacity: 0.8;
+}

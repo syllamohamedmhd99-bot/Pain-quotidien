@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { Printer, ArrowLeft, Receipt, Download, Share2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import WheatLogo from '../components/WheatLogo';
 import './Invoice.css';
 
 export default function Invoice() {
@@ -142,7 +143,9 @@ export default function Invoice() {
             <div className="invoice-paper card glass" id="invoice-content">
                 <div className="invoice-header">
                     <div className="brand">
-                        <div className="brand-logo">🥖</div>
+                        <div className="brand-logo">
+                            <WheatLogo size={40} />
+                        </div>
                         <div>
                             <h1>Pain Doré</h1>
                             <p>Boulangerie Artisanale & Pâtisserie</p>

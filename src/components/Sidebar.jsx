@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet, ChefHat, ShieldCheck } from 'lucide-react';
+import WheatLogo from './WheatLogo';
 import './Sidebar.css';
 
 const navItems = [
@@ -73,7 +74,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
             <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div className="logo-icon">
-                        <Croissant size={32} />
+                        <WheatLogo size={32} />
                     </div>
                     <h2>Pain Doré</h2>
                 </div>

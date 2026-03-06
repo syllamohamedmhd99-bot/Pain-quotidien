@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ShoppingBag, TrendingUp, Croissant, Users, Truck, AlertTriangle, ArrowRight, DollarSign } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Wheat, Users, Truck, AlertTriangle, ArrowRight, DollarSign } from 'lucide-react';
+import WheatLogo from '../components/WheatLogo';
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import './Dashboard.css';

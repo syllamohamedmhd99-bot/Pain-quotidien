@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, LogIn, UserPlus, Croissant } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import WheatLogo from '../components/WheatLogo';
 import { supabase } from '../supabaseClient';
 import './Auth.css';
 
@@ -121,7 +122,7 @@ export default function Auth({ onLogin }) {
                         whileHover={{ scale: 1.05, rotate: 5 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Croissant size={32} />
+                        <WheatLogo size={48} />
                     </motion.div>
                     <motion.h2
                         className="auth-title"
