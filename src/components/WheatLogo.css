@@ -8,22 +8,25 @@
 .wheat-stalk {
     position: absolute;
     transform-origin: bottom center;
-    color: var(--primary-color, #c68b59);
+    color: var(--primary-color, #d4a373);
     stroke: currentColor;
+    stroke-width: 2.5;
     transition: var(--transition-smooth);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .stalk-1 {
-    transform: rotate(-25deg) translateX(-2px);
-    opacity: 0.8;
+    transform: rotate(-30deg) translateX(-4px);
+    opacity: 0.7;
 }
 
 .stalk-2 {
-    transform: rotate(0deg) translateY(-2px);
+    transform: rotate(0deg) translateY(-4px);
     z-index: 2;
+    color: var(--primary-color, #e9c46a);
 }
 
 .stalk-3 {
-    transform: rotate(25deg) translateX(2px);
-    opacity: 0.8;
+    transform: rotate(30deg) translateX(4px);
+    opacity: 0.7;
 }
