@@ -68,6 +68,7 @@ export default function Dashboard({ profile }) {
 
     // BI Calculations
     const totalRevenue = (Array.isArray(transactions) ? transactions : [])
+        .filter(t => !t.trx_id?.startsWith('FACT-'))
         .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
     const totalExpenses = (Array.isArray(expenses) ? expenses : [])
@@ -76,11 +77,11 @@ export default function Dashboard({ profile }) {
     const netProfit = totalRevenue - totalExpenses;
 
     const totalSalesToday = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => isToday(t.date))
+        .filter(t => isToday(t.date) && !t.trx_id?.startsWith('FACT-'))
         .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
     const todayOrdersCount = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => isToday(t.date)).length;
+        .filter(t => isToday(t.date) && !t.trx_id?.startsWith('FACT-')).length;
 
     // Top Products Calculation
     const getTopProducts = () => {
@@ -116,7 +117,8 @@ export default function Dashboard({ profile }) {
                     const tDate = new Date(t.date);
                     return tDate.getDate() === d.getDate() &&
                         tDate.getMonth() === d.getMonth() &&
-                        tDate.getFullYear() === d.getFullYear();
+                        tDate.getFullYear() === d.getFullYear() &&
+                        !t.trx_id?.startsWith('FACT-');
                 })
                 .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
@@ -138,7 +140,8 @@ export default function Dashboard({ profile }) {
                 .filter(t => {
                     const tDate = new Date(t.date);
                     return tDate.getMonth() === d.getMonth() &&
-                        tDate.getFullYear() === d.getFullYear();
+                        tDate.getFullYear() === d.getFullYear() &&
+                        !t.trx_id?.startsWith('FACT-');
                 })
                 .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
