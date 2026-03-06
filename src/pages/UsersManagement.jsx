@@ -233,30 +233,24 @@ export default function UsersManagement() {
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <button className="btn btn-outline" onClick={async () => {
+                        alert("DIAGNOSTIC : Bouton pressé ! Test de la session...");
                         try {
                             const { data: { session } } = await supabase.auth.getSession();
-                            if (!session) return alert("ERREUR : Vous n'êtes pas connecté (Session absente).");
+                            if (!session) return alert("ERREUR : Session absente. Reconnectez-vous.");
 
+                            alert("Session OK. Appel serveur API...");
                             const res = await fetch('/api/checkConfig', {
                                 headers: { 'Authorization': `Bearer ${session.access_token}` }
                             });
 
                             if (!res.ok) {
-                                const text = await res.text();
-                                return alert(`ERREUR SERVEUR (${res.status}) :\nL'API de diagnostic n'a pas pu être contactée.\n\nNote: Assurez-vous d'avoir poussé vos changements sur GitHub et que Vercel a fini le déploiement.`);
+                                return alert(`ERREUR SERVEUR (${res.status}) : L'API ne répond pas.`);
                             }
 
                             const data = await res.json();
-                            if (!data.results) throw new Error("Réponse API malformée.");
-
-                            alert(`DIAGNOSTIC SERVEUR :\n` +
-                                `- Clé Service Role : ${data.results.hasServiceKey ? 'OK (Configurée)' : 'ABSENTE (ERREUR)'}\n` +
-                                `- Connexion DB : ${data.results.dbConnection}\n` +
-                                `- Votre Rôle : ${data.results.isAdmin}\n\n` +
-                                `Note: Si la Clé est ABSENTE, mettez à jour les variables d'environnement sur Vercel.`);
+                            alert(`CONFIG SERVEUR :\n- Clé : ${data.results.hasServiceKey ? 'OK' : 'KO'}\n- DB : ${data.results.dbConnection}\n- Rôle : ${data.results.isAdmin}`);
                         } catch (e) {
-                            console.error("Diagnostic error:", e);
-                            alert("ERREUR CRITIQUE :\n" + e.message);
+                            alert("ERREUR : " + e.message);
                         }
                     }} style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}>
                         <Shield size={20} />
