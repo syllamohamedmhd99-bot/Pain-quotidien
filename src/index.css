@@ -105,6 +105,66 @@
   --glass-border: rgba(173, 132, 170, 0.1);
 }
 
+/* Theme: Sunset Orange */
+.theme-sunset {
+  --primary-color: #f3722c;
+  --primary-hover: #d65d1d;
+  --bg-color: #fffaf8;
+  --glass-border: rgba(243, 114, 44, 0.2);
+}
+
+.dark.theme-sunset {
+  --primary-color: #f8961e;
+  --primary-hover: #f9844a;
+  --bg-color: #1e1a18;
+  --glass-border: rgba(243, 114, 44, 0.1);
+}
+
+/* Theme: Lavender Mist */
+.theme-lavender {
+  --primary-color: #8338ec;
+  --primary-hover: #6a2cc0;
+  --bg-color: #f9f8ff;
+  --glass-border: rgba(131, 56, 236, 0.2);
+}
+
+.dark.theme-lavender {
+  --primary-color: #9b5de5;
+  --primary-hover: #af7aef;
+  --bg-color: #17151c;
+  --glass-border: rgba(155, 93, 229, 0.1);
+}
+
+/* Theme: Midnight Navy */
+.theme-midnight {
+  --primary-color: #3a86ff;
+  --primary-hover: #1b6ef0;
+  --bg-color: #f4f8ff;
+  --glass-border: rgba(58, 134, 255, 0.2);
+}
+
+.dark.theme-midnight {
+  --primary-color: #00b4d8;
+  --primary-hover: #48cae4;
+  --bg-color: #0b131e;
+  --glass-border: rgba(0, 180, 216, 0.1);
+}
+
+/* Theme: Eco Green */
+.theme-eco {
+  --primary-color: #43aa8b;
+  --primary-hover: #358f74;
+  --bg-color: #f2fbf8;
+  --glass-border: rgba(67, 170, 139, 0.2);
+}
+
+.dark.theme-eco {
+  --primary-color: #4d908e;
+  --primary-hover: #577590;
+  --bg-color: #151c1a;
+  --glass-border: rgba(77, 144, 142, 0.1);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

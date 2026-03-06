@@ -21,7 +21,7 @@ import { supabase } from './supabaseClient';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
-  const [theme, setTheme] = useState('default'); // 'default', 'matcha', 'ocean', 'berry'
+  const [theme, setTheme] = useState('default'); // 'default', 'matcha', 'ocean', 'berry', 'sunset', 'lavender', 'midnight', 'eco'
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
