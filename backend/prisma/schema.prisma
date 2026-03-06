@@ -66,6 +66,8 @@ model Transaction {
   description  String?
   user_id      String            @default("admin@boulangerie.local")
   date         DateTime          @default(now())
+  payment_mode  String            @default("Espèce")
+  payment_details String?
   client_id    Int?
   client       Client?           @relation(fields: [client_id], references: [id])
   items        TransactionItem[]

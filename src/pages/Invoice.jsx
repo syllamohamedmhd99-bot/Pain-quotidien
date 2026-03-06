@@ -152,6 +152,7 @@ export default function Invoice() {
                         <h2>FACTURE</h2>
                         <p><strong>N°:</strong> {transaction.trx_id}</p>
                         <p><strong>Date:</strong> {new Date(transaction.date).toLocaleString('fr-FR')}</p>
+                        <p><strong>Paiement:</strong> {transaction.payment_mode}</p>
                     </div>
                 </div>
 
@@ -216,7 +217,7 @@ export default function Invoice() {
                     <p>Merci de votre confiance !</p>
                     <div className="invoice-stamp">
                         <Receipt size={40} />
-                        <span>PAYÉ</span>
+                        <span>{transaction.payment_mode?.toUpperCase() || 'PAYÉ'}</span>
                     </div>
                 </div>
             </div>

@@ -17,6 +17,8 @@ export default function POS() {
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [isCheckout, setIsCheckout] = useState(false);
+    const [paymentMode, setPaymentMode] = useState("Espèce");
+    const [paymentDetails, setPaymentDetails] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,6 +70,8 @@ export default function POS() {
     const clearCart = () => {
         setCart([]);
         setSelectedClientId("");
+        setPaymentMode("Espèce");
+        setPaymentDetails("");
     };
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -89,8 +93,10 @@ export default function POS() {
                     total_amount: grandTotal,
                     tax: 0,
                     status: "Succès",
-                    description: `Achat en caisse`,
-                    client_id: selectedClientId || null
+                    description: paymentMode === "Autre" && paymentDetails ? `Vente (${paymentDetails})` : `Vente (${paymentMode})`,
+                    client_id: selectedClientId || null,
+                    payment_mode: paymentMode,
+                    payment_details: paymentDetails || null
                 }])
                 .select()
                 .single();
@@ -261,6 +267,33 @@ export default function POS() {
                     <div className="summary-row grand-total">
                         <span>Total</span>
                         <span>{grandTotal.toLocaleString('fr-FR')} GNF</span>
+                    </div>
+
+                    {/* Mode de Paiement Selection */}
+                    <div className="payment-mode-selector" style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', pt: '1rem' }}>
+                        <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>MODE DE PAIEMENT</label>
+                        <div className="payment-options" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                            {["Espèce", "Orange Money", "Virement bancaire", "Autre"].map(mode => (
+                                <button
+                                    key={mode}
+                                    type="button"
+                                    onClick={() => setPaymentMode(mode)}
+                                    className={`btn ${paymentMode === mode ? 'btn-primary' : 'btn-outline'}`}
+                                    style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                                >
+                                    {mode}
+                                </button>
+                            ))}
+                        </div>
+                        {paymentMode === "Autre" && (
+                            <input
+                                type="text"
+                                placeholder="Précisez le mode (ex: Chèque...)"
+                                value={paymentDetails}
+                                onChange={(e) => setPaymentDetails(e.target.value)}
+                                style={{ width: '100%', marginTop: '8px', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                            />
+                        )}
                     </div>
                 </div>
 

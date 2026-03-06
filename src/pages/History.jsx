@@ -31,7 +31,8 @@ export default function History() {
                 icon: trx.type === "Vente" ? ShoppingBag : trx.type === "Achat" ? ArrowDownRight : trx.type === "Inventaire" ? PackagePlus : Users,
                 color: trx.type === "Vente" ? "var(--success-color)" : trx.type === "Achat" ? "var(--danger-color)" : trx.type === "Inventaire" ? "var(--primary-color)" : "var(--accent-color)",
                 deletable: true,
-                rawId: trx.id
+                rawId: trx.id,
+                paymentMode: trx.payment_mode
             }));
 
             setLogs(mappedLogs);
@@ -147,6 +148,11 @@ export default function History() {
                                         {log.amount}
                                     </div>
                                     <div className="status-action-group" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                        {log.paymentMode && (
+                                            <span className="badge badge-outline" style={{ border: '1px solid var(--border-color)', opacity: 0.8, fontSize: '0.7rem' }}>
+                                                {log.paymentMode}
+                                            </span>
+                                        )}
                                         <span className={`status-badge ${log.status === 'Succès' ? 'badge-success' : log.status === 'Confirmé' ? 'badge-warning' : 'badge-neutral'}`}>
                                             {log.status}
                                         </span>
