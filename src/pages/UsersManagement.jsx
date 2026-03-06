@@ -232,6 +232,26 @@ export default function UsersManagement() {
                     />
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button className="btn btn-outline" onClick={async () => {
+                        try {
+                            const { data: { session } } = await supabase.auth.getSession();
+                            if (!session) return alert("Session manquante");
+                            const res = await fetch('/api/checkConfig', {
+                                headers: { 'Authorization': `Bearer ${session.access_token}` }
+                            });
+                            const data = await res.json();
+                            alert(`DIAGNOSTIC SERVEUR :\n` +
+                                `- Clé Service Role : ${data.results.hasServiceKey ? 'OK (Configurée)' : 'ABSENTE (ERREUR)'}\n` +
+                                `- Connexion DB : ${data.results.dbConnection}\n` +
+                                `- Votre Rôle : ${data.results.isAdmin}\n\n` +
+                                `Note: Si Clé ABSENTE ou Profil manquant, la suppression échouera.`);
+                        } catch (e) {
+                            alert("Erreur diagnostic : " + e.message);
+                        }
+                    }} style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}>
+                        <Shield size={20} />
+                        <span>Diagnostic</span>
+                    </button>
                     <button className="btn btn-outline" onClick={handleDeleteAllStaffs} style={{ color: 'var(--danger-color)', borderColor: 'var(--danger-color)' }}>
                         <Trash2 size={20} />
                         <span>Supprimer tous les Staffs</span>
