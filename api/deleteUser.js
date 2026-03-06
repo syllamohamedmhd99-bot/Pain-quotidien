@@ -70,6 +70,22 @@ async function deleteUser(req, res) {
             return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte.' });
         }
 
+        // --- DISSOCIATION DES DONNÉES (Pour éviter les erreurs de contrainte d'intégrité) ---
+        // On détache l'utilisateur de ses records métier sans supprimer les records (pour les rapports financiers)
+        try {
+            await Promise.all([
+                supabaseAdmin.from('transactions').update({ user_id: null }).eq('user_id', targetUserId),
+                supabaseAdmin.from('expenses').update({ user_id: null }).eq('user_id', targetUserId),
+                supabaseAdmin.from('production_logs').update({ user_id: null }).eq('user_id', targetUserId),
+                supabaseAdmin.from('products').update({ user_id: null }).eq('user_id', targetUserId),
+                supabaseAdmin.from('clients').update({ user_id: null }).eq('user_id', targetUserId),
+                supabaseAdmin.from('suppliers').update({ user_id: null }).eq('user_id', targetUserId)
+            ]);
+        } catch (error) {
+            console.warn("Dissociation partially failed:", error);
+            // On continue quand même, l'erreur de suppression finale nous dira si c'est bloquant
+        }
+
         // 2. Delete the user from Auth layer (this will cascade to profiles if DB is set up right)
         const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
 
