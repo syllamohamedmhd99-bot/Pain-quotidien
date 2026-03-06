@@ -81,19 +81,17 @@ async function deleteUser(req, res) {
             return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte.' });
         }
 
-        // --- DISSOCIATION DES DONNÉES (Pour éviter les erreurs de contrainte d'intégrité) ---
-        const tables = ['transactions', 'expenses', 'production_logs', 'products', 'clients', 'suppliers'];
-        const possibleUserCols = ['user_id', 'created_by'];
+        // --- DISSOCIATION ET NETTOYAGE PROFOND ---
+        const cleanupQueries = [
+            supabaseAdmin.from('profiles').delete().eq('id', targetUserId), // On tente de supprimer le profil direct
+            supabaseAdmin.from('transactions').update({ user_id: null }).eq('user_id', targetUserId),
+            supabaseAdmin.from('expenses').update({ user_id: null }).eq('user_id', targetUserId),
+            supabaseAdmin.from('production_logs').update({ user_id: null }).eq('user_id', targetUserId),
+            // Dissocier aussi via les colonnes TEXT (emails) si nécessaire
+            supabaseAdmin.from('products').update({ user_id: 'admin@boulangerie.local' }).eq('user_id', requesterProfile.user_id),
+        ];
 
-        for (const table of tables) {
-            for (const col of possibleUserCols) {
-                try {
-                    await supabaseAdmin.from(table).update({ [col]: null }).eq(col, targetUserId);
-                } catch (e) {
-                    // Silencieusement ignorer si la colonne n'existe pas ou est NOT NULL
-                }
-            }
-        }
+        await Promise.all(cleanupQueries.map(q => q.catch(e => console.warn("Cleanup warning:", e))));
 
         // 2. Delete the user from Auth layer
         const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);

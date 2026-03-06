@@ -109,14 +109,16 @@ export default function UserDetail() {
             if (!response.ok) {
                 const msg = data.error || "Erreur lors de la suppression sur le serveur.";
                 const details = data.details ? `\n\nNote: ${data.details}` : "";
-                throw new Error(msg + details);
+                console.error("Delete failure:", msg);
+                alert("ÉCHEC DE SUPPRESSION :\n" + msg + details); // On garde l'alert ici pour l'instant car pas de diag-zone sur cette page
+                return;
             }
 
             alert("Utilisateur supprimé avec succès.");
             navigate('/admin/users');
         } catch (error) {
             console.error("Delete User Error:", error);
-            alert("Erreur lors de la suppression : " + error.message);
+            alert("Erreur critique : " + error.message);
         } finally {
             setIsDeleting(false);
         }
