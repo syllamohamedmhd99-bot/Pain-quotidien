@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     DollarSign,
@@ -12,7 +12,10 @@ import {
     Truck,
     Flame,
     Package,
-    Wheat
+    Wheat,
+    Edit2,
+    X,
+    ChevronDown
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './ProductionCosts.css';
@@ -21,7 +24,10 @@ export default function ProductionCosts() {
     const [costs, setCosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('Toutes');
+    const [dateFilter, setDateFilter] = useState('Tous');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingCost, setEditingCost] = useState(null);
     const [formData, setFormData] = useState({
         category: 'Matière Première',
         amount: '',
@@ -35,9 +41,11 @@ export default function ProductionCosts() {
         'Livraison',
         'Emballage',
         'Maintenance Four',
-        'Main d''œuvre Production',
+        "Main d'œuvre Production",
         'Autre'
     ];
+
+    const dateFilters = ['Tous', "Aujourd'hui", 'Cette Semaine', 'Ce Mois'];
 
     useEffect(() => {
         fetchData();
@@ -72,21 +80,49 @@ export default function ProductionCosts() {
                 user_id: user?.id
             };
 
-            const { data, error } = await supabase.from('production_costs').insert([payload]);
+            let error;
+            if (editingCost) {
+                const { error: updateError } = await supabase
+                    .from('production_costs')
+                    .update(payload)
+                    .eq('id', editingCost.id);
+                error = updateError;
+            } else {
+                const { error: insertError } = await supabase
+                    .from('production_costs')
+                    .insert([payload]);
+                error = insertError;
+            }
 
             if (!error) {
-                setIsModalOpen(false);
-                setFormData({
-                    category: 'Matière Première',
-                    amount: '',
-                    description: '',
-                    date: new Date().toISOString().split('T')[0]
-                });
+                closeModal();
                 fetchData();
             }
         } catch (error) {
-            console.error("Erreur lors de l'ajout de la charge:", error);
+            console.error("Erreur lors de l'enregistrement de la charge:", error);
         }
+    };
+
+    const openEditModal = (cost) => {
+        setEditingCost(cost);
+        setFormData({
+            category: cost.category,
+            amount: cost.amount,
+            description: cost.description || '',
+            date: new Date(cost.date).toISOString().split('T')[0]
+        });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingCost(null);
+        setFormData({
+            category: 'Matière Première',
+            amount: '',
+            description: '',
+            date: new Date().toISOString().split('T')[0]
+        });
     };
 
     const handleDeleteCost = async (id) => {
@@ -110,12 +146,46 @@ export default function ProductionCosts() {
         }
     };
 
-    const filteredCosts = costs.filter(cost =>
-        cost.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cost.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredCosts = useMemo(() => {
+        return costs.filter(cost => {
+            const matchesSearch = (cost.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                cost.category.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            const matchesCategory = categoryFilter === 'Toutes' || cost.category === categoryFilter;
+
+            let matchesDate = true;
+            if (dateFilter !== 'Tous') {
+                const costDate = new Date(cost.date);
+                const now = new Date();
+                if (dateFilter === 'Aujourd\'hui') {
+                    matchesDate = costDate.toDateString() === now.toDateString();
+                } else if (dateFilter === 'Cette Semaine') {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(now.getDate() - 7);
+                    matchesDate = costDate >= weekAgo;
+                } else if (dateFilter === 'Ce Mois') {
+                    matchesDate = costDate.getMonth() === now.getMonth() && costDate.getFullYear() === now.getFullYear();
+                }
+            }
+
+            return matchesSearch && matchesCategory && matchesDate;
+        });
+    }, [costs, searchTerm, categoryFilter, dateFilter]);
 
     const totalAmount = filteredCosts.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+
+    const categoryBreakdown = useMemo(() => {
+        const breakdown = {};
+        categories.forEach(cat => breakdown[cat] = 0);
+        filteredCosts.forEach(cost => {
+            if (breakdown[cost.category] !== undefined) {
+                breakdown[cost.category] += cost.amount;
+            } else {
+                breakdown['Autre'] = (breakdown['Autre'] || 0) + cost.amount;
+            }
+        });
+        return breakdown;
+    }, [filteredCosts, categories]);
 
     return (
         <div className="costs-page">
@@ -130,20 +200,29 @@ export default function ProductionCosts() {
                 </button>
             </div>
 
-            <div className="costs-overview card glass">
+            <div className="costs-overview card glass" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                 <div className="overview-item">
                     <div className="overview-icon" style={{ backgroundColor: 'rgba(212, 163, 115, 0.1)', color: 'var(--primary-color)' }}>
-                        <Flame size={24} />
+                        <DollarSign size={24} />
                     </div>
                     <div>
-                        <span className="overview-label">Total Charges Production</span>
+                        <span className="overview-label">Total Filtré</span>
                         <h2 className="overview-value">{totalAmount.toLocaleString()} GNF</h2>
                     </div>
                 </div>
+
+                <div className="category-breakdown">
+                    {Object.entries(categoryBreakdown).map(([cat, amount]) => amount > 0 && (
+                        <div key={cat} className="breakdown-item card glass">
+                            <span className="breakdown-label">{getCategoryIcon(cat)} {cat}</span>
+                            <span className="breakdown-value">{amount.toLocaleString()} GNF</span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            <div className="filters-section card">
-                <div className="search-bar">
+            <div className="filters-section card glass">
+                <div className="search-bar" style={{ flex: 2 }}>
                     <Search size={20} />
                     <input
                         type="text"
@@ -151,6 +230,21 @@ export default function ProductionCosts() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                </div>
+
+                <div className="filter-group">
+                    <Filter size={18} />
+                    <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+                        <option value="Toutes">Toutes les catégories</option>
+                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    </select>
+                </div>
+
+                <div className="filter-group">
+                    <Calendar size={18} />
+                    <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+                        {dateFilters.map(f => <option key={f} value={f}>{f}</option>)}
+                    </select>
                 </div>
             </div>
 
@@ -181,9 +275,14 @@ export default function ProductionCosts() {
                                         {cost.amount.toLocaleString()} GNF
                                     </td>
                                     <td>
-                                        <button className="delete-btn" onClick={() => handleDeleteCost(cost.id)}>
-                                            <Trash2 size={16} />
-                                        </button>
+                                        <div style={{ display: 'flex' }}>
+                                            <button className="edit-btn" onClick={() => openEditModal(cost)}>
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button className="delete-btn" onClick={() => handleDeleteCost(cost.id)}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -197,7 +296,7 @@ export default function ProductionCosts() {
                 )}
             </div>
 
-            {/* Modal Ajout Charge */}
+            {/* Modal Ajout/Modif Charge */}
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="modal-overlay">
@@ -208,8 +307,8 @@ export default function ProductionCosts() {
                             exit={{ scale: 0.9, opacity: 0 }}
                         >
                             <div className="modal-header">
-                                <h2>Ajouter une Charge de Production</h2>
-                                <button className="close-btn" onClick={() => setIsModalOpen(false)}>&times;</button>
+                                <h2>{editingCost ? 'Modifier la Charge' : 'Ajouter une Charge de Production'}</h2>
+                                <button className="close-btn" onClick={closeModal}><X size={24} /></button>
                             </div>
                             <form onSubmit={handleAddCost}>
                                 <div className="form-group">
@@ -250,8 +349,10 @@ export default function ProductionCosts() {
                                     ></textarea>
                                 </div>
                                 <div className="form-actions">
-                                    <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>
-                                    <button type="submit" className="btn btn-primary">Enregistrer</button>
+                                    <button type="button" className="btn btn-outline" onClick={closeModal}>Annuler</button>
+                                    <button type="submit" className="btn btn-primary">
+                                        {editingCost ? 'Mettre à jour' : 'Enregistrer'}
+                                    </button>
                                 </div>
                             </form>
                         </motion.div>
