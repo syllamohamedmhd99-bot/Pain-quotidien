@@ -117,12 +117,13 @@ body:not(.dark) .particle {
     max-width: 420px;
     padding: 3rem;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.05);
-    /* Lighter base for glass */
+    background: rgba(44, 24, 16, 0.8);
+    /* Fond chocolat chaud semi-transparent */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 163, 115, 0.3);
+    /* Bordure cuivrée subtile */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -130,11 +131,11 @@ body:not(.dark) .particle {
     /* For smooth toggle transitions */
 }
 
-/* Light theme overrides for glassmorphism */
 body:not(.dark) .auth-card {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    background: rgba(60, 35, 25, 0.85);
+    /* Garde un ton chaud même en mode clair */
+    border: 1px solid rgba(212, 163, 115, 0.4);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
 }
 
 .auth-header {
@@ -159,14 +160,14 @@ body:not(.dark) .auth-card {
 .auth-title {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #ffffff;
     margin: 0 0 0.5rem 0;
     letter-spacing: -0.5px;
 }
 
 .auth-subtitle {
     font-size: 0.95rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     margin: 0;
 }
 
@@ -263,7 +264,7 @@ body:not(.dark) .auth-card {
     margin-top: 2rem;
     text-align: center;
     font-size: 0.95rem;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .auth-toggle-btn {
