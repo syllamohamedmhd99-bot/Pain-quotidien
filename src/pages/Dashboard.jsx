@@ -26,16 +26,23 @@ export default function Dashboard({ profile }) {
     const [suppliers, setSuppliers] = useState([]);
     const [expenses, setExpenses] = useState([]);
     const [viewType, setViewType] = useState('weekly');
+    const [globalView, setGlobalView] = useState(profile?.role === 'Administrateur');
+
+    const isAdmin = profile?.role === 'Administrateur';
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Pour le mode local, on peut passer un paramètre ?all=true
+                // En mode Supabase, le RLS gère déjà cela si l'admin a les droits.
+                const queryOptions = isAdmin && globalView ? { all: 'true' } : {};
+
                 const [trxRes, clientRes, prodRes, suppRes, expRes] = await Promise.all([
-                    supabase.from('transactions').select('*'),
-                    supabase.from('clients').select('*'),
-                    supabase.from('products').select('*'),
-                    supabase.from('suppliers').select('*'),
-                    supabase.from('expenses').select('*')
+                    supabase.from('transactions').select('*', queryOptions),
+                    supabase.from('clients').select('*', queryOptions),
+                    supabase.from('products').select('*', queryOptions),
+                    supabase.from('suppliers').select('*', queryOptions),
+                    supabase.from('expenses').select('*', queryOptions)
                 ]);
 
                 if (trxRes.data) setTransactions(trxRes.data);
@@ -49,7 +56,7 @@ export default function Dashboard({ profile }) {
         };
 
         fetchData();
-    }, []);
+    }, [globalView]);
 
     const isToday = (dateString) => {
         const today = new Date();
@@ -161,13 +168,33 @@ export default function Dashboard({ profile }) {
         >
             <div className="dashboard-header">
                 <div>
-                    <h1>Tableau de bord</h1>
-                    <p>Voici l'analyse de votre performance aujourd'hui.</p>
+                    <h1>Tableau de bord {isAdmin && (globalView ? "(Global)" : "(Personnel)")}</h1>
+                    <p>{isAdmin ? "Gérez l'ensemble de l'activité ou votre propre performance." : "Voici l'analyse de votre performance aujourd'hui."}</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => window.location.href = '/pos'}>
-                    <DollarSign size={18} />
-                    Nouvelle Vente
-                </button>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    {isAdmin && (
+                        <div className="view-toggle" style={{ display: 'flex', background: 'var(--bg-secondary)', borderRadius: '12px', padding: '4px', gap: '4px' }}>
+                            <button
+                                className={`btn ${!globalView ? 'btn-primary' : 'btn-text'}`}
+                                style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                                onClick={() => setGlobalView(false)}
+                            >
+                                Ma Vue
+                            </button>
+                            <button
+                                className={`btn ${globalView ? 'btn-primary' : 'btn-text'}`}
+                                style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                                onClick={() => setGlobalView(true)}
+                            >
+                                Global
+                            </button>
+                        </div>
+                    )}
+                    <button className="btn btn-primary" onClick={() => window.location.href = '/pos'}>
+                        <DollarSign size={18} />
+                        Nouvelle Vente
+                    </button>
+                </div>
             </div>
 
             <motion.div

@@ -41,13 +41,20 @@ const localClient = {
         let filters = {};
         const user = getLocalUser();
 
-        const getHeaders = () => ({
-            'Content-Type': 'application/json',
-            'x-user-id': user.email
-        });
+        const getHeaders = () => {
+            const h = {
+                'Content-Type': 'application/json',
+                'x-user-id': user.email
+            };
+            if (chain.showAll) h['x-view-all'] = 'true';
+            return h;
+        };
 
         const chain = {
-            select: (columns) => chain,
+            select: (columns, options) => {
+                if (options?.all) chain.showAll = true;
+                return chain;
+            },
             order: (column, { ascending = true } = {}) => chain,
             eq: (field, value) => {
                 filters[field] = value;

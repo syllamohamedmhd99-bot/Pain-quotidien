@@ -120,7 +120,7 @@ function App() {
           session ? (
             <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout} profile={profile}>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Dashboard profile={profile} />} />
                 <Route path="/profile" element={<Profile session={session} />} />
 
                 <Route path="/pos" element={<ProtectedRoute path="/pos"><POS /></ProtectedRoute>} />

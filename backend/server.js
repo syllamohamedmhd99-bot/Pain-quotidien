@@ -16,19 +16,21 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Middleware pour extraire le user_id des headers
-app.use((req, res, next) => {
-    // Si on est sur la racine, pas besoin de user_id
+// Middleware pour extraire le user_id et le rôle des headers
+app.use(async (req, res, next) => {
     if (req.path === '/') return next();
 
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        console.warn("Requête sans x-user-id:", req.path);
-        // On ne bloque pas forcément tout de suite pour permettre le debug, 
-        // mais on le définit par défaut si manquant (pour la transition)
-        req.userId = 'admin@boulangerie.local';
-    } else {
-        req.userId = userId;
+    const userId = req.headers['x-user-id'] || 'admin@boulangerie.local';
+    req.userId = userId;
+
+    // Récupérer le rôle (simulé ou réel via DB)
+    try {
+        const profile = await prisma.profile.findUnique({
+            where: { user_id: userId }
+        });
+        req.userRole = profile?.role || "Vendeur";
+    } catch (e) {
+        req.userRole = "Vendeur";
     }
     next();
 });
@@ -54,8 +56,11 @@ const handleInsert = async (model, data, userId) => {
 // --- PRODUCTS ---
 app.get('/api/products', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const products = await prisma.product.findMany({
-            where: { user_id: req.userId },
+            where: where,
             orderBy: { name: 'asc' }
         });
         res.json(products);
@@ -93,8 +98,11 @@ app.delete('/api/products/:id', async (req, res, next) => {
 // --- CLIENTS ---
 app.get('/api/clients', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const clients = await prisma.client.findMany({
-            where: { user_id: req.userId },
+            where: where,
             orderBy: { name: 'asc' }
         });
         res.json(clients);
@@ -132,8 +140,11 @@ app.delete('/api/clients/:id', async (req, res, next) => {
 // --- SUPPLIERS ---
 app.get('/api/suppliers', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const suppliers = await prisma.supplier.findMany({
-            where: { user_id: req.userId },
+            where: where,
             orderBy: { name: 'asc' }
         });
         res.json(suppliers);
@@ -171,8 +182,11 @@ app.delete('/api/suppliers/:id', async (req, res, next) => {
 // --- TRANSACTIONS ---
 app.get('/api/transactions', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const transactions = await prisma.transaction.findMany({
-            where: { user_id: req.userId },
+            where: where,
             include: { client: true },
             orderBy: { date: 'desc' }
         });
@@ -253,8 +267,11 @@ app.post('/api/profiles', async (req, res, next) => {
 // --- EXPENSES ---
 app.get('/api/expenses', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const expenses = await prisma.expense.findMany({
-            where: { user_id: req.userId },
+            where: where,
             include: { supplier: true },
             orderBy: { date: 'desc' }
         });
@@ -282,8 +299,11 @@ app.delete('/api/expenses/:id', async (req, res, next) => {
 // --- PRODUCTION LOGS ---
 app.get('/api/production', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const logs = await prisma.productionLog.findMany({
-            where: { user_id: req.userId },
+            where: where,
             orderBy: { created_at: 'desc' }
         });
         res.json(logs);
@@ -321,8 +341,11 @@ app.delete('/api/production/:id', async (req, res, next) => {
 // --- SALARIES ---
 app.get('/api/salaries', async (req, res, next) => {
     try {
+        const viewAll = req.headers['x-view-all'] === 'true' && req.userRole === 'Administrateur';
+        const where = viewAll ? {} : { user_id: req.userId };
+
         const salaries = await prisma.salary.findMany({
-            where: { user_id: req.userId },
+            where: where,
             orderBy: { date: 'desc' }
         });
         res.json(salaries);
