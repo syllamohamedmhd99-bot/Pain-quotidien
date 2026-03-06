@@ -190,21 +190,27 @@ body:not(.dark) .auth-card {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-muted);
-    transition: color 0.3s ease;
+    color: rgba(255, 215, 0, 0.8);
+    /* Or doux pour les icônes */
+    transition: all 0.3s ease;
     pointer-events: none;
 }
 
 .auth-input {
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
-    background: rgba(var(--bg-secondary-rgb), 0.5);
-    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.1);
+    /* Fond plus clair */
+    border: 1px solid rgba(255, 215, 0, 0.2);
     border-radius: 12px;
-    color: var(--text-primary);
+    color: #ffffff;
     font-size: 1rem;
     transition: all 0.3s ease;
     outline: none;
+}
+
+.auth-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .auth-input:focus {
@@ -221,11 +227,12 @@ body:not(.dark) .auth-card {
 .forgot-password {
     align-self: flex-end;
     font-size: 0.85rem;
-    color: var(--primary);
+    color: #FFD700;
+    /* Or éclatant */
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
     margin-top: -0.5rem;
-    transition: color 0.2s;
+    transition: all 0.2s;
 }
 
 .forgot-password:hover {
@@ -268,7 +275,9 @@ body:not(.dark) .auth-card {
     margin-top: 2rem;
     text-align: center;
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: #ffffff;
+    /* Blanc pur pour le footer */
+    font-weight: 500;
 }
 
 .auth-toggle-btn {
