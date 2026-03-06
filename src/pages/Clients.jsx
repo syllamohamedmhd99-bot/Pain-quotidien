@@ -8,6 +8,7 @@ export default function Clients() {
     const [clients, setClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
+    const [diagResult, setDiagResult] = useState(null);
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +51,7 @@ export default function Clients() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?\nNote: Ses transactions passées seront conservées mais ne seront plus liées à son nom.")) return;
 
         try {
+            setDiagResult("Suppression du client en cours...");
             console.log("Tentative de suppression du client ID:", id);
 
             // 1. Dissociation des transactions
@@ -59,7 +61,7 @@ export default function Clients() {
                 .eq('client_id', id);
 
             if (dissociationError) {
-                console.warn("Erreur de dissociation (ignorée) :", dissociationError);
+                console.warn("Erreur de dissociation :", dissociationError);
             }
 
             // 2. Suppression du client
@@ -70,15 +72,16 @@ export default function Clients() {
 
             if (deleteError) {
                 console.error("Erreur Supabase lors de la suppression :", deleteError);
-                throw new Error(`Code ${deleteError.code}: ${deleteError.message}`);
+                setDiagResult(`ÉCHEC : ${deleteError.message} (Code: ${deleteError.code})`);
+                return;
             }
 
             console.log("Suppression réussie !");
             setClients(clients.filter(c => c.id !== id));
-            alert("Client supprimé avec succès.");
+            setDiagResult("SUCCÈS : Client supprimé de la base.");
         } catch (err) {
             console.error("Erreur complète :", err);
-            alert("ERREUR DE SUPPRESSION :\n" + err.message);
+            setDiagResult("ERREUR CRITIQUE : " + err.message);
         }
     };
 
@@ -173,6 +176,17 @@ export default function Clients() {
                 </div>
             </div>
 
+            {diagResult && (
+                <div className="card" style={{ margin: '0 2rem 1rem', padding: '1rem', background: 'var(--bg-secondary)', borderLeft: '4px solid var(--primary-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                        <strong>Diagnostic :</strong> {diagResult}
+                    </div>
+                    <button onClick={() => setDiagResult(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
+
             <motion.div className="crm-grid" layout>
                 <AnimatePresence>
                     {filteredClients.map((client) => (
@@ -197,10 +211,10 @@ export default function Clients() {
                                     </span>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button className="btn-icon" onClick={() => handleOpenModal(client)}>
+                                    <button type="button" className="btn-icon" onClick={(e) => { e.preventDefault(); handleOpenModal(client); }}>
                                         <Edit2 size={16} />
                                     </button>
-                                    <button className="btn-icon delete-action" onClick={() => handleDelete(client.id)}>
+                                    <button type="button" className="btn-icon delete-action" onClick={(e) => { e.preventDefault(); handleDelete(client.id); }}>
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
