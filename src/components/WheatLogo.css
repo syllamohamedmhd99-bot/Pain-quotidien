@@ -1,81 +1,82 @@
-.wheat-bouquet {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.wheat-logo-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: sway 4s ease-in-out infinite;
+    overflow: visible;
 }
 
-.wheat-stalk {
-    position: absolute;
-    transform-origin: bottom center;
-    /* Golden realistic palette */
-    color: #e9c46a;
-    /* Base Gold */
-    stroke: #d4a373;
-    /* Amber stroke for depth */
-    stroke-width: 2;
+.wheat-svg-bouquet {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.stalk-group {
+    transform-origin: 50px 95px;
     transition: var(--transition-smooth);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) brightness(1.1);
 }
 
-.stalk-1 {
-    transform: rotate(-28deg) translateX(-4px);
-    opacity: 0.8;
-    color: #f4a261;
-    /* Slightly darker/toasted */
-    animation: individual-sway-1 5s ease-in-out infinite;
+.stalk-middle {
+    animation: sway-middle 5s ease-in-out infinite;
 }
 
-.stalk-2 {
-    transform: rotate(0deg) translateY(-4px);
-    z-index: 2;
-    color: #ffd700;
-    /* Brightest Gold */
-    filter: drop-shadow(0 4px 8px rgba(233, 196, 106, 0.3)) brightness(1.2);
+.stalk-left {
+    animation: sway-left 6s ease-in-out infinite;
+    opacity: 0.85;
 }
 
-.stalk-3 {
-    transform: rotate(28deg) translateX(4px);
-    opacity: 0.8;
-    color: #e9c46a;
-    animation: individual-sway-2 6s ease-in-out infinite;
+.stalk-right {
+    animation: sway-right 5.5s ease-in-out infinite;
+    opacity: 0.85;
 }
 
-@keyframes sway {
+@keyframes sway-middle {
 
     0%,
     100% {
-        transform: rotate(-2deg);
+        transform: rotate(-1.5deg);
     }
 
     50% {
-        transform: rotate(2deg);
+        transform: rotate(1.5deg);
     }
 }
 
-@keyframes individual-sway-1 {
+@keyframes sway-left {
 
     0%,
     100% {
-        transform: rotate(-28deg) translateX(-4px);
+        transform: rotate(-2deg) scale(0.98);
     }
 
     50% {
-        transform: rotate(-32deg) translateX(-5px);
+        transform: rotate(2deg) scale(1);
     }
 }
 
-@keyframes individual-sway-2 {
+@keyframes sway-right {
 
     0%,
     100% {
-        transform: rotate(28deg) translateX(4px);
+        transform: rotate(-2.5deg) scale(0.98);
     }
 
     50% {
-        transform: rotate(32deg) translateX(5px);
+        transform: rotate(2.5deg) scale(1.02);
+    }
+}
+
+/* Subtle grain pulse glow */
+.stalk-group circle {
+    animation: grain-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes grain-glow {
+    from {
+        filter: brightness(1);
+    }
+
+    to {
+        filter: brightness(1.2) drop-shadow(0 0 2px rgba(255, 215, 0, 0.4));
     }
 }
