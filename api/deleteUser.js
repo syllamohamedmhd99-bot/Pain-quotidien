@@ -39,7 +39,18 @@ async function deleteUser(req, res) {
         const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseServiceKey) {
-            return res.status(500).json({ error: 'ERREUR CRITIQUE: La variable SUPABASE_SERVICE_ROLE_KEY est introuvable.' });
+            return res.status(500).json({ error: 'ERREUR CRITIQUE: La variable SUPABASE_SERVICE_ROLE_KEY est introuvable sur Vercel.' });
+        }
+
+        // --- TEST DE VALIDITÉ DE LA CLÉ ---
+        // On fait un petit test rapide pour voir si la clé est acceptée par Supabase
+        const testClient = createClient(supabaseUrl, supabaseServiceKey);
+        const { error: testError } = await testClient.from('profiles').select('id').limit(1);
+        if (testError && testError.message.includes("Invalid API key")) {
+            return res.status(500).json({
+                error: "La clé SUPABASE_SERVICE_ROLE_KEY configurée sur Vercel est INVALIDE.",
+                details: "Comme vous avez recréé votre base de données, vous devez copier la NOUVELLE 'service_role key' depuis Supabase (Settings -> API) et la mettre à jour dans les variables d'environnement de Vercel."
+            });
         }
 
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {

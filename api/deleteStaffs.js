@@ -32,6 +32,16 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'La variable SUPABASE_SERVICE_ROLE_KEY est requise sur le serveur.' });
         }
 
+        // --- TEST DE VALIDITÉ DE LA CLÉ ---
+        const testClient = createClient(supabaseUrl, supabaseServiceKey);
+        const { error: testError } = await testClient.from('profiles').select('id').limit(1);
+        if (testError && testError.message.includes("Invalid API key")) {
+            return res.status(500).json({
+                error: "Clé SUPABASE_SERVICE_ROLE_KEY invalide sur Vercel.",
+                details: "Veuillez mettre à jour la clé 'service_role' dans les variables d'environnement Vercel avec celle de votre nouveau projet Supabase."
+            });
+        }
+
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
             auth: { autoRefreshToken: false, persistSession: false }
         });

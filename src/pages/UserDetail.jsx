@@ -103,12 +103,12 @@ export default function UserDetail() {
                 body: JSON.stringify({ targetUserId: id })
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
+            console.log("Delete response data:", data);
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const msg = errorData.error || "Erreur lors de la suppression sur le serveur.";
-                const details = errorData.details ? `\n\nNote: ${errorData.details}` : "";
+                const msg = data.error || "Erreur lors de la suppression sur le serveur.";
+                const details = data.details ? `\n\nNote: ${data.details}` : "";
                 throw new Error(msg + details);
             }
 
