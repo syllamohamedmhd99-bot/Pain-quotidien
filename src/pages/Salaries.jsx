@@ -9,6 +9,7 @@ import {
     DollarSign,
     CheckCircle,
     Clock,
+    AlertTriangle,
     X
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -163,8 +164,14 @@ export default function Salaries() {
                                     <td>{s.period}</td>
                                     <td style={{ fontWeight: 'bold' }}>{s.amount.toLocaleString()} GNF</td>
                                     <td>
-                                        <span className={s.status === 'Payé' ? 'status-paid' : 'status-pending'}>
-                                            {s.status === 'Payé' ? <CheckCircle size={12} /> : <Clock size={12} />}
+                                        <span className={
+                                            s.status === 'Payé' ? 'status-paid' :
+                                                s.status === 'Non payé' ? 'status-unpaid' :
+                                                    'status-pending'
+                                        }>
+                                            {s.status === 'Payé' && <CheckCircle size={12} />}
+                                            {s.status === 'Non payé' && <AlertTriangle size={12} />}
+                                            {s.status === 'En attente' && <Clock size={12} />}
                                             {s.status}
                                         </span>
                                     </td>
@@ -206,6 +213,7 @@ export default function Salaries() {
                                     <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                                         <option value="Payé">Payé</option>
                                         <option value="En attente">En attente</option>
+                                        <option value="Non payé">Non payé</option>
                                     </select>
                                 </div>
                                 <div className="form-group">

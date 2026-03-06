@@ -28,3 +28,13 @@
     font-size: 0.8rem;
     font-weight: 500;
 }
+
+.status-unpaid {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    /* Rouge pour non payé */
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
