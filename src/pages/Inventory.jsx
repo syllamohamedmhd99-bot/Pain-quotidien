@@ -57,16 +57,16 @@ export default function Inventory() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?\nNote: Le produit sera retiré de l'inventaire mais restera visible dans l'historique des ventes.")) return;
 
         try {
-            // 1. D'abord, on essaie de dissocier dans transaction_items
+            // 1. D'abord, on doit supprimer ou détacher les items de transaction liés
+            // Note: On utilise delete() plutôt que update({product_id: null}) car souvent transaction_items
+            // est une table de mapping qui ne supporte pas bien les nulls sur product_id.
             const { error: updateError } = await supabase
                 .from('transaction_items')
-                .update({ product_id: null })
+                .delete()
                 .eq('product_id', id);
 
-            // Si l'erreur est liée à une contrainte NOT NULL, on peut soit laisser tel quel (bloqué) 
-            // ou informer l'utilisateur. Ici on continue car certains items peuvent ne pas être liés.
             if (updateError) {
-                console.warn("Dissociation partially failed or column is NOT NULL:", updateError);
+                console.warn("Dissociation failed:", updateError);
             }
 
             // 2. Supprimer le produit
