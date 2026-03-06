@@ -151,10 +151,11 @@ body:not(.dark) .auth-card {
     width: 60px;
     height: 60px;
     border-radius: 16px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    background: linear-gradient(135deg, #FFD700, #DAA520);
+    /* Or et Miel */
+    color: #4B2E1E;
     margin-bottom: 1.5rem;
-    box-shadow: 0 10px 20px -10px var(--primary);
+    box-shadow: 0 10px 20px -10px rgba(255, 215, 0, 0.5);
 }
 
 .auth-title {
@@ -237,22 +238,25 @@ body:not(.dark) .auth-card {
     width: 100%;
     padding: 1rem;
     margin-top: 0.5rem;
-    background: linear-gradient(135deg, var(--primary-color, #d4a373), var(--secondary-color, #faedcd));
-    color: #ffffff;
+    background: linear-gradient(135deg, #FFD700, #CD853F);
+    /* Or et Sucre roux */
+    color: #4B2E1E;
+    /* Texte brun pour le contraste sur l'or */
     border: none;
     border-radius: 12px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 8px 16px -8px rgba(212, 163, 115, 0.5);
+    box-shadow: 0 8px 16px -8px rgba(255, 215, 0, 0.6);
     position: relative;
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .auth-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 20px -8px var(--primary);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 24px -8px rgba(255, 215, 0, 0.8),
+        0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .auth-submit:active {
@@ -270,16 +274,18 @@ body:not(.dark) .auth-card {
 .auth-toggle-btn {
     background: none;
     border: none;
-    color: var(--primary);
-    font-weight: 600;
+    color: #FFD700;
+    /* Or dynamique */
+    font-weight: 700;
     cursor: pointer;
     padding: 0 0.25rem;
     font-size: 1rem;
-    transition: color 0.2s;
+    transition: all 0.2s;
 }
 
 .auth-toggle-btn:hover {
-    color: var(--accent);
+    color: #FFF;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
     text-decoration: underline;
 }
 
