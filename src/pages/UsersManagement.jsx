@@ -14,7 +14,8 @@ export default function UsersManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProfile, setEditingProfile] = useState(null);
     const [selectedRole, setSelectedRole] = useState("Staff");
-    const [selectedPermissions, setSelectedPermissions] = useState([]); // Nouveau state pour les permissions
+    const [selectedPermissions, setSelectedPermissions] = useState([]);
+    const [diagResult, setDiagResult] = useState(null); // Pour l'affichage persistant
 
     const availablePages = [
         { id: '/pos', name: 'Encaissement' },
@@ -232,27 +233,32 @@ export default function UsersManagement() {
                     />
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button className="btn btn-outline" onClick={async () => {
-                        alert("DIAGNOSTIC : Bouton pressé ! Test de la session...");
-                        try {
-                            const { data: { session } } = await supabase.auth.getSession();
-                            if (!session) return alert("ERREUR : Session absente. Reconnectez-vous.");
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            setDiagResult("Vérification en cours... Veuillez patienter.");
+                            try {
+                                const { data: { session } } = await supabase.auth.getSession();
+                                if (!session) return setDiagResult("ERREUR : Vous n'êtes pas connecté (Session absente).");
 
-                            alert("Session OK. Appel serveur API...");
-                            const res = await fetch('/api/checkConfig', {
-                                headers: { 'Authorization': `Bearer ${session.access_token}` }
-                            });
+                                const res = await fetch('/api/checkConfig', {
+                                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                                });
 
-                            if (!res.ok) {
-                                return alert(`ERREUR SERVEUR (${res.status}) : L'API ne répond pas.`);
+                                if (!res.ok) {
+                                    return setDiagResult(`ERREUR SERVEUR (${res.status}) : L'API ne répond pas. Vérifiez que vous avez poussé vos changements.`);
+                                }
+
+                                const data = await res.json();
+                                setDiagResult(`RÉSULTAT : Clé=${data.results.hasServiceKey ? 'OK' : 'KO'}, DB=${data.results.dbConnection}, Rôle=${data.results.isAdmin}`);
+                            } catch (err) {
+                                setDiagResult("ERREUR LOCALE : " + err.message);
                             }
-
-                            const data = await res.json();
-                            alert(`CONFIG SERVEUR :\n- Clé : ${data.results.hasServiceKey ? 'OK' : 'KO'}\n- DB : ${data.results.dbConnection}\n- Rôle : ${data.results.isAdmin}`);
-                        } catch (e) {
-                            alert("ERREUR : " + e.message);
-                        }
-                    }} style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}>
+                        }}
+                        style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
+                    >
                         <Shield size={20} />
                         <span>Diagnostic</span>
                     </button>
@@ -266,6 +272,17 @@ export default function UsersManagement() {
                     </button>
                 </div>
             </div>
+
+            {diagResult && (
+                <div className="card diag-zone" style={{ margin: '0 2rem 1.5rem', padding: '1.2rem', background: 'var(--bg-secondary)', borderLeft: '4px solid var(--primary-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animation: 'slideDown 0.3s ease' }}>
+                    <div style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+                        <strong style={{ color: 'var(--primary-color)' }}>Diagnostic :</strong> {diagResult}
+                    </div>
+                    <button onClick={() => setDiagResult(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '5px' }}>
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
 
             <motion.div className="crm-grid" layout>
                 <AnimatePresence>
@@ -324,11 +341,13 @@ export default function UsersManagement() {
                 </AnimatePresence>
             </motion.div>
 
-            {filteredProfiles.length === 0 && !loading && (
-                <motion.div className="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <p>Aucun utilisateur trouvé.</p>
-                </motion.div>
-            )}
+            {
+                filteredProfiles.length === 0 && !loading && (
+                    <motion.div className="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <p>Aucun utilisateur trouvé.</p>
+                    </motion.div>
+                )
+            }
 
             {/* Modal for Edit Role */}
             <AnimatePresence>
@@ -471,6 +490,6 @@ export default function UsersManagement() {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }
