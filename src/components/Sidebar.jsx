@@ -177,7 +177,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                         <span>Thème</span>
                     </div>
                     <div className="theme-options" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-                        <button className={`theme-btn ${theme === 'default' ? 'active' : ''}`} onClick={() => setTheme('default')} title="Blé Doré" style={{ backgroundColor: '#d4a373' }}></button>
+                        <button className={`theme-btn ${theme === 'default' ? 'active' : ''}`} onClick={() => setTheme('default')} title="Blé Doré" style={{ backgroundColor: '#c68b59' }}></button>
                         <button className={`theme-btn ${theme === 'matcha' ? 'active' : ''}`} onClick={() => setTheme('matcha')} title="Matcha" style={{ backgroundColor: '#8da47e' }}></button>
                         <button className={`theme-btn ${theme === 'ocean' ? 'active' : ''}`} onClick={() => setTheme('ocean')} title="Océan" style={{ backgroundColor: '#6096b4' }}></button>
                         <button className={`theme-btn ${theme === 'berry' ? 'active' : ''}`} onClick={() => setTheme('berry')} title="Baie" style={{ backgroundColor: '#9a7197' }}></button>
