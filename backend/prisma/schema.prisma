@@ -106,6 +106,8 @@ model Expense {
   description String?
   supplier_id Int?
   user_id     String    @default("admin@boulangerie.local")
+  payment_mode String    @default("Espèce")
+  payment_details String?
   supplier    Supplier? @relation(fields: [supplier_id], references: [id])
 
   @@map("expenses")
@@ -131,7 +133,23 @@ model Salary {
   status        String   @default("Payé") // "Payé", "En attente"
   date          DateTime @default(now())
   user_id       String   @default("admin@boulangerie.local")
+  payment_mode  String   @default("Espèce")
+  payment_details String?
   updated_at    DateTime @default(now())
 
   @@map("salaries")
+}
+
+model ProductionCost {
+  id          Int      @id @default(autoincrement())
+  category    String
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  user_id     String   @default("admin@boulangerie.local")
+  payment_mode String   @default("Espèce")
+  payment_details String?
+  updated_at  DateTime @default(now())
+
+  @@map("production_costs")
 }

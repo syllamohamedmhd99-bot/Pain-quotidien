@@ -32,7 +32,9 @@ export default function ProductionCosts() {
         category: 'Matière Première',
         amount: '',
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        payment_mode: 'Espèce',
+        payment_details: ''
     });
 
     const categories = [
@@ -77,7 +79,9 @@ export default function ProductionCosts() {
                 amount: parseFloat(formData.amount),
                 description: formData.description,
                 date: new Date(formData.date).toISOString(),
-                user_id: user?.id
+                user_id: user?.id,
+                payment_mode: formData.payment_mode,
+                payment_details: formData.payment_details || null
             };
 
             let error;
@@ -109,7 +113,9 @@ export default function ProductionCosts() {
             category: cost.category,
             amount: cost.amount,
             description: cost.description || '',
-            date: new Date(cost.date).toISOString().split('T')[0]
+            date: new Date(cost.date).toISOString().split('T')[0],
+            payment_mode: cost.payment_mode || 'Espèce',
+            payment_details: cost.payment_details || ''
         });
         setIsModalOpen(true);
     };
@@ -121,7 +127,9 @@ export default function ProductionCosts() {
             category: 'Matière Première',
             amount: '',
             description: '',
-            date: new Date().toISOString().split('T')[0]
+            date: new Date().toISOString().split('T')[0],
+            payment_mode: 'Espèce',
+            payment_details: ''
         });
     };
 
@@ -256,6 +264,7 @@ export default function ProductionCosts() {
                                 <th>Date</th>
                                 <th>Catégorie</th>
                                 <th>Description</th>
+                                <th>Paiement</th>
                                 <th>Montant</th>
                                 <th>Actions</th>
                             </tr>
@@ -271,6 +280,11 @@ export default function ProductionCosts() {
                                         </div>
                                     </td>
                                     <td>{cost.description || '-'}</td>
+                                    <td>
+                                        <span className="badge badge-outline" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', opacity: 0.8 }}>
+                                            {cost.payment_mode}
+                                        </span>
+                                    </td>
                                     <td className="amount-cell">
                                         {cost.amount.toLocaleString()} GNF
                                     </td>
@@ -348,6 +362,28 @@ export default function ProductionCosts() {
                                         placeholder="Précisez la nature de la dépense..."
                                     ></textarea>
                                 </div>
+                                <div className="form-group">
+                                    <label>Mode de Paiement</label>
+                                    <select
+                                        value={formData.payment_mode}
+                                        onChange={(e) => setFormData({ ...formData, payment_mode: e.target.value })}
+                                    >
+                                        {["Espèce", "Orange Money", "Virement bancaire", "Chèque", "Autre"].map(mode => (
+                                            <option key={mode} value={mode}>{mode}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {formData.payment_mode === "Autre" && (
+                                    <div className="form-group">
+                                        <label>Détails du paiement</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Précisez..."
+                                            value={formData.payment_details}
+                                            onChange={(e) => setFormData({ ...formData, payment_details: e.target.value })}
+                                        />
+                                    </div>
+                                )}
                                 <div className="form-actions">
                                     <button type="button" className="btn btn-outline" onClick={closeModal}>Annuler</button>
                                     <button type="submit" className="btn btn-primary">

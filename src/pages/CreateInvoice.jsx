@@ -14,6 +14,8 @@ export default function CreateInvoice() {
 
     const [selectedClient, setSelectedClient] = useState("");
     const [items, setItems] = useState([{ name: "", quantity: 1, price: 0 }]);
+    const [paymentMode, setPaymentMode] = useState("Espèce");
+    const [paymentDetails, setPaymentDetails] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,7 +88,9 @@ export default function CreateInvoice() {
                     total_amount: totalAmount,
                     tax: 0,
                     status: "Succès",
-                    description: `Facture manuelle ${trxId}`
+                    description: `Facture manuelle ${trxId}`,
+                    payment_mode: paymentMode,
+                    payment_details: paymentDetails || null
                 }])
                 .select()
                 .single();
@@ -228,6 +232,34 @@ export default function CreateInvoice() {
                             <span><Calculator size={18} /> Total à payer :</span>
                             <span className="grand-total">{calculateTotal().toLocaleString()} GNF</span>
                         </div>
+                    </div>
+
+                    <div className="payment-selection card" style={{ padding: '1rem', marginBottom: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
+                        <h3>Mode de Règlement</h3>
+                        <div className="payment-options" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px', marginTop: '1rem' }}>
+                            {["Espèce", "Orange Money", "Virement bancaire", "Chèque", "Autre"].map(mode => (
+                                <button
+                                    key={mode}
+                                    type="button"
+                                    onClick={() => setPaymentMode(mode)}
+                                    className={`btn ${paymentMode === mode ? 'btn-primary' : 'btn-outline'}`}
+                                    style={{ padding: '0.5rem', fontSize: '0.8rem' }}
+                                >
+                                    {mode}
+                                </button>
+                            ))}
+                        </div>
+                        {paymentMode === "Autre" && (
+                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                <label>Précisez le mode</label>
+                                <input
+                                    type="text"
+                                    value={paymentDetails}
+                                    onChange={(e) => setPaymentDetails(e.target.value)}
+                                    placeholder="ex: Chèque #1234..."
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-actions">

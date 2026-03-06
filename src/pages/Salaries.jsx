@@ -25,7 +25,8 @@ export default function Salaries() {
         amount: '',
         period: '',
         status: 'Payé',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        payment_mode: 'Espèce'
     });
 
     useEffect(() => {
@@ -59,7 +60,8 @@ export default function Salaries() {
                 period: formData.period,
                 status: formData.status,
                 date: new Date(formData.date).toISOString(),
-                user_id: user?.id
+                user_id: user?.id,
+                payment_mode: formData.payment_mode
             };
 
             const { error } = await supabase.from('salaries').insert([payload]);
@@ -76,7 +78,8 @@ export default function Salaries() {
                     amount: '',
                     period: '',
                     status: 'Payé',
-                    date: new Date().toISOString().split('T')[0]
+                    date: new Date().toISOString().split('T')[0],
+                    payment_mode: 'Espèce'
                 });
                 fetchData();
             }
@@ -147,6 +150,7 @@ export default function Salaries() {
                                 <th>Employé</th>
                                 <th>Période</th>
                                 <th>Montant</th>
+                                <th>Paiement</th>
                                 <th>Statut</th>
                                 <th>Actions</th>
                             </tr>
@@ -163,6 +167,11 @@ export default function Salaries() {
                                     </td>
                                     <td>{s.period}</td>
                                     <td style={{ fontWeight: 'bold' }}>{s.amount.toLocaleString()} GNF</td>
+                                    <td>
+                                        <span className="badge badge-outline" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', opacity: 0.8 }}>
+                                            {s.payment_mode || 'Espèce'}
+                                        </span>
+                                    </td>
                                     <td>
                                         <span className={
                                             s.status === 'Payé' ? 'status-paid' :
@@ -219,6 +228,14 @@ export default function Salaries() {
                                 <div className="form-group">
                                     <label>Date</label>
                                     <input required type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Mode de Paiement</label>
+                                    <select value={formData.payment_mode} onChange={e => setFormData({ ...formData, payment_mode: e.target.value })}>
+                                        {["Espèce", "Orange Money", "Virement bancaire", "Chèque", "Autre"].map(mode => (
+                                            <option key={mode} value={mode}>{mode}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="form-actions">
                                     <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>

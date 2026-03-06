@@ -25,7 +25,9 @@ export default function Expenses() {
         amount: '',
         description: '',
         supplier_id: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
+        payment_mode: 'Espèce',
+        payment_details: ''
     });
 
     const categories = [
@@ -69,7 +71,9 @@ export default function Expenses() {
                 description: formData.description,
                 supplier_id: formData.supplier_id ? parseInt(formData.supplier_id) : null,
                 date: new Date(formData.date).toISOString(),
-                user_id: user?.id
+                user_id: user?.id,
+                payment_mode: formData.payment_mode,
+                payment_details: formData.payment_details || null
             };
 
             const { data, error } = await supabase.from('expenses').insert([payload]);
@@ -86,7 +90,9 @@ export default function Expenses() {
                     amount: '',
                     description: '',
                     supplier_id: '',
-                    date: new Date().toISOString().split('T')[0]
+                    date: new Date().toISOString().split('T')[0],
+                    payment_mode: 'Espèce',
+                    payment_details: ''
                 });
                 fetchData();
             }
@@ -164,6 +170,7 @@ export default function Expenses() {
                             <th>Catégorie</th>
                             <th>Description</th>
                             <th>Fournisseur</th>
+                            <th>Paiement</th>
                             <th>Montant</th>
                             <th>Actions</th>
                         </tr>
@@ -179,6 +186,11 @@ export default function Expenses() {
                                 </td>
                                 <td>{exp.description || '-'}</td>
                                 <td>{exp.suppliers?.name || 'Aucun'}</td>
+                                <td>
+                                    <span className="badge badge-outline" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', opacity: 0.8 }}>
+                                        {exp.payment_mode}
+                                    </span>
+                                </td>
                                 <td className="text-danger" style={{ fontWeight: 'bold' }}>
                                     {exp.amount.toLocaleString()} GNF
                                 </td>
@@ -259,6 +271,28 @@ export default function Expenses() {
                                         rows="3"
                                     ></textarea>
                                 </div>
+                                <div className="form-group">
+                                    <label>Mode de Paiement</label>
+                                    <select
+                                        value={formData.payment_mode}
+                                        onChange={(e) => setFormData({ ...formData, payment_mode: e.target.value })}
+                                    >
+                                        {["Espèce", "Orange Money", "Virement bancaire", "Chèque", "Autre"].map(mode => (
+                                            <option key={mode} value={mode}>{mode}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {formData.payment_mode === "Autre" && (
+                                    <div className="form-group">
+                                        <label>Détails du paiement</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Précisez..."
+                                            value={formData.payment_details}
+                                            onChange={(e) => setFormData({ ...formData, payment_details: e.target.value })}
+                                        />
+                                    </div>
+                                )}
                                 <div className="form-actions">
                                     <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>
                                     <button type="submit" className="btn btn-primary">Enregistrer</button>
