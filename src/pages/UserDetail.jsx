@@ -107,7 +107,9 @@ export default function UserDetail() {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || "Erreur lors de la suppression sur le serveur.");
+                const msg = errorData.error || "Erreur lors de la suppression sur le serveur.";
+                const details = errorData.details ? `\n\nNote: ${errorData.details}` : "";
+                throw new Error(msg + details);
             }
 
             alert("Utilisateur supprimé avec succès.");

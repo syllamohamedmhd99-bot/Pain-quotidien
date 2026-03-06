@@ -73,17 +73,19 @@ export default async function handler(req, res) {
         // DELETE each staff from Auth then Profile (auto-cascade usually, but just in case)
         for (const staff of staffProfiles) {
             try {
-                // Dissociation des données pour ce staff spécifique avant suppression
-                await Promise.all([
-                    supabaseAdmin.from('transactions').update({ user_id: null }).eq('user_id', staff.id),
-                    supabaseAdmin.from('expenses').update({ user_id: null }).eq('user_id', staff.id),
-                    supabaseAdmin.from('production_logs').update({ user_id: null }).eq('user_id', staff.id),
-                    supabaseAdmin.from('products').update({ user_id: null }).eq('user_id', staff.id),
-                    supabaseAdmin.from('clients').update({ user_id: null }).eq('user_id', staff.id),
-                    supabaseAdmin.from('suppliers').update({ user_id: null }).eq('user_id', staff.id)
-                ]).catch(err => console.warn(`Dissociation failed for ${staff.id}:`, err));
+                // Dissociation exhaustive pour ce staff spécifique avant suppression
+                const tables = ['transactions', 'expenses', 'production_logs', 'products', 'clients', 'suppliers'];
+                const possibleUserCols = ['user_id', 'created_by'];
 
-                // Delete from auth.users (this should cascade to public.profiles)
+                for (const table of tables) {
+                    for (const col of possibleUserCols) {
+                        try {
+                            await supabaseAdmin.from(table).update({ [col]: null }).eq(col, staff.id);
+                        } catch (e) { }
+                    }
+                }
+
+                // Delete from auth.users
                 const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(staff.id);
                 if (deleteAuthError) {
                     errors.push({ id: staff.id, error: deleteAuthError.message });

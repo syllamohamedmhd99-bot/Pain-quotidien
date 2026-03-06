@@ -192,7 +192,9 @@ export default function UsersManagement() {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || "Erreur lors de la suppression groupée sur le serveur.");
+                const msg = errorData.error || "Erreur lors de la suppression groupée sur le serveur.";
+                const details = errorData.details ? `\n\nNote: ${errorData.details}` : "";
+                throw new Error(msg + details);
             }
 
             alert(data.message || "Tous les comptes Staff ont été supprimés.");

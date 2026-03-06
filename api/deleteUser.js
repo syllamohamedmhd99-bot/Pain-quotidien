@@ -71,27 +71,30 @@ async function deleteUser(req, res) {
         }
 
         // --- DISSOCIATION DES DONNÉES (Pour éviter les erreurs de contrainte d'intégrité) ---
-        // On détache l'utilisateur de ses records métier sans supprimer les records (pour les rapports financiers)
-        try {
-            await Promise.all([
-                supabaseAdmin.from('transactions').update({ user_id: null }).eq('user_id', targetUserId),
-                supabaseAdmin.from('expenses').update({ user_id: null }).eq('user_id', targetUserId),
-                supabaseAdmin.from('production_logs').update({ user_id: null }).eq('user_id', targetUserId),
-                supabaseAdmin.from('products').update({ user_id: null }).eq('user_id', targetUserId),
-                supabaseAdmin.from('clients').update({ user_id: null }).eq('user_id', targetUserId),
-                supabaseAdmin.from('suppliers').update({ user_id: null }).eq('user_id', targetUserId)
-            ]);
-        } catch (error) {
-            console.warn("Dissociation partially failed:", error);
-            // On continue quand même, l'erreur de suppression finale nous dira si c'est bloquant
+        const tables = ['transactions', 'expenses', 'production_logs', 'products', 'clients', 'suppliers'];
+        const possibleUserCols = ['user_id', 'created_by'];
+
+        for (const table of tables) {
+            for (const col of possibleUserCols) {
+                try {
+                    await supabaseAdmin.from(table).update({ [col]: null }).eq(col, targetUserId);
+                } catch (e) {
+                    // Silencieusement ignorer si la colonne n'existe pas ou est NOT NULL
+                }
+            }
         }
 
-        // 2. Delete the user from Auth layer (this will cascade to profiles if DB is set up right)
+        // 2. Delete the user from Auth layer
         const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
 
         if (deleteError) {
             console.error("Auth Delete Error:", deleteError);
-            return res.status(500).json({ error: 'Delete failed in Auth: ' + deleteError.message });
+            // Si la suppression échoue, c'est probablement car une contrainte NOT NULL bloque toujours
+            return res.status(500).json({
+                error: 'Échec de suppression Supabase: ' + deleteError.message,
+                details: "Cela arrive souvent quand l'utilisateur est lié à des factures ou dépenses qui ne peuvent pas être dissociées (colonnes obligatoires).",
+                code: deleteError.code
+            });
         }
 
         // Also explicitly delete from profiles just in case ON DELETE CASCADE is missing
