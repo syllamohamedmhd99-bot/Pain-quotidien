@@ -273,7 +273,7 @@ export default function POS() {
                     <div className="payment-mode-selector" style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', pt: '1rem' }}>
                         <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>MODE DE PAIEMENT</label>
                         <div className="payment-options" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                            {["Espèce", "Orange Money", "Virement bancaire", "Autre"].map(mode => (
+                            {["Espèce", "Orange Money", "Virement bancaire", "Chèque", "Autre"].map(mode => (
                                 <button
                                     key={mode}
                                     type="button"
