@@ -318,6 +318,45 @@ app.delete('/api/production/:id', async (req, res, next) => {
     } catch (err) { next(err); }
 });
 
+// --- SALARIES ---
+app.get('/api/salaries', async (req, res, next) => {
+    try {
+        const salaries = await prisma.salary.findMany({
+            where: { user_id: req.userId },
+            orderBy: { date: 'desc' }
+        });
+        res.json(salaries);
+    } catch (err) { next(err); }
+});
+
+app.post('/api/salaries', async (req, res, next) => {
+    try {
+        const result = await handleInsert(prisma.salary, req.body, req.userId);
+        res.json(result);
+    } catch (err) { next(err); }
+});
+
+app.put('/api/salaries/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const salary = await prisma.salary.update({
+            where: { id: parseInt(id), user_id: req.userId },
+            data: req.body
+        });
+        res.json(salary);
+    } catch (err) { next(err); }
+});
+
+app.delete('/api/salaries/:id', async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        await prisma.salary.delete({
+            where: { id: parseInt(id), user_id: req.userId }
+        });
+        res.json({ success: true });
+    } catch (err) { next(err); }
+});
+
 // --- STATS ---
 app.get('/api/stats', async (req, res, next) => {
     try {

@@ -17,6 +17,7 @@ import Reports from './pages/Reports';
 import ProductionCosts from './pages/ProductionCosts';
 import UsersManagement from './pages/UsersManagement';
 import UserDetail from './pages/UserDetail';
+import Salaries from './pages/Salaries';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -130,6 +131,7 @@ function App() {
                 <Route path="/expenses" element={<ProtectedRoute path="/expenses"><Expenses /></ProtectedRoute>} />
                 <Route path="/production-costs" element={<ProtectedRoute path="/production-costs"><ProductionCosts /></ProtectedRoute>} />
                 <Route path="/production" element={<ProtectedRoute path="/production"><Production /></ProtectedRoute>} />
+                <Route path="/salaries" element={<ProtectedRoute path="/salaries"><Salaries /></ProtectedRoute>} />
 
                 {/* Facturation et ses sous-pages */}
                 <Route path="/invoices" element={<ProtectedRoute path="/invoices"><Invoices /></ProtectedRoute>} />

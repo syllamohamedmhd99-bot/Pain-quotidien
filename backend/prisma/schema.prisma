@@ -120,3 +120,16 @@ model ProductionLog {
 
   @@map("production_logs")
 }
+
+model Salary {
+  id            Int      @id @default(autoincrement())
+  employee_name String
+  amount        Float
+  period        String
+  status        String   @default("Payé") // "Payé", "En attente"
+  date          DateTime @default(now())
+  user_id       String   @default("admin@boulangerie.local")
+  updated_at    DateTime @default(now())
+
+  @@map("salaries")
+}

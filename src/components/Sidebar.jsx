@@ -17,7 +17,8 @@ const navItems = [
         icon: Wallet,
         subItems: [
             { name: 'Charges Générales', path: '/expenses' },
-            { name: 'Charges Production', path: '/production-costs' }
+            { name: 'Charges Production', path: '/production-costs' },
+            { name: 'Salaires', path: '/salaries' }
         ]
     },
     {
