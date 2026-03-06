@@ -77,7 +77,9 @@ function App() {
 
   useEffect(() => {
     const bodyClass = document.body.classList;
-    bodyClass.remove('dark', 'theme-matcha', 'theme-ocean', 'theme-berry');
+    // Remove all possible theme classes
+    const themesToClear = ['theme-matcha', 'theme-ocean', 'theme-berry', 'theme-sunset', 'theme-lavender', 'theme-midnight', 'theme-eco'];
+    bodyClass.remove('dark', ...themesToClear);
 
     if (darkMode) bodyClass.add('dark');
     if (theme !== 'default') bodyClass.add(`theme-${theme}`);

@@ -9,6 +9,8 @@
     position: absolute;
     transform-origin: bottom center;
     color: var(--primary-color, #c68b59);
+    stroke: currentColor;
+    transition: var(--transition-smooth);
 }
 
 .stalk-1 {
