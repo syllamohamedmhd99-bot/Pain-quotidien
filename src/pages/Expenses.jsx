@@ -111,7 +111,7 @@ export default function Expenses() {
         <div className="expenses-page">
             <div className="page-header">
                 <div>
-                    <h1>Gestion des Dépenses</h1>
+                    <h1>Autres Charges</h1>
                     <p>Suivez vos sorties d'argent et paiements fournisseurs.</p>
                 </div>
                 <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
