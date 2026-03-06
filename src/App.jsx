@@ -90,6 +90,21 @@ function App() {
 
   const isAdmin = profile?.role === 'Administrateur';
 
+  // Composant pour protéger les routes individuellement par permissions
+  const ProtectedRoute = ({ children, path }) => {
+    if (loading) return null;
+    if (!profile) return <Navigate to="/auth" />;
+    if (isAdmin) return children; // L'admin a accès à tout
+
+    const perms = profile.permissions || [];
+    if (perms.includes(path) || path === '/' || path === '/profile') {
+      return children;
+    }
+
+    // Sinon redirection vers le Dashboard
+    return <Navigate to="/" replace />;
+  };
+
   return (
     <Router>
       <Routes>
@@ -105,17 +120,21 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile session={session} />} />
-                <Route path="/pos" element={<POS />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/clients" element={<Clients />} />
-                <Route path="/suppliers" element={<Suppliers />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/expenses" element={<Expenses />} />
-                <Route path="/production" element={<Production />} />
-                <Route path="/invoices" element={<Invoices />} />
-                <Route path="/invoices/new" element={<CreateInvoice />} />
+
+                <Route path="/pos" element={<ProtectedRoute path="/pos"><POS /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute path="/inventory"><Inventory /></ProtectedRoute>} />
+                <Route path="/clients" element={<ProtectedRoute path="/clients"><Clients /></ProtectedRoute>} />
+                <Route path="/suppliers" element={<ProtectedRoute path="/suppliers"><Suppliers /></ProtectedRoute>} />
+                <Route path="/history" element={<ProtectedRoute path="/history"><History /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute path="/expenses"><Expenses /></ProtectedRoute>} />
+                <Route path="/production" element={<ProtectedRoute path="/production"><Production /></ProtectedRoute>} />
+
+                {/* Facturation et ses sous-pages */}
+                <Route path="/invoices" element={<ProtectedRoute path="/invoices"><Invoices /></ProtectedRoute>} />
+                <Route path="/invoices/new" element={<ProtectedRoute path="/invoices/new"><CreateInvoice /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute path="/reports"><Reports /></ProtectedRoute>} />
+
                 <Route path="/invoice/:id" element={<Invoice />} />
-                <Route path="/reports" element={<Reports />} />
 
                 {/* Admin Only Routes */}
                 {isAdmin && (
