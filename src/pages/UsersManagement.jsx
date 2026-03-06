@@ -233,35 +233,6 @@ export default function UsersManagement() {
                     />
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button
-                        type="button"
-                        className="btn btn-outline"
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            setDiagResult("Vérification en cours... Veuillez patienter.");
-                            try {
-                                const { data: { session } } = await supabase.auth.getSession();
-                                if (!session) return setDiagResult("ERREUR : Vous n'êtes pas connecté (Session absente).");
-
-                                const res = await fetch('/api/checkConfig', {
-                                    headers: { 'Authorization': `Bearer ${session.access_token}` }
-                                });
-
-                                if (!res.ok) {
-                                    return setDiagResult(`ERREUR SERVEUR (${res.status}) : L'API ne répond pas. Vérifiez que vous avez poussé vos changements.`);
-                                }
-
-                                const data = await res.json();
-                                setDiagResult(`RÉSULTAT : Clé=${data.results.hasServiceKey ? 'OK' : 'KO'}, DB=${data.results.dbConnection}, Rôle=${data.results.isAdmin}`);
-                            } catch (err) {
-                                setDiagResult("ERREUR LOCALE : " + err.message);
-                            }
-                        }}
-                        style={{ borderColor: 'var(--primary-color)', color: 'var(--primary-color)' }}
-                    >
-                        <Shield size={20} />
-                        <span>Diagnostic</span>
-                    </button>
                     <button className="btn btn-outline" onClick={handleDeleteAllStaffs} style={{ color: 'var(--danger-color)', borderColor: 'var(--danger-color)' }}>
                         <Trash2 size={20} />
                         <span>Supprimer tous les Staffs</span>
@@ -276,7 +247,7 @@ export default function UsersManagement() {
             {diagResult && (
                 <div className="card diag-zone" style={{ margin: '0 2rem 1.5rem', padding: '1.2rem', background: 'var(--bg-secondary)', borderLeft: '4px solid var(--primary-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animation: 'slideDown 0.3s ease' }}>
                     <div style={{ color: 'var(--text-primary)', fontSize: '0.95rem' }}>
-                        <strong style={{ color: 'var(--primary-color)' }}>Diagnostic :</strong> {diagResult}
+                        <strong style={{ color: 'var(--primary-color)' }}>Information :</strong> {diagResult}
                     </div>
                     <button onClick={() => setDiagResult(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '5px' }}>
                         <X size={18} />

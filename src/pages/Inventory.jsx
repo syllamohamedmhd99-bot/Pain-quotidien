@@ -223,7 +223,7 @@ export default function Inventory() {
             {diagResult && (
                 <div className="card" style={{ margin: '0 2rem 1rem', padding: '1rem', background: 'var(--bg-secondary)', borderLeft: '4px solid var(--primary-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                        <strong>Diagnostic :</strong> {diagResult}
+                        <strong>Statut :</strong> {diagResult}
                     </div>
                     <button onClick={() => setDiagResult(null)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
                         <X size={18} />
