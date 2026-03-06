@@ -30,10 +30,8 @@ export default function Expenses() {
 
     const categories = [
         'Fournitures',
-        'Matières Premières',
         'Loyer',
         'Électricité/Eau',
-        'Salaires',
         'Marketing',
         'Maintenance',
         'Autre'
