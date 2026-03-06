@@ -63,17 +63,18 @@ async function deleteUser(req, res) {
         // 1. Verify requester is Admin
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
         if (authError || !user) {
-            return res.status(401).json({ error: 'Invalid or expired token' });
+            return res.status(401).json({ error: 'Session invalide ou expirée.' });
         }
 
+        // On récupère TOUTES les infos du profil pour avoir l'id et l'éventuel user_id (email)
         const { data: requesterProfile, error: profileError } = await supabaseAdmin
             .from('profiles')
-            .select('role')
+            .select('*')
             .eq('id', user.id)
             .single();
 
         if (profileError || !requesterProfile || requesterProfile.role !== 'Administrateur') {
-            return res.status(403).json({ error: 'Forbidden: Requires Administrator role' });
+            return res.status(403).json({ error: 'Accès refusé : Rôle Administrateur requis.' });
         }
 
         // Prevent admin from deleting themselves
@@ -81,32 +82,43 @@ async function deleteUser(req, res) {
             return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte.' });
         }
 
-        // --- DISSOCIATION ET NETTOYAGE PROFOND ---
-        const cleanupQueries = [
-            supabaseAdmin.from('profiles').delete().eq('id', targetUserId), // On tente de supprimer le profil direct
-            supabaseAdmin.from('transactions').update({ user_id: null }).eq('user_id', targetUserId),
-            supabaseAdmin.from('expenses').update({ user_id: null }).eq('user_id', targetUserId),
-            supabaseAdmin.from('production_logs').update({ user_id: null }).eq('user_id', targetUserId),
-            // Dissocier aussi via les colonnes TEXT (emails) si nécessaire
-            supabaseAdmin.from('products').update({ user_id: 'admin@boulangerie.local' }).eq('user_id', requesterProfile.user_id),
-        ];
+        // --- DISSOCIATION MANUELLE ET SÉCURISÉE ---
+        // On détache l'utilisateur de toutes les tables pour éviter les erreurs de FK
+        const detach = async (table, col, val) => {
+            try {
+                await supabaseAdmin.from(table).update({ [col]: null }).eq(col, val);
+            } catch (e) {
+                console.warn(`Could not detach ${val} from ${table}.${col}`);
+            }
+        };
 
-        await Promise.all(cleanupQueries.map(q => q.catch(e => console.warn("Cleanup warning:", e))));
+        // Tables utilisant des UUID
+        await detach('transactions', 'user_id', targetUserId);
+        await detach('expenses', 'user_id', targetUserId);
+        await detach('production_logs', 'user_id', targetUserId);
 
-        // 2. Delete the user from Auth layer
-        const { data: deleteData, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
+        // tables utilisant potentiellement des emails (legacy)
+        // On récupère l'email de l'utilisateur à supprimer si possible
+        const { data: { user: targetUser } } = await supabaseAdmin.auth.admin.getUserById(targetUserId);
+        if (targetUser && targetUser.email) {
+            await detach('products', 'user_id', targetUser.email);
+            await detach('clients', 'user_id', targetUser.email);
+            await detach('suppliers', 'user_id', targetUser.email);
+        }
+
+        // On supprime d'abord le profil manuellement pour être sûr (avant le auth.user)
+        await supabaseAdmin.from('profiles').delete().eq('id', targetUserId);
+
+        // 2. Suppression de la couche Auth (L'action finale)
+        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
 
         if (deleteError) {
             console.error("Auth Delete ERROR:", deleteError);
             return res.status(500).json({
                 error: `Erreur Supabase Auth: ${deleteError.message}`,
-                details: "La suppression a été rejetée par la base de données. Il reste probablement des données (transactions, stocks) liées à cet utilisateur que le système n'a pas pu détacher.",
-                supabaseError: deleteError
+                details: "La base de données refuse toujours la suppression. Assurez-vous d'avoir exécuté le script ultimate_unlock.sql dans Supabase."
             });
         }
-
-        // Also explicitly delete from profiles just in case ON DELETE CASCADE is missing
-        await supabaseAdmin.from('profiles').delete().eq('id', targetUserId);
 
         return res.status(200).json({
             success: true,
