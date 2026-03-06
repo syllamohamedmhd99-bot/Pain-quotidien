@@ -53,34 +53,35 @@ export default function Suppliers() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce fournisseur ?\nNote: Ses dépenses passées resteront enregistrées.")) return;
 
         try {
-            // 1. D'abord, on essaie de dissocier le fournisseur de ses dépenses
-            const { error: updateError } = await supabase
+            console.log("Tentative de suppression du fournisseur ID:", id);
+
+            // 1. Dissociation des dépenses
+            const { error: dissociationError } = await supabase
                 .from('expenses')
                 .update({ supplier_id: null })
                 .eq('supplier_id', id);
 
-            if (updateError) {
-                console.warn("Dissociation from expenses partially failed:", updateError);
+            if (dissociationError) {
+                console.warn("Erreur de dissociation (ignorée) :", dissociationError);
             }
 
-            // 2. Supprimer le fournisseur
+            // 2. Suppression du fournisseur
             const { error: deleteError } = await supabase
                 .from('suppliers')
                 .delete()
                 .eq('id', id);
 
             if (deleteError) {
-                if (deleteError.code === '23503') {
-                    throw new Error("Ce fournisseur ne peut pas être supprimé car il est lié à des dépenses enregistrées. Vous pouvez le marquer comme 'Inactif' à la place.");
-                }
-                throw deleteError;
+                console.error("Erreur Supabase lors de la suppression :", deleteError);
+                throw new Error(`Code ${deleteError.code}: ${deleteError.message}`);
             }
 
+            console.log("Suppression réussie !");
             setSuppliers(suppliers.filter(s => s.id !== id));
             alert("Fournisseur supprimé avec succès.");
         } catch (err) {
-            console.error("Delete supplier error:", err);
-            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
+            console.error("Erreur complète :", err);
+            alert("ERREUR DE SUPPRESSION :\n" + err.message);
         }
     };
 

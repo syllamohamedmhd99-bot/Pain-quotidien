@@ -57,36 +57,35 @@ export default function Inventory() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?\nNote: Le produit sera retiré de l'inventaire mais restera visible dans l'historique des ventes.")) return;
 
         try {
-            // 1. D'abord, on doit supprimer ou détacher les items de transaction liés
-            // Note: On utilise delete() plutôt que update({product_id: null}) car souvent transaction_items
-            // est une table de mapping qui ne supporte pas bien les nulls sur product_id.
-            const { error: updateError } = await supabase
+            console.log("Tentative de suppression du produit ID:", id);
+
+            // 1. Dissociation des items de transaction
+            const { error: dissociationError } = await supabase
                 .from('transaction_items')
                 .delete()
                 .eq('product_id', id);
 
-            if (updateError) {
-                console.warn("Dissociation failed:", updateError);
+            if (dissociationError) {
+                console.warn("Erreur de dissociation (ignorée) :", dissociationError);
             }
 
-            // 2. Supprimer le produit
+            // 2. Suppression du produit
             const { error: deleteError } = await supabase
                 .from('products')
                 .delete()
                 .eq('id', id);
 
             if (deleteError) {
-                if (deleteError.code === '23503') {
-                    throw new Error("Ce produit ne peut pas être supprimé car il est lié à des factures existantes. Vous pouvez modifier son stock à 0 à la place.");
-                }
-                throw deleteError;
+                console.error("Erreur Supabase lors de la suppression :", deleteError);
+                throw new Error(`Code ${deleteError.code}: ${deleteError.message}`);
             }
 
+            console.log("Suppression réussie !");
             setProducts(products.filter(p => p.id !== id));
             alert("Produit supprimé avec succès.");
         } catch (err) {
-            console.error("Delete product error:", err);
-            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
+            console.error("Erreur complète :", err);
+            alert("ERREUR DE SUPPRESSION :\n" + err.message + "\n\nSi le problème persiste, vérifiez vos permissions dans Supabase.");
         }
     };
 

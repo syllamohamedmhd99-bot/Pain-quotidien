@@ -50,34 +50,35 @@ export default function Clients() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce client ?\nNote: Ses transactions passées seront conservées mais ne seront plus liées à son nom.")) return;
 
         try {
-            // 1. D'abord, on essaie de dissocier le client de ses transactions
-            const { error: updateError } = await supabase
+            console.log("Tentative de suppression du client ID:", id);
+
+            // 1. Dissociation des transactions
+            const { error: dissociationError } = await supabase
                 .from('transactions')
                 .update({ client_id: null })
                 .eq('client_id', id);
 
-            if (updateError) {
-                console.warn("Dissociation partially failed or column is NOT NULL:", updateError);
+            if (dissociationError) {
+                console.warn("Erreur de dissociation (ignorée) :", dissociationError);
             }
 
-            // 2. Supprimer le client
+            // 2. Suppression du client
             const { error: deleteError } = await supabase
                 .from('clients')
                 .delete()
                 .eq('id', id);
 
             if (deleteError) {
-                if (deleteError.code === '23503') {
-                    throw new Error("Ce client ne peut pas être supprimé car il est lié à des documents comptables indispensables. Vous pouvez le marquer comme 'Inactif' à la place.");
-                }
-                throw deleteError;
+                console.error("Erreur Supabase lors de la suppression :", deleteError);
+                throw new Error(`Code ${deleteError.code}: ${deleteError.message}`);
             }
 
+            console.log("Suppression réussie !");
             setClients(clients.filter(c => c.id !== id));
             alert("Client supprimé avec succès.");
         } catch (err) {
-            console.error("Delete client error:", err);
-            alert("Erreur lors de la suppression : " + (err.message || "Contrainte d'intégrité détectée."));
+            console.error("Erreur complète :", err);
+            alert("ERREUR DE SUPPRESSION :\n" + err.message);
         }
     };
 
