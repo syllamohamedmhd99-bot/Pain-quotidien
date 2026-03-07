@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet, ChefHat, ShieldCheck } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, ShoppingCart, Wheat, Users, Truck, History as HistoryIcon, LogOut, Sun, Moon, Palette, Croissant, Receipt, X, User, Wallet, ChefHat, ShieldCheck, Package } from 'lucide-react';
 import WheatLogo from './WheatLogo';
 import './Sidebar.css';
 
