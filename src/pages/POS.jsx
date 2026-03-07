@@ -22,6 +22,7 @@ export default function POS() {
     const [isDelivery, setIsDelivery] = useState(false);
     const [deliveryAddress, setDeliveryAddress] = useState("");
     const [deliveryFee, setDeliveryFee] = useState(0);
+    const [recipientName, setRecipientName] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -80,6 +81,7 @@ export default function POS() {
         setIsDelivery(false);
         setDeliveryAddress("");
         setDeliveryFee(0);
+        setRecipientName("");
     };
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -132,6 +134,7 @@ export default function POS() {
                     .insert([{
                         transaction_id: trxData.id,
                         destination: deliveryAddress || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.address : null),
+                        recipient_name: recipientName || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.name : null),
                         status: 'Pending',
                         delivery_fee: parseFloat(deliveryFee || 0)
                     }]);
@@ -345,6 +348,16 @@ export default function POS() {
                                 animate={{ height: 'auto', opacity: 1 }}
                                 style={{ marginTop: '10px' }}
                             >
+                                <div style={{ marginBottom: '10px' }}>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: 'var(--text-secondary)' }}>NOM DU DESTINATAIRE</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Nom complet du destinataire..."
+                                        value={recipientName}
+                                        onChange={(e) => setRecipientName(e.target.value)}
+                                        style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                                    />
+                                </div>
                                 <input
                                     type="text"
                                     placeholder="Adresse de livraison..."

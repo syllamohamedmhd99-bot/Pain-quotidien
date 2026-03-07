@@ -29,7 +29,8 @@ export default function Deliveries() {
         driver_name: '',
         delivery_date: new Date().toISOString().split('T')[0],
         status: 'Pending',
-        delivery_fee: 0
+        delivery_fee: 0,
+        recipient_name: ''
     });
 
     useEffect(() => {
@@ -67,7 +68,7 @@ export default function Deliveries() {
         try {
             await supabase.from('deliveries').insert([formData]);
             setIsModalOpen(false);
-            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0 });
+            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '' });
             fetchData();
         } catch (err) {
             console.error("Error creating delivery:", err);
@@ -78,6 +79,7 @@ export default function Deliveries() {
         return deliveries.filter(d => {
             const matchesSearch = d.destination?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 d.driver_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                d.recipient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 d.transactions?.trx_id?.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'Tous' || d.status === statusFilter;
             return matchesSearch && matchesStatus;
@@ -163,6 +165,10 @@ export default function Deliveries() {
                                             <MapPin size={16} />
                                             {d.destination || 'Destination non spécifiée'}
                                         </h3>
+                                        <div className="recipient" style={{ marginBottom: '0.4rem', color: 'var(--text-primary)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <User size={14} />
+                                            <span>Destinataire: {d.recipient_name || 'Inconnu'}</span>
+                                        </div>
                                         <div className="driver">
                                             <User size={14} />
                                             <span>Chauffeur: {d.driver_name || 'Non assigné'}</span>
@@ -227,6 +233,15 @@ export default function Deliveries() {
                                 <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
                             </div>
                             <form onSubmit={handleCreateDelivery}>
+                                <div className="form-group">
+                                    <label>Nom du Destinataire</label>
+                                    <input
+                                        type="text"
+                                        value={formData.recipient_name}
+                                        onChange={e => setFormData({ ...formData, recipient_name: e.target.value })}
+                                        placeholder="ex: M. Sylla"
+                                    />
+                                </div>
                                 <div className="form-group">
                                     <label>Destination / Adresse</label>
                                     <input
