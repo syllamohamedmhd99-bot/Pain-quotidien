@@ -18,6 +18,8 @@ import ProductionCosts from './pages/ProductionCosts';
 import UsersManagement from './pages/UsersManagement';
 import UserDetail from './pages/UserDetail';
 import Salaries from './pages/Salaries';
+import RawMaterials from './pages/RawMaterials';
+import Deliveries from './pages/Deliveries';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -139,6 +141,9 @@ function App() {
                 <Route path="/invoices" element={<ProtectedRoute path="/invoices"><Invoices /></ProtectedRoute>} />
                 <Route path="/invoices/new" element={<ProtectedRoute path="/invoices/new"><CreateInvoice /></ProtectedRoute>} />
                 <Route path="/reports" element={<ProtectedRoute path="/reports"><Reports /></ProtectedRoute>} />
+
+                <Route path="/raw-materials" element={<ProtectedRoute path="/raw-materials"><RawMaterials /></ProtectedRoute>} />
+                <Route path="/deliveries" element={<ProtectedRoute path="/deliveries"><Deliveries /></ProtectedRoute>} />
 
                 <Route path="/invoice/:id" element={<Invoice />} />
 

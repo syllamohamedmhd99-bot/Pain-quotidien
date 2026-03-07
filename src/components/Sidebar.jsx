@@ -7,6 +7,15 @@ import './Sidebar.css';
 
 const navItems = [
     { name: 'Tableau de bord', path: '/', icon: LayoutDashboard },
+    { name: 'Matières Premières', path: '/raw-materials', icon: Wheat },
+    { name: 'Catalogue & Stock', path: '/inventory', icon: Package },
+    { name: 'Production', path: '/production', icon: ChefHat },
+    { name: 'Ventes (POS)', path: '/pos', icon: ShoppingCart },
+    { name: 'Livraisons', path: '/deliveries', icon: Truck },
+    { name: 'Historique', path: '/history', icon: HistoryIcon },
+    { name: 'Facturation', path: '/invoices', icon: Receipt },
+    { name: 'Dépenses', path: '/expenses', icon: Wallet },
+    { name: 'Rapports', path: '/reports', icon: ShieldCheck, adminOnly: true },
 ];
 
 export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose, profile }) {
