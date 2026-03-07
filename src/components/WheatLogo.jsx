@@ -1,4 +1,5 @@
 import React from 'react';
+// Triggering deployment refresh after Vercel limit reset
 import logo from '../assets/logo.png';
 import './WheatLogo.css';
 
