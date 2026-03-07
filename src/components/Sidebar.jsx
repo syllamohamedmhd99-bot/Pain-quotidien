@@ -12,10 +12,18 @@ const navItems = [
     { name: 'Matières Premières', path: '/raw-materials', icon: Wheat },
     { name: 'Ventes (POS)', path: '/pos', icon: ShoppingCart },
     { name: 'Livraisons', path: '/deliveries', icon: Truck },
-    { name: 'Historique', path: '/history', icon: HistoryIcon },
     { name: 'Facturation', path: '/invoices', icon: Receipt },
     { name: 'Dépenses', path: '/expenses', icon: Wallet },
-    { name: 'Rapports', path: '/reports', icon: ShieldCheck, adminOnly: true },
+    {
+        name: 'Contrôle de Gestion',
+        icon: ShieldCheck,
+        adminOnly: true,
+        subItems: [
+            { name: 'Utilisateurs', path: '/admin/users' },
+            { name: 'Salaires', path: '/salaries' },
+            { name: 'Rapports Financiers', path: '/reports' },
+        ]
+    },
 ];
 
 export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose, profile }) {
