@@ -7,9 +7,9 @@ import './Sidebar.css';
 
 const navItems = [
     { name: 'Tableau de bord', path: '/', icon: LayoutDashboard },
-    { name: 'Matières Premières', path: '/raw-materials', icon: Wheat },
     { name: 'Catalogue & Stock', path: '/inventory', icon: Package },
     { name: 'Production', path: '/production', icon: ChefHat },
+    { name: 'Matières Premières', path: '/raw-materials', icon: Wheat },
     { name: 'Ventes (POS)', path: '/pos', icon: ShoppingCart },
     { name: 'Livraisons', path: '/deliveries', icon: Truck },
     { name: 'Historique', path: '/history', icon: HistoryIcon },

@@ -25,6 +25,8 @@ export default function Dashboard({ profile }) {
     const [products, setProducts] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [expenses, setExpenses] = useState([]);
+    const [deliveries, setDeliveries] = useState([]);
+    const [rawMaterials, setRawMaterials] = useState([]);
     const [viewType, setViewType] = useState('weekly');
     const [globalView, setGlobalView] = useState(profile?.role === 'Administrateur');
 
@@ -37,12 +39,14 @@ export default function Dashboard({ profile }) {
                 // En mode Supabase, le RLS gère déjà cela si l'admin a les droits.
                 const queryOptions = isAdmin && globalView ? { all: 'true' } : {};
 
-                const [trxRes, clientRes, prodRes, suppRes, expRes] = await Promise.all([
+                const [trxRes, clientRes, prodRes, suppRes, expRes, delRes, rawRes] = await Promise.all([
                     supabase.from('transactions').select('*', queryOptions),
                     supabase.from('clients').select('*', queryOptions),
                     supabase.from('products').select('*', queryOptions),
                     supabase.from('suppliers').select('*', queryOptions),
-                    supabase.from('expenses').select('*', queryOptions)
+                    supabase.from('expenses').select('*', queryOptions),
+                    supabase.from('deliveries').select('*', queryOptions),
+                    supabase.from('raw_materials').select('*', queryOptions)
                 ]);
 
                 if (trxRes.data) setTransactions(trxRes.data);
@@ -50,6 +54,8 @@ export default function Dashboard({ profile }) {
                 if (prodRes.data) setProducts(prodRes.data);
                 if (suppRes.data) setSuppliers(suppRes.data);
                 if (expRes.data) setExpenses(expRes.data);
+                if (delRes.data) setDeliveries(delRes.data);
+                if (rawRes.data) setRawMaterials(rawRes.data);
             } catch (error) {
                 console.error("Erreur de récupération des données:", error);
             }
@@ -155,9 +161,9 @@ export default function Dashboard({ profile }) {
 
     const stats = [
         { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
-        { id: 2, title: "Ventes du Jour", value: `${totalSalesToday.toLocaleString()} GNF`, icon: TrendingUp, color: "var(--success-color)", increase: "+5%" },
-        { id: 3, title: "Commandes Jour", value: todayOrdersCount.toString(), icon: ShoppingBag, color: "var(--primary-color)", increase: "+2" },
-        { id: 4, title: "Stock Critique", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
+        { id: 2, title: "Livraisons en cours", value: deliveries.filter(d => d.status === 'Out').length.toString(), icon: Truck, color: "var(--warning-color)", increase: "Actives" },
+        { id: 3, title: "Stock Produits", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
+        { id: 4, title: "Stock Matières", value: rawMaterials.filter(rm => rm.stock <= (rm.min_stock || 5)).length.toString(), icon: Wheat, color: "var(--secondary-color)", increase: "Alertes" },
     ];
 
     const stockAlerts = products.filter(p => p.stock <= (p.min_stock || 10)).slice(0, 5);
