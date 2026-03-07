@@ -122,7 +122,7 @@ export default function Auth({ onLogin }) {
                         whileHover={{ scale: 1.05, rotate: 5 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <WheatLogo size={100} />
+                        <WheatLogo size={90} />
                     </motion.div>
                     <motion.h2
                         className="auth-title"
