@@ -216,6 +216,10 @@
     border-left: 4px solid var(--warning-color);
 }
 
+.alert-item.success {
+    border-left: 4px solid var(--success-color);
+}
+
 .status-dot {
     width: 8px;
     height: 8px;
@@ -227,6 +231,11 @@
 .alert-item.warning .status-dot {
     background: var(--warning-color);
     box-shadow: 0 0 10px var(--warning-color);
+}
+
+.alert-item.success .status-dot {
+    background: var(--success-color);
+    box-shadow: 0 0 10px var(--success-color);
 }
 
 .status-tag {

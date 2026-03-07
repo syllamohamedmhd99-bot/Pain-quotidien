@@ -175,8 +175,22 @@ export default function Dashboard({ profile }) {
         { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
         { id: 2, title: "Produits Vendus (Jour)", value: totalProductsSoldToday.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: "Aujourd'hui" },
         { id: 3, title: "Livraisons en cours", value: deliveries.filter(d => d.status === 'Out').length.toString(), icon: Truck, color: "var(--warning-color)", increase: "Actives" },
-        { id: 4, title: "Stock Produits", value: products.filter(p => (p.stock || 0) <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
-        { id: 5, title: "Stock Matières", value: rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).length.toString(), icon: Wheat, color: "var(--secondary-color)", increase: "Alertes" },
+        {
+            id: 4,
+            title: "Stock Produits",
+            value: products.reduce((sum, p) => sum + (p.stock || 0), 0).toString(),
+            icon: Package,
+            color: products.some(p => (p.stock || 0) <= (p.min_stock || 10)) ? "var(--danger-color)" : "var(--success-color)",
+            increase: `${products.filter(p => (p.stock || 0) <= (p.min_stock || 10)).length} Alertes`
+        },
+        {
+            id: 5,
+            title: "Stock Matières",
+            value: rawMaterials.reduce((sum, rm) => sum + (rm.quantity || 0), 0).toString(),
+            icon: Wheat,
+            color: rawMaterials.some(rm => (rm.quantity || 0) <= (rm.min_stock || 5)) ? "var(--secondary-color)" : "var(--success-color)",
+            increase: `${rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).length} Alertes`
+        },
     ];
 
     const materialAlerts = rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5));
@@ -404,7 +418,7 @@ export default function Dashboard({ profile }) {
                                     <Wheat size={16} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{rm.name}</div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{rm.quantity} {rm.unit} {rm.quantity <= rm.min_stock && `(Seuil: ${rm.min_stock})`}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{rm.quantity} {rm.unit} {rm.quantity <= rm.min_stock && `(Critique: <${rm.min_stock})`}</div>
                                     </div>
                                     <div className="status-dot"></div>
                                 </div>
@@ -414,7 +428,7 @@ export default function Dashboard({ profile }) {
                                     <Package size={16} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{p.name}</div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{p.stock} unités {p.stock <= p.min_stock && `(Seuil: ${p.min_stock})`}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{p.stock} unités {p.stock <= p.min_stock && `(Critique: <${p.min_stock})`}</div>
                                     </div>
                                     <div className="status-dot"></div>
                                 </div>
