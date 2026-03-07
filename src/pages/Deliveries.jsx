@@ -41,6 +41,7 @@ export default function Deliveries() {
         status: 'Pending',
         delivery_fee: 0,
         recipient_name: '',
+        observation: '',
         items: []
     });
 
@@ -93,7 +94,8 @@ export default function Deliveries() {
                     delivery_date: formData.delivery_date,
                     status: formData.status,
                     delivery_fee: formData.delivery_fee,
-                    recipient_name: formData.recipient_name
+                    recipient_name: formData.recipient_name,
+                    observation: formData.observation
                 }
             ]).select().single();
 
@@ -113,7 +115,7 @@ export default function Deliveries() {
             }
 
             setIsModalOpen(false);
-            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '', items: [] });
+            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '', observation: '', items: [] });
             fetchData();
         } catch (err) {
             console.error("Error creating delivery:", err);

@@ -157,7 +157,7 @@ export default function DeliveryNote() {
                                 <tr key={idx}>
                                     <td>{item.products?.name || "Produit"}</td>
                                     <td className="text-center"><strong>{item.quantity}</strong></td>
-                                    <td className="text-center">---</td>
+                                    <td className="text-center">{delivery.observation || "---"}</td>
                                 </tr>
                             )) : (
                                 <tr>
