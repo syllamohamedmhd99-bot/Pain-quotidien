@@ -12,18 +12,27 @@ import {
     ChevronRight,
     ArrowRight,
     Plus,
-    X
+    X,
+    ClipboardList,
+    Printer,
+    FileText
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import './Deliveries.css';
 
 export default function Deliveries() {
+    const navigate = useNavigate();
     const [deliveries, setDeliveries] = useState([]);
     const [transactions, setTransactions] = useState([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('Tous');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isItemsModalOpen, setIsItemsModalOpen] = useState(false);
+    const [selectedDelivery, setSelectedDelivery] = useState(null);
+    const [currentDeliveryItems, setCurrentDeliveryItems] = useState([]);
     const [formData, setFormData] = useState({
         destination: '',
         driver_name: '',
@@ -40,13 +49,15 @@ export default function Deliveries() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [delRes, trxRes] = await Promise.all([
+            const [delRes, trxRes, prodRes] = await Promise.all([
                 supabase.from('deliveries').select('*, transactions(*)').order('created_at', { ascending: false }),
-                supabase.from('transactions').select('*').eq('type', 'Vente').order('date', { ascending: false })
+                supabase.from('transactions').select('*').eq('type', 'Vente').order('date', { ascending: false }),
+                supabase.from('products').select('*').order('name')
             ]);
 
             if (delRes.data) setDeliveries(delRes.data);
             if (trxRes.data) setTransactions(trxRes.data);
+            if (prodRes.data) setProducts(prodRes.data);
         } catch (err) {
             console.error("Error fetching deliveries:", err);
         } finally {
@@ -101,6 +112,55 @@ export default function Deliveries() {
             case 'Out': return 'En cours';
             case 'Delivered': return 'Livré';
             default: return status;
+        }
+    };
+
+    const openItemsModal = async (delivery) => {
+        setSelectedDelivery(delivery);
+        const { data } = await supabase.from('delivery_items').select('*, products(name)').eq('delivery_id', delivery.id);
+        setCurrentDeliveryItems(data || []);
+        setIsItemsModalOpen(true);
+    };
+
+    const handleAddItem = () => {
+        setCurrentDeliveryItems([...currentDeliveryItems, { product_id: '', quantity: 1, products: { name: '' } }]);
+    };
+
+    const handleRemoveItem = (index) => {
+        setCurrentDeliveryItems(currentDeliveryItems.filter((_, i) => i !== index));
+    };
+
+    const updateItem = (index, field, value) => {
+        const newItems = [...currentDeliveryItems];
+        if (field === 'product_id') {
+            const prod = products.find(p => p.id === parseInt(value));
+            newItems[index] = { ...newItems[index], product_id: value, products: { name: prod ? prod.name : '' } };
+        } else {
+            newItems[index] = { ...newItems[index], [field]: value };
+        }
+        setCurrentDeliveryItems(newItems);
+    };
+
+    const saveDeliveryItems = async () => {
+        try {
+            // Delete old items
+            await supabase.from('delivery_items').delete().eq('delivery_id', selectedDelivery.id);
+            // Insert new items
+            const itemsToSave = currentDeliveryItems
+                .filter(it => it.product_id)
+                .map(it => ({
+                    delivery_id: selectedDelivery.id,
+                    product_id: parseInt(it.product_id),
+                    quantity: parseFloat(it.quantity)
+                }));
+
+            if (itemsToSave.length > 0) {
+                await supabase.from('delivery_items').insert(itemsToSave);
+            }
+            setIsItemsModalOpen(false);
+            fetchData();
+        } catch (err) {
+            console.error("Error saving items:", err);
         }
     };
 
@@ -212,6 +272,14 @@ export default function Deliveries() {
                                             <CheckCircle2 size={16} /> Livré avec succès
                                         </div>
                                     )}
+                                    <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                                        <button className="btn btn-outline btn-sm" onClick={() => openItemsModal(d)} title="Gérer les produits">
+                                            <ClipboardList size={14} /> Articles
+                                        </button>
+                                        <button className="btn btn-outline btn-sm" onClick={() => navigate(`/delivery-note/${d.id}`)} title="Imprimer le bon de livraison">
+                                            <Printer size={14} /> Bon de livraison
+                                        </button>
+                                    </div>
                                 </div>
                             </motion.div>
                         ))
@@ -284,6 +352,48 @@ export default function Deliveries() {
                                     <button type="submit" className="btn btn-primary">Créer</button>
                                 </div>
                             </form>
+                        </motion.div>
+                    </div>
+                )}
+                {isItemsModalOpen && (
+                    <div className="modal-overlay">
+                        <motion.div className="modal-content card" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}>
+                            <div className="modal-header">
+                                <h2>Produits de la Livraison</h2>
+                                <button className="close-btn" onClick={() => setIsItemsModalOpen(false)}><X size={24} /></button>
+                            </div>
+                            <div className="items-editor" style={{ maxHeight: '400px', overflowY: 'auto', marginBottom: '20px' }}>
+                                {currentDeliveryItems.length === 0 && <p style={{ textAlign: 'center', opacity: 0.5 }}>Aucun article. Ajoutez-en un !</p>}
+                                {currentDeliveryItems.map((item, idx) => (
+                                    <div key={idx} style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+                                        <select
+                                            value={item.product_id}
+                                            onChange={(e) => updateItem(idx, 'product_id', e.target.value)}
+                                            style={{ flex: 2, padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                        >
+                                            <option value="">Sélectionner un produit</option>
+                                            {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                        </select>
+                                        <input
+                                            type="number"
+                                            value={item.quantity}
+                                            onChange={(e) => updateItem(idx, 'quantity', e.target.value)}
+                                            style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                                            placeholder="Qté"
+                                        />
+                                        <button className="btn btn-outline" onClick={() => handleRemoveItem(idx)} style={{ padding: '10px', color: 'var(--danger-color)', borderColor: 'var(--danger-color)' }}>
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                                <button className="btn btn-outline" onClick={handleAddItem} style={{ width: '100%', marginTop: '10px', borderStyle: 'dashed' }}>
+                                    <Plus size={16} /> Ajouter un produit
+                                </button>
+                            </div>
+                            <div className="modal-actions">
+                                <button className="btn btn-outline" onClick={() => setIsItemsModalOpen(false)}>Annuler</button>
+                                <button className="btn btn-primary" onClick={saveDeliveryItems}>Enregistrer les articles</button>
+                            </div>
                         </motion.div>
                     </div>
                 )}

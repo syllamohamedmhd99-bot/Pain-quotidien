@@ -141,7 +141,22 @@ export default function POS() {
 
                 if (deliveryError) {
                     console.warn("Could not create delivery record:", deliveryError);
-                    // We don't throw here to avoid failing the whole transaction if just delivery insert fails
+                } else {
+                    // Create delivery items automatically
+                    const { data: delRow } = await supabase
+                        .from('deliveries')
+                        .select('id')
+                        .eq('transaction_id', trxData.id)
+                        .single();
+
+                    if (delRow && cart.length > 0) {
+                        const deliveryItems = cart.map(item => ({
+                            delivery_id: delRow.id,
+                            product_id: item.id,
+                            quantity: item.qty
+                        }));
+                        await supabase.from('delivery_items').insert(deliveryItems);
+                    }
                 }
             }
 

@@ -20,6 +20,7 @@ import UserDetail from './pages/UserDetail';
 import Salaries from './pages/Salaries';
 import RawMaterials from './pages/RawMaterials';
 import Deliveries from './pages/Deliveries';
+import DeliveryNote from './pages/DeliveryNote';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 
@@ -146,6 +147,7 @@ function App() {
                 <Route path="/deliveries" element={<ProtectedRoute path="/deliveries"><Deliveries /></ProtectedRoute>} />
 
                 <Route path="/invoice/:id" element={<Invoice />} />
+                <Route path="/delivery-note/:id" element={<DeliveryNote />} />
 
                 {/* Admin Only Routes */}
                 {isAdmin && (
