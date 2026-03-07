@@ -255,6 +255,14 @@ export default function Deliveries() {
                                             onChange={e => setFormData({ ...formData, delivery_date: e.target.value })}
                                         />
                                     </div>
+                                    <div className="form-group">
+                                        <label>Prix de Livraison (GNF)</label>
+                                        <input
+                                            type="number"
+                                            value={formData.delivery_fee}
+                                            onChange={e => setFormData({ ...formData, delivery_fee: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="modal-actions">
                                     <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>
