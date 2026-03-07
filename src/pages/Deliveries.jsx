@@ -21,6 +21,13 @@ export default function Deliveries() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('Tous');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        destination: '',
+        driver_name: '',
+        delivery_date: new Date().toISOString().split('T')[0],
+        status: 'Pending'
+    });
 
     useEffect(() => {
         fetchData();
@@ -49,6 +56,18 @@ export default function Deliveries() {
             fetchData();
         } catch (err) {
             console.error("Error updating status:", err);
+        }
+    };
+
+    const handleCreateDelivery = async (e) => {
+        e.preventDefault();
+        try {
+            await supabase.from('deliveries').insert([formData]);
+            setIsModalOpen(false);
+            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending' });
+            fetchData();
+        } catch (err) {
+            console.error("Error creating delivery:", err);
         }
     };
 
@@ -87,6 +106,10 @@ export default function Deliveries() {
                     <h1>Suivi de Livraison</h1>
                     <p>Gérez l'expédition et la réception de vos commandes clients.</p>
                 </div>
+                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+                    <Plus size={18} />
+                    Nouvelle Livraison
+                </button>
             </div>
 
             <div className="controls-row card glass">
@@ -183,6 +206,59 @@ export default function Deliveries() {
                     )}
                 </div>
             )}
+
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="modal-overlay">
+                        <motion.div
+                            className="modal-content card"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                        >
+                            <div className="modal-header">
+                                <h2>Créer une Livraison Manuelle</h2>
+                                <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
+                            </div>
+                            <form onSubmit={handleCreateDelivery}>
+                                <div className="form-group">
+                                    <label>Destination / Adresse</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.destination}
+                                        onChange={e => setFormData({ ...formData, destination: e.target.value })}
+                                        placeholder="ex: Quartier Kaloum, Immeuble X"
+                                    />
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Nom du Chauffeur</label>
+                                        <input
+                                            type="text"
+                                            value={formData.driver_name}
+                                            onChange={e => setFormData({ ...formData, driver_name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Date de Livraison</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={formData.delivery_date}
+                                            onChange={e => setFormData({ ...formData, delivery_date: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="modal-actions">
+                                    <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>
+                                    <button type="submit" className="btn btn-primary">Créer</button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

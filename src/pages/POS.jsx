@@ -19,6 +19,8 @@ export default function POS() {
     const [isCheckout, setIsCheckout] = useState(false);
     const [paymentMode, setPaymentMode] = useState("Espèce");
     const [paymentDetails, setPaymentDetails] = useState("");
+    const [isDelivery, setIsDelivery] = useState(false);
+    const [deliveryAddress, setDeliveryAddress] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,6 +76,8 @@ export default function POS() {
         setSelectedClientId("");
         setPaymentMode("Espèce");
         setPaymentDetails("");
+        setIsDelivery(false);
+        setDeliveryAddress("");
     };
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -118,6 +122,22 @@ export default function POS() {
                 .insert(itemsToInsert);
 
             if (itemsError) throw itemsError;
+
+            // 2.5 Insert Delivery if requested
+            if (isDelivery) {
+                const { error: deliveryError } = await supabase
+                    .from('deliveries')
+                    .insert([{
+                        transaction_id: trxData.id,
+                        destination: deliveryAddress || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.address : null),
+                        status: 'Pending'
+                    }]);
+
+                if (deliveryError) {
+                    console.warn("Could not create delivery record:", deliveryError);
+                    // We don't throw here to avoid failing the whole transaction if just delivery insert fails
+                }
+            }
 
             // 3. Update Loyalty Points (1 point per 1000 GNF)
             if (selectedClientId) {
@@ -302,6 +322,34 @@ export default function POS() {
                                 onChange={(e) => setPaymentDetails(e.target.value)}
                                 style={{ width: '100%', marginTop: '8px', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                             />
+                        )}
+                    </div>
+
+                    {/* Options de Livraison */}
+                    <div className="delivery-option-section" style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                        <label className="checkbox-container" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}>
+                            <input
+                                type="checkbox"
+                                checked={isDelivery}
+                                onChange={(e) => setIsDelivery(e.target.checked)}
+                            />
+                            <span>Marquer pour livraison ?</span>
+                        </label>
+
+                        {isDelivery && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                style={{ marginTop: '10px' }}
+                            >
+                                <input
+                                    type="text"
+                                    placeholder="Adresse de livraison..."
+                                    value={deliveryAddress}
+                                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                                />
+                            </motion.div>
                         )}
                     </div>
                 </div>
