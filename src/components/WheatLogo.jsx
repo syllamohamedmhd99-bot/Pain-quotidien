@@ -3,9 +3,9 @@ import React from 'react';
 import logo from '../assets/logo.png';
 import './WheatLogo.css';
 
-export default function WheatLogo({ size = 32, className = "" }) {
+export default function WheatLogo({ size = 48, className = "" }) {
     return (
-        <div className={`wheat-logo-container ${className}`} style={{ width: size, height: size }}>
+        <div className={`wheat-logo-container ${className}`} style={{ width: size, height: 'auto' }}>
             <img
                 src={logo}
                 alt="Pain Doré Logo"
