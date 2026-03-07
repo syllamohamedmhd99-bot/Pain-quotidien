@@ -74,7 +74,7 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
             <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div className="logo-icon">
-                        <WheatLogo size={56} />
+                        <Croissant size={32} />
                     </div>
                     <h2>Pain Doré</h2>
                 </div>
