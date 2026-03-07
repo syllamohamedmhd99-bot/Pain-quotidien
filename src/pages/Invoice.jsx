@@ -43,6 +43,17 @@ export default function Invoice() {
                 if (itemsError) throw itemsError;
                 setItems(itemsData || []);
 
+                // Fetch delivery fee if available
+                const { data: delData } = await supabase
+                    .from('deliveries')
+                    .select('delivery_fee')
+                    .eq('transaction_id', numericId)
+                    .single();
+
+                if (delData) {
+                    setTransaction(prev => ({ ...prev, delivery_fee: delData.delivery_fee }));
+                }
+
             } catch (error) {
                 console.error("Error fetching invoice:", error);
                 setTransaction(null);
@@ -210,9 +221,15 @@ export default function Invoice() {
                             <span>{transaction.tax.toLocaleString()} GNF</span>
                         </div>
                     )}
+                    {transaction.delivery_fee > 0 && (
+                        <div className="total-row">
+                            <span>Frais de livraison</span>
+                            <span>{transaction.delivery_fee.toLocaleString()} GNF</span>
+                        </div>
+                    )}
                     <div className="total-row grand-total">
                         <span>Total à payer</span>
-                        <span>{transaction.total_amount.toLocaleString()} GNF</span>
+                        <span>{((transaction.total_amount || 0) + (transaction.delivery_fee || 0)).toLocaleString()} GNF</span>
                     </div>
                 </div>
 

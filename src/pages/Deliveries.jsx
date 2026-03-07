@@ -28,7 +28,8 @@ export default function Deliveries() {
         destination: '',
         driver_name: '',
         delivery_date: new Date().toISOString().split('T')[0],
-        status: 'Pending'
+        status: 'Pending',
+        delivery_fee: 0
     });
 
     useEffect(() => {
@@ -66,7 +67,7 @@ export default function Deliveries() {
         try {
             await supabase.from('deliveries').insert([formData]);
             setIsModalOpen(false);
-            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending' });
+            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0 });
             fetchData();
         } catch (err) {
             console.error("Error creating delivery:", err);
@@ -165,6 +166,9 @@ export default function Deliveries() {
                                         <div className="driver">
                                             <User size={14} />
                                             <span>Chauffeur: {d.driver_name || 'Non assigné'}</span>
+                                        </div>
+                                        <div className="delivery-fee" style={{ marginTop: '0.5rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
+                                            Prix: {d.delivery_fee?.toLocaleString() || 0} GNF
                                         </div>
                                     </div>
                                 </div>

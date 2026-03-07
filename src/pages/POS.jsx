@@ -21,6 +21,7 @@ export default function POS() {
     const [paymentDetails, setPaymentDetails] = useState("");
     const [isDelivery, setIsDelivery] = useState(false);
     const [deliveryAddress, setDeliveryAddress] = useState("");
+    const [deliveryFee, setDeliveryFee] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -78,10 +79,11 @@ export default function POS() {
         setPaymentDetails("");
         setIsDelivery(false);
         setDeliveryAddress("");
+        setDeliveryFee(0);
     };
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    const grandTotal = total;
+    const grandTotal = total + (isDelivery ? parseFloat(deliveryFee || 0) : 0);
 
     const handleCheckout = async () => {
         if (cart.length === 0) return;
@@ -130,7 +132,8 @@ export default function POS() {
                     .insert([{
                         transaction_id: trxData.id,
                         destination: deliveryAddress || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.address : null),
-                        status: 'Pending'
+                        status: 'Pending',
+                        delivery_fee: parseFloat(deliveryFee || 0)
                     }]);
 
                 if (deliveryError) {
@@ -349,6 +352,16 @@ export default function POS() {
                                     onChange={(e) => setDeliveryAddress(e.target.value)}
                                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
                                 />
+                                <div style={{ marginTop: '10px' }}>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px', color: 'var(--text-secondary)' }}>FRAIS DE LIVRAISON (GNF)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Prix de livraison..."
+                                        value={deliveryFee}
+                                        onChange={(e) => setDeliveryFee(e.target.value)}
+                                        style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem' }}
+                                    />
+                                </div>
                             </motion.div>
                         )}
                     </div>
