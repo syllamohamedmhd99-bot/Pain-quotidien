@@ -58,8 +58,10 @@ export default function POS() {
     const updateQty = (id, delta) => {
         setCart(prev => prev.map(item => {
             if (item.id === id) {
-                const newQty = item.qty + delta;
-                return newQty > 0 ? { ...item, qty: newQty } : item;
+                if (typeof delta === 'string' || typeof delta === 'number' && delta >= 0) {
+                    const newQty = typeof delta === 'number' ? item.qty + delta : parseInt(delta) || 0;
+                    return newQty >= 0 ? { ...item, qty: newQty } : item;
+                }
             }
             return item;
         }));
@@ -250,8 +252,15 @@ export default function POS() {
                                     <div className="cart-item-actions">
                                         <div className="qty-controls">
                                             <button className="qty-btn" onClick={() => updateQty(item.id, -1)}><Minus size={14} /></button>
-                                            <span className="qty-val">{item.qty}</span>
+                                            <input
+                                                type="number"
+                                                className="qty-input"
+                                                value={item.qty}
+                                                onChange={(e) => updateQty(item.id, e.target.value)}
+                                                min="0"
+                                            />
                                             <button className="qty-btn" onClick={() => updateQty(item.id, 1)}><Plus size={14} /></button>
+                                            <span className="unit-label">{item.unit || (item.category === 'Pain' ? 'u' : 'kg')}</span>
                                         </div>
                                         <button className="delete-btn" onClick={() => removeFromCart(item.id)}>
                                             <Trash2 size={16} />

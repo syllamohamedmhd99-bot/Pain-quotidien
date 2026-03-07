@@ -228,10 +228,23 @@
     background-color: var(--card-bg);
 }
 
-.qty-val {
-    font-weight: 600;
-    width: 20px;
+.qty-input {
+    width: 50px;
     text-align: center;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 2px;
+    margin: 0 4px;
+    font-weight: 700;
+}
+
+.unit-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-left: 4px;
+    align-self: center;
 }
 
 .delete-btn {

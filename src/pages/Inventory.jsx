@@ -23,6 +23,7 @@ export default function Inventory() {
         price: "",
         stock: "",
         min_stock: 10, // Added min_stock
+        unit: "unité",
         status: "En stock",
         image: ""
     });
@@ -101,6 +102,7 @@ export default function Inventory() {
                 price: parseFloat(product.price), // Parse to float
                 stock: parseInt(product.stock), // Parse to int
                 min_stock: parseInt(product.min_stock || 10), // Parse to int, default to 10
+                unit: product.unit || "unité",
                 status: product.status,
                 image: product.image || ""
             });
@@ -112,6 +114,7 @@ export default function Inventory() {
                 price: "",
                 stock: "",
                 min_stock: 10, // Default for new product
+                unit: "unité",
                 status: "En stock",
                 image: ""
             });
@@ -267,7 +270,7 @@ export default function Inventory() {
                                     <div className="stock-info">
                                         <span className="stock-label">Stock disponible</span>
                                         <span className={`stock-count ${product.stock <= product.min_stock ? 'text-danger' : ''}`}>
-                                            {product.stock} {product.category === 'Pain' ? 'unités' : 'kg'}
+                                            {product.stock} {product.unit || (product.category === 'Pain' ? 'unités' : 'kg')}
                                         </span>
                                     </div>
                                 </div>
@@ -346,6 +349,15 @@ export default function Inventory() {
                                         >
                                             {productCategories.map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
+                                    </div>
+                                    <div className="input-half">
+                                        <label>Unité de vente</label>
+                                        <input
+                                            type="text"
+                                            placeholder="ex: Baguette, Kg, Lot"
+                                            value={formData.unit}
+                                            onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                                        />
                                     </div>
                                     <div className="input-half">
                                         <label>Statut</label>
