@@ -4,33 +4,33 @@
   /* Font Families */
   --font-primary: 'Outfit', sans-serif;
 
-  /* Light Theme Colors (Bakery Premium) */
-  --bg-color: #fcfaf7;
-  --bg-secondary: #f3eee6;
-  --text-primary: #2d241d;
-  --text-secondary: #5a4b3c;
+  /* Light Theme Colors (Modern Printing Premium) */
+  --bg-color: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
 
-  --primary-color: #c68b59;
-  /* Toasted Crust */
-  --primary-hover: #af7a4b;
-  --secondary-color: #faedcd;
-  /* Light Wheat */
-  --accent-color: #8da47e;
-  /* Sage/Matcha */
+  --primary-color: #0ea5e9;
+  /* Cyan 500 */
+  --primary-hover: #0284c7;
+  --secondary-color: #e0f2fe;
+  /* Light Blue */
+  --accent-color: #d946ef;
+  /* Fuchsia/Magenta */
 
-  --danger-color: #e5484d;
-  --success-color: #30a46c;
-  --warning-color: #ffb224;
+  --danger-color: #ef4444;
+  --success-color: #22c55e;
+  --warning-color: #f59e0b;
 
   /* Glassmorphism Premium */
   --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(198, 139, 89, 0.15);
+  --glass-border: rgba(14, 165, 233, 0.15);
   /* Tinted with primary */
-  --glass-shadow: 0 8px 32px 0 rgba(45, 36, 29, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
   --glass-blur: blur(16px);
 
   --card-bg: #ffffff;
-  --border-color: rgba(198, 139, 89, 0.12);
+  --border-color: rgba(14, 165, 233, 0.12);
 
   --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --radius-lg: 24px;
@@ -40,22 +40,22 @@
 
 /* Dark Mode Theme */
 .dark {
-  --bg-color: #0f0d0c;
-  --bg-secondary: #221c18;
-  --text-primary: #fcfaf7;
-  --text-secondary: #a89a8e;
+  --bg-color: #020617;
+  --bg-secondary: #0f172a;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
 
-  --primary-color: #d49a6a;
-  --primary-hover: #e6b081;
-  --secondary-color: #241e1a;
-  --accent-color: #9cb071;
+  --primary-color: #38bdf8;
+  --primary-hover: #7dd3fc;
+  --secondary-color: #1e293b;
+  --accent-color: #f0abfc;
 
-  --glass-bg: rgba(18, 16, 14, 0.75);
-  --glass-border: rgba(212, 154, 106, 0.12);
+  --glass-bg: rgba(15, 23, 42, 0.75);
+  --glass-border: rgba(56, 189, 248, 0.12);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
 
-  --card-bg: #181412;
-  --border-color: rgba(212, 154, 106, 0.08);
+  --card-bg: #0f172a;
+  --border-color: rgba(56, 189, 248, 0.08);
 }
 
 /* Theme: Matcha Green */
@@ -177,14 +177,14 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
   overflow-x: hidden;
   background-image:
-    radial-gradient(at 0% 0%, hsla(30, 40%, 93%, 0.8) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(40, 50%, 90%, 0.4) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(200, 40%, 93%, 0.8) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(220, 50%, 90%, 0.4) 0, transparent 50%);
 }
 
 .dark body {
   background-image:
-    radial-gradient(at 0% 0%, hsla(30, 25%, 8%, 0.8) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(40, 30%, 12%, 0.5) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(220, 25%, 8%, 0.8) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(230, 30%, 12%, 0.5) 0, transparent 50%);
 }
 
 #root {
