@@ -8,6 +8,8 @@ import './Reports.css';
 export default function Reports() {
     const [transactions, setTransactions] = useState([]);
     const [expenses, setExpenses] = useState([]);
+    const [productionLogs, setProductionLogs] = useState([]);
+    const [deliveries, setDeliveries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState("month"); // "today", "week", "month", "year"
     const [reporterName, setReporterName] = useState("");
@@ -57,8 +59,28 @@ export default function Reports() {
 
             if (expError) throw expError;
 
+            // Fetch Production (Lots de production)
+            const { data: prodData, error: prodError } = await supabase
+                .from('production_logs')
+                .select('*')
+                .gte('created_at', startDateIso)
+                .order('created_at', { ascending: false });
+
+            if (prodError) throw prodError;
+
+            // Fetch Deliveries (Livraisons)
+            const { data: delData, error: delError } = await supabase
+                .from('deliveries')
+                .select('*, delivery_items(quantity)')
+                .gte('delivery_date', startDateIso)
+                .order('delivery_date', { ascending: false });
+
+            if (delError) throw delError;
+
             setTransactions(trxData || []);
             setExpenses(expData || []);
+            setProductionLogs(prodData || []);
+            setDeliveries(delData || []);
 
         } catch (error) {
             console.error("Erreur lors du chargement des données de rapport:", error);
@@ -67,10 +89,27 @@ export default function Reports() {
         }
     };
 
-    // Calculs
+    // Calculs financiers
     const totalSales = transactions.reduce((sum, t) => sum + (t.total_amount || 0), 0);
     const totalDespenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
     const netProfit = totalSales - totalDespenses;
+
+    // Calculs Production
+    const totalProductionQty = productionLogs
+        .filter(l => l.status === 'Ready')
+        .reduce((sum, l) => sum + (l.quantity || 0), 0);
+
+    const productionByProduct = productionLogs
+        .filter(l => l.status === 'Ready')
+        .reduce((acc, l) => {
+            acc[l.product_name] = (acc[l.product_name] || 0) + (l.quantity || 0);
+            return acc;
+        }, {});
+
+    // Calculs Livraisons
+    const totalDeliveries = deliveries.length;
+    const completedDeliveries = deliveries.filter(d => d.status === 'Delivered').length;
+    const totalDeliveryFees = deliveries.reduce((sum, d) => sum + (parseFloat(d.delivery_fee) || 0), 0);
 
     // --- Actions ---
 
@@ -225,35 +264,91 @@ export default function Reports() {
 
                         <div className="report-details">
                             <div className="report-column">
-                                <h3>Dernières Ventes ({transactions.length})</h3>
+                                <h3>Résumé Financier</h3>
+                                <table className="report-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>Chiffre d'Affaires</td>
+                                            <td className="text-right text-success">{totalSales.toLocaleString()} GNF</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dépenses Générales</td>
+                                            <td className="text-right text-danger">-{totalDespenses.toLocaleString()} GNF</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Revenus Livraisons (Frais)</td>
+                                            <td className="text-right text-success">+{totalDeliveryFees.toLocaleString()} GNF</td>
+                                        </tr>
+                                        <tr style={{ fontWeight: 'bold', borderTop: '2px solid var(--border-color)' }}>
+                                            <td>Bénéfice Net Global</td>
+                                            <td className={`text-right ${netProfit + totalDeliveryFees >= 0 ? 'text-success' : 'text-danger'}`}>
+                                                {(netProfit + totalDeliveryFees).toLocaleString()} GNF
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <h3 style={{ marginTop: '2rem' }}>Production Réalisée</h3>
                                 <table className="report-table">
                                     <thead>
                                         <tr>
-                                            <th>Date</th>
-                                            <th>Réf</th>
-                                            <th className="text-right">Montant</th>
+                                            <th>Produit</th>
+                                            <th className="text-right">Quantité Totale</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {transactions.slice(0, 10).map(t => (
-                                            <tr key={t.id}>
-                                                <td>{new Date(t.date).toLocaleDateString('fr-FR')}</td>
-                                                <td>{t.trx_id}</td>
-                                                <td className="text-right text-success">+{t.total_amount.toLocaleString()}</td>
+                                        {Object.entries(productionByProduct).map(([name, qty]) => (
+                                            <tr key={name}>
+                                                <td>{name}</td>
+                                                <td className="text-right">{qty.toLocaleString()}</td>
                                             </tr>
                                         ))}
-                                        {transactions.length > 10 && (
-                                            <tr><td colSpan="3" className="text-center text-secondary">... et {transactions.length - 10} autres ventes</td></tr>
+                                        {Object.keys(productionByProduct).length === 0 && (
+                                            <tr><td colSpan="2" className="text-center text-secondary">Aucune production terminée</td></tr>
                                         )}
-                                        {transactions.length === 0 && (
-                                            <tr><td colSpan="3" className="text-center text-secondary">Aucune vente sur cette période</td></tr>
-                                        )}
+                                        <tr style={{ fontWeight: 'bold', background: 'var(--bg-tertiary)' }}>
+                                            <td>TOTAL PRODUCTION</td>
+                                            <td className="text-right">{totalProductionQty.toLocaleString()} unités</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             <div className="report-column">
-                                <h3>Dernières Dépenses ({expenses.length})</h3>
+                                <h3>Activité Livraisons</h3>
+                                <div className="stats-mini-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '1rem' }}>
+                                    <div className="stat-mini-card card glass">
+                                        <span className="label">Total Courses</span>
+                                        <span className="value">{totalDeliveries}</span>
+                                    </div>
+                                    <div className="stat-mini-card card glass">
+                                        <span className="label">Livraisons Réussies</span>
+                                        <span className="value text-success">{completedDeliveries}</span>
+                                    </div>
+                                </div>
+                                <table className="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Destination</th>
+                                            <th className="text-right">Frais</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {deliveries.slice(0, 8).map(d => (
+                                            <tr key={d.id}>
+                                                <td>{new Date(d.delivery_date).toLocaleDateString('fr-FR')}</td>
+                                                <td className="truncate" style={{ maxWidth: '100px' }}>{d.destination}</td>
+                                                <td className="text-right">{parseFloat(d.delivery_fee).toLocaleString()} GNF</td>
+                                            </tr>
+                                        ))}
+                                        {deliveries.length > 8 && (
+                                            <tr><td colSpan="3" className="text-center text-secondary">... et {deliveries.length - 8} autres</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
+
+                                <h3 style={{ marginTop: '2rem' }}>Dernières Dépenses</h3>
                                 <table className="report-table">
                                     <thead>
                                         <tr>
@@ -263,19 +358,13 @@ export default function Reports() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {expenses.slice(0, 10).map(e => (
+                                        {expenses.slice(0, 8).map(e => (
                                             <tr key={e.id}>
                                                 <td>{new Date(e.date).toLocaleDateString('fr-FR')}</td>
                                                 <td>{e.category}</td>
                                                 <td className="text-right text-danger">-{e.amount.toLocaleString()}</td>
                                             </tr>
                                         ))}
-                                        {expenses.length > 10 && (
-                                            <tr><td colSpan="3" className="text-center text-secondary">... et {expenses.length - 10} autres dépenses</td></tr>
-                                        )}
-                                        {expenses.length === 0 && (
-                                            <tr><td colSpan="3" className="text-center text-secondary">Aucune dépense sur cette période</td></tr>
-                                        )}
                                     </tbody>
                                 </table>
                             </div>
