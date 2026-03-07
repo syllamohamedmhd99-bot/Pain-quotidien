@@ -8,14 +8,14 @@ import './Sidebar.css';
 const navItems = [
     { name: 'Tableau de bord', path: '/', icon: LayoutDashboard },
     { name: 'Catalogue & Stock', path: '/inventory', icon: Package },
+    { name: 'Fournisseurs', path: '/suppliers', icon: Users },
+    { name: 'Historique', path: '/history', icon: HistoryIcon },
+    { name: 'Facturation', path: '/invoices', icon: Receipt },
     { name: 'Production', path: '/production', icon: ChefHat },
     { name: 'Matières Premières', path: '/raw-materials', icon: Wheat },
     { name: 'Ventes (POS)', path: '/pos', icon: ShoppingCart },
     { name: 'Livraisons', path: '/deliveries', icon: Truck },
     { name: 'Clients', path: '/clients', icon: Users },
-    { name: 'Fournisseurs', path: '/suppliers', icon: Users },
-    { name: 'Historique', path: '/history', icon: HistoryIcon },
-    { name: 'Facturation', path: '/invoices', icon: Receipt },
     { name: 'Dépenses', path: '/expenses', icon: Wallet },
     {
         name: 'Contrôle de Gestion',

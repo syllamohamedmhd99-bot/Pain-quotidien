@@ -183,6 +183,77 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
+.alert-list,
+.deliveries-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.alert-item,
+.delivery-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-smooth);
+}
+
+.alert-item:hover,
+.delivery-mini-item:hover {
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.alert-item.danger {
+    border-left: 4px solid var(--danger-color);
+}
+
+.alert-item.warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--danger-color);
+    box-shadow: 0 0 10px var(--danger-color);
+}
+
+.alert-item.warning .status-dot {
+    background: var(--warning-color);
+    box-shadow: 0 0 10px var(--warning-color);
+}
+
+.status-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+}
+
+.status-tag.pending {
+    background: color-mix(in srgb, var(--warning-color) 20%, transparent);
+    color: var(--warning-color);
+}
+
+.status-tag.out {
+    background: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    color: var(--primary-color);
+}
+
+.status-tag.delivered {
+    background: color-mix(in srgb, var(--success-color) 20%, transparent);
+    color: var(--success-color);
+}
+
 @media (max-width: 1024px) {
     .dashboard-content {
         grid-template-columns: 1fr;

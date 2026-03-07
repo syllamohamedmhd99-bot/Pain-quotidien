@@ -172,11 +172,13 @@ export default function Dashboard({ profile }) {
         { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
         { id: 2, title: "Produits Vendus (Jour)", value: totalProductsSoldToday.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: "Aujourd'hui" },
         { id: 3, title: "Livraisons en cours", value: deliveries.filter(d => d.status === 'Out').length.toString(), icon: Truck, color: "var(--warning-color)", increase: "Actives" },
-        { id: 4, title: "Stock Produits", value: products.filter(p => p.stock <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
-        { id: 5, title: "Stock Matières", value: rawMaterials.filter(rm => rm.stock <= (rm.min_stock || 5)).length.toString(), icon: Wheat, color: "var(--secondary-color)", increase: "Alertes" },
+        { id: 4, title: "Stock Produits", value: products.filter(p => (p.stock || 0) <= (p.min_stock || 10)).length.toString(), icon: AlertTriangle, color: "var(--danger-color)", increase: "Alertes" },
+        { id: 5, title: "Stock Matières", value: rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).length.toString(), icon: Wheat, color: "var(--secondary-color)", increase: "Alertes" },
     ];
 
-    const stockAlerts = products.filter(p => p.stock <= (p.min_stock || 10)).slice(0, 5);
+    const stockAlerts = products.filter(p => (p.stock || 0) <= (p.min_stock || 10)).slice(0, 5);
+    const materialAlerts = rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).slice(0, 5);
+    const recentDeliveries = (Array.isArray(deliveries) ? deliveries : []).slice(0, 5);
 
     return (
         <motion.div
@@ -359,7 +361,7 @@ export default function Dashboard({ profile }) {
                     >
                         <div className="section-header">
                             <h3>Ventes Récentes</h3>
-                            <button className="btn-outline btn-small" onClick={() => window.location.href = '/history'}>Voir plus</button>
+                            <button className="btn-outline btn-small" onClick={() => window.location.href = '/history'}>Plus</button>
                         </div>
                         <ul className="order-list">
                             {(Array.isArray(transactions) ? transactions : []).slice(0, 4).map(trx => (
@@ -374,6 +376,75 @@ export default function Dashboard({ profile }) {
                                 </li>
                             ))}
                         </ul>
+                    </motion.div>
+
+                    <motion.div
+                        className="critical-stock card glass"
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6, duration: 0.7 }}
+                    >
+                        <div className="section-header">
+                            <h3>Stocks Critiques</h3>
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <button className="btn-text btn-small" onClick={() => window.location.href = '/inventory'}>Produits</button>
+                                <button className="btn-text btn-small" onClick={() => window.location.href = '/raw-materials'}>Matières</button>
+                            </div>
+                        </div>
+                        <div className="alert-list">
+                            {materialAlerts.map(rm => (
+                                <div key={rm.id} className="alert-item danger">
+                                    <Wheat size={16} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{rm.name}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{rm.quantity} {rm.unit} (Seuil: {rm.min_stock})</div>
+                                    </div>
+                                    <div className="status-dot"></div>
+                                </div>
+                            ))}
+                            {stockAlerts.map(p => (
+                                <div key={p.id} className="alert-item warning">
+                                    <Package size={16} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{p.name}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{p.stock} unités (Seuil: {p.min_stock})</div>
+                                    </div>
+                                    <div className="status-dot"></div>
+                                </div>
+                            ))}
+                            {materialAlerts.length === 0 && stockAlerts.length === 0 && (
+                                <p style={{ textAlign: 'center', opacity: 0.5, padding: '1rem' }}>Aucune alerte de stock.</p>
+                            )}
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        className="recent-deliveries card glass"
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.7, duration: 0.7 }}
+                    >
+                        <div className="section-header">
+                            <h3>Livraisons</h3>
+                            <button className="btn-outline btn-small" onClick={() => window.location.href = '/deliveries'}>Voir tout</button>
+                        </div>
+                        <div className="deliveries-mini-list">
+                            {recentDeliveries.map(d => (
+                                <div key={d.id} className="delivery-mini-item">
+                                    <div className={`status-tag ${d.status.toLowerCase()}`}>
+                                        {d.status === 'Pending' ? 'Atte.' : d.status === 'Out' ? 'Cours' : 'Livré'}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{d.destination}</div>
+                                        <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>{d.driver_name} • {new Date(d.delivery_date).toLocaleDateString()}</div>
+                                    </div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>{d.delivery_fee.toLocaleString()}</div>
+                                </div>
+                            ))}
+                            {recentDeliveries.length === 0 && (
+                                <p style={{ textAlign: 'center', opacity: 0.5, padding: '1rem' }}>Pas de livraisons.</p>
+                            )}
+                        </div>
                     </motion.div>
                 </div>
             </div>
