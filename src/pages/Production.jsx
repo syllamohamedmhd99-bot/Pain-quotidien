@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChefHat, Timer, CheckCircle, Play, Trash2, Plus, AlertCircle } from 'lucide-react';
+import { ChefHat, Timer, CheckCircle, Play, Trash2, Plus, AlertCircle, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Production.css';
 
@@ -195,7 +195,7 @@ export default function Production() {
                         >
                             <div className="modal-header">
                                 <h2>Nouvelle Fournée</h2>
-                                <button className="close-btn" onClick={() => setIsModalOpen(false)}>&times;</button>
+                                <button className="close-btn" onClick={() => setIsModalOpen(false)}><X size={24} /></button>
                             </div>
                             <form onSubmit={handleAddBatch}>
                                 <div className="form-group">

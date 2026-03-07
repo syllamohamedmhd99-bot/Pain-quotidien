@@ -10,7 +10,9 @@ import {
     Search,
     Filter,
     ChevronRight,
-    ArrowRight
+    ArrowRight,
+    Plus,
+    X
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './Deliveries.css';
