@@ -165,6 +165,11 @@
     font-weight: 600;
 }
 
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--danger-color) !important;
+}
+
 @media (max-width: 992px) {
     .delivery-item {
         flex-direction: column;
