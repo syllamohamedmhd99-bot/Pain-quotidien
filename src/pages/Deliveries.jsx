@@ -39,7 +39,8 @@ export default function Deliveries() {
         delivery_date: new Date().toISOString().split('T')[0],
         status: 'Pending',
         delivery_fee: 0,
-        recipient_name: ''
+        recipient_name: '',
+        items: [] // New: track items during creation
     });
 
     useEffect(() => {
@@ -50,7 +51,7 @@ export default function Deliveries() {
         try {
             setLoading(true);
             const [delRes, trxRes, prodRes] = await Promise.all([
-                supabase.from('deliveries').select('*, transactions(*)').order('created_at', { ascending: false }),
+                supabase.from('deliveries').select('*, transactions(*), delivery_items(quantity, products(name))').order('created_at', { ascending: false }),
                 supabase.from('transactions').select('*').eq('type', 'Vente').order('date', { ascending: false }),
                 supabase.from('products').select('*').order('name')
             ]);
@@ -77,9 +78,32 @@ export default function Deliveries() {
     const handleCreateDelivery = async (e) => {
         e.preventDefault();
         try {
-            await supabase.from('deliveries').insert([formData]);
+            const { data: newDel, error: delError } = await supabase.from('deliveries').insert([
+                {
+                    destination: formData.destination,
+                    driver_name: formData.driver_name,
+                    delivery_date: formData.delivery_date,
+                    status: formData.status,
+                    delivery_fee: formData.delivery_fee,
+                    recipient_name: formData.recipient_name
+                }
+            ]).select().single();
+
+            if (delError) throw delError;
+
+            if (newDel && formData.items.length > 0) {
+                const itemsToSave = formData.items
+                    .filter(it => it.product_id)
+                    .map(it => ({
+                        delivery_id: newDel.id,
+                        product_id: parseInt(it.product_id),
+                        quantity: parseFloat(it.quantity)
+                    }));
+                await supabase.from('delivery_items').insert(itemsToSave);
+            }
+
             setIsModalOpen(false);
-            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '' });
+            setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '', items: [] });
             fetchData();
         } catch (err) {
             console.error("Error creating delivery:", err);
@@ -233,8 +257,18 @@ export default function Deliveries() {
                                             <User size={14} />
                                             <span>Chauffeur: {d.driver_name || 'Non assigné'}</span>
                                         </div>
-                                        <div className="delivery-fee" style={{ marginTop: '0.5rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                                            Prix: {d.delivery_fee?.toLocaleString() || 0} GNF
+                                        <div className="delivery-fee" style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '10px 15px' }}>
+                                            <span style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>Prix: {d.delivery_fee?.toLocaleString() || 0} GNF</span>
+                                            {d.delivery_items && d.delivery_items.length > 0 && (
+                                                <div className="items-summary" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                                    <Package size={14} />
+                                                    {d.delivery_items.map((it, idx) => (
+                                                        <span key={idx} style={{ background: 'var(--bg-secondary)', padding: '2px 6px', borderRadius: '4px' }}>
+                                                            {it.quantity} {it.products?.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -347,6 +381,48 @@ export default function Deliveries() {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="form-group" style={{ marginTop: '20px', borderTop: '1px solid var(--border-color)', paddingTop: '15px' }}>
+                                    <h3 style={{ fontSize: '1rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Package size={18} /> Articles livrés
+                                    </h3>
+                                    <div className="items-selector" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {formData.items.map((item, idx) => (
+                                            <div key={idx} style={{ display: 'flex', gap: '8px' }}>
+                                                <select
+                                                    value={item.product_id}
+                                                    onChange={(e) => {
+                                                        const newItems = [...formData.items];
+                                                        newItems[idx].product_id = e.target.value;
+                                                        setFormData({ ...formData, items: newItems });
+                                                    }}
+                                                    style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
+                                                >
+                                                    <option value="">Produit...</option>
+                                                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                                </select>
+                                                <input
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    onChange={(e) => {
+                                                        const newItems = [...formData.items];
+                                                        newItems[idx].quantity = e.target.value;
+                                                        setFormData({ ...formData, items: newItems });
+                                                    }}
+                                                    style={{ width: '70px', padding: '8px', borderRadius: '4px', border: '1px solid var(--border-color)' }}
+                                                    placeholder="Qté"
+                                                />
+                                                <button type="button" className="btn btn-outline btn-sm" onClick={() => setFormData({ ...formData, items: formData.items.filter((_, i) => i !== idx) })}>
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button type="button" className="btn btn-outline btn-sm" onClick={() => setFormData({ ...formData, items: [...formData.items, { product_id: '', quantity: 1 }] })}>
+                                            <Plus size={14} /> Ajouter un article
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div className="modal-actions">
                                     <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Annuler</button>
                                     <button type="submit" className="btn btn-primary">Créer</button>
