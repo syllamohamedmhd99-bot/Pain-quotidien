@@ -7,39 +7,6 @@ import './Sidebar.css';
 
 const navItems = [
     { name: 'Tableau de bord', path: '/', icon: LayoutDashboard },
-    { name: 'Encaissement', path: '/pos', icon: ShoppingCart },
-    { name: 'Inventaire', path: '/inventory', icon: Wheat },
-    { name: 'Clients', path: '/clients', icon: Users },
-    { name: 'Fournisseurs', path: '/suppliers', icon: Truck },
-    { name: 'Production', path: '/production', icon: ChefHat },
-    {
-        name: 'Charges',
-        path: '/expenses',
-        icon: Wallet,
-        subItems: [
-            { name: 'Autres Charges', path: '/expenses' },
-            { name: 'Charges Production', path: '/production-costs' },
-            { name: 'Salaires', path: '/salaries' }
-        ]
-    },
-    {
-        name: 'Facturation',
-        path: '/invoices',
-        icon: Receipt,
-        subItems: [
-            { name: 'Historique', path: '/invoices' },
-            { name: 'Créer Facture', path: '/invoices/new' },
-            { name: 'Rapports', path: '/reports' }
-        ]
-    },
-    { name: 'Mon Profil', path: '/profile', icon: User },
-    { name: 'Historique Activité', path: '/history', icon: HistoryIcon },
-    {
-        name: 'Administration',
-        path: '/admin/users',
-        icon: ShieldCheck,
-        adminOnly: true
-    },
 ];
 
 export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onLogout, isOpen, onClose, profile }) {
