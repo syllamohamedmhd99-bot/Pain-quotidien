@@ -18,16 +18,17 @@ export default function UsersManagement() {
     const [diagResult, setDiagResult] = useState(null); // Pour l'affichage persistant
 
     const availablePages = [
-        { id: '/pos', name: 'Encaissement' },
-        { id: '/inventory', name: 'Inventaire' },
+        { id: '/pos', name: 'Ventes (POS)' },
+        { id: '/inventory', name: 'Catalogue & Stock' },
+        { id: '/production', name: 'Production' },
+        { id: '/raw-materials', name: 'Matières Premières' },
+        { id: '/deliveries', name: 'Livraisons' },
+        { id: '/invoices', name: 'Facturation' },
+        { id: '/expenses', name: 'Dépenses' },
+        { id: '/history', name: 'Historique d\'activité' },
         { id: '/clients', name: 'Clients' },
         { id: '/suppliers', name: 'Fournisseurs' },
-        { id: '/expenses', name: 'Dépenses Générales' },
-        { id: '/production-costs', name: 'Charges Production' },
-        { id: '/production', name: 'Production' },
-        { id: '/invoices', name: 'Facturation (Historique)' },
-        { id: '/invoices/new', name: 'Créer Facture' },
-        { id: '/history', name: 'Historique Activité' },
+        { id: '/salaries', name: 'Salaires' },
     ];
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
