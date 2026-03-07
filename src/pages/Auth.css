@@ -151,11 +151,8 @@ body:not(.dark) .auth-card {
     width: 120px;
     height: 120px;
     border-radius: 24px;
-    background: linear-gradient(135deg, #FFD700, #DAA520);
-    /* Or et Miel */
     color: #4B2E1E;
     margin-bottom: 1.5rem;
-    box-shadow: 0 10px 20px -10px rgba(255, 215, 0, 0.5);
 }
 
 .auth-title {
