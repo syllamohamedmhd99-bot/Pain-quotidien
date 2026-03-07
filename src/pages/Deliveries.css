@@ -152,6 +152,19 @@
     font-size: 0.9rem;
 }
 
+.items-summary {
+    background: rgba(var(--primary-rgb), 0.05);
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    margin-top: 0.5rem;
+}
+
+.items-summary span {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
 @media (max-width: 992px) {
     .delivery-item {
         flex-direction: column;

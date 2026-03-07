@@ -26,8 +26,20 @@ export default function DeliveryNote() {
                     .eq('id', id)
                     .single();
 
-                if (delError) throw delError;
-                setDelivery(delData);
+                if (delError) {
+                    // If the join fails (e.g., transactions table missing or join error), try fetching without the join
+                    console.warn("Initial fetch with join failed, attempting fallback:", delError.message);
+                    const { data: fallbackDelData, error: fallbackDelError } = await supabase
+                        .from('deliveries')
+                        .select('*') // Fetch only from deliveries table
+                        .eq('id', id)
+                        .single();
+
+                    if (fallbackDelError) throw fallbackDelError;
+                    setDelivery(fallbackDelData);
+                } else {
+                    setDelivery(delData);
+                }
 
                 // Fetch delivery items
                 const { data: itemsData, error: itemsError } = await supabase
@@ -105,9 +117,9 @@ export default function DeliveryNote() {
                     </div>
                     <div className="invoice-meta">
                         <h2>BON DE LIVRAISON</h2>
-                        <p><strong>Réf:</strong> DL-{delivery.id.toString().padStart(4, '0')}</p>
+                        <p><strong>Réf:</strong> DL-{delivery.id.toString().substring(0, 8).toUpperCase()}</p>
                         <p><strong>Date:</strong> {displayDate.toLocaleDateString('fr-FR')}</p>
-                        {delivery.transactions && <p><strong>Commande:</strong> {delivery.transactions.trx_id}</p>}
+                        {delivery.transactions && <p><strong>Commande:</strong> {(Array.isArray(delivery.transactions) ? delivery.transactions[0] : delivery.transactions)?.trx_id}</p>}
                     </div>
                 </div>
 
@@ -120,9 +132,9 @@ export default function DeliveryNote() {
                     </div>
                     <div className="info-block">
                         <h3>Destinataire</h3>
-                        <p><strong>{delivery.recipient_name || delivery.transactions?.clients?.name || "Client"}</strong></p>
+                        <p><strong>{delivery.recipient_name || (Array.isArray(delivery.transactions) ? delivery.transactions[0] : delivery.transactions)?.clients?.name || "Client"}</strong></p>
                         <p><MapPin size={14} /> {delivery.destination}</p>
-                        {(delivery.transactions?.clients?.phone) && <p>Tél: {delivery.transactions.clients.phone}</p>}
+                        {((Array.isArray(delivery.transactions) ? delivery.transactions[0] : delivery.transactions)?.clients?.phone) && <p>Tél: {(Array.isArray(delivery.transactions) ? delivery.transactions[0] : delivery.transactions).clients.phone}</p>}
                     </div>
                 </div>
 
