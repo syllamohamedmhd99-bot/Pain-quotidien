@@ -35,18 +35,18 @@ export default function Dashboard({ profile }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Pour le mode local, on peut passer un paramètre ?all=true
-                // En mode Supabase, le RLS gère déjà cela si l'admin a les droits.
-                const queryOptions = isAdmin && globalView ? { all: 'true' } : {};
+                // On ne passe queryOptions que si on est en mode Local (simulé dans supabaseClient)
+                // Pour le mode Supabase, ces options causent des erreurs 400.
+                const fetchOptions = (isAdmin && globalView && supabase.isLocal) ? { all: 'true' } : {};
 
                 const [trxRes, clientRes, prodRes, suppRes, expRes, delRes, rawRes] = await Promise.all([
-                    supabase.from('transactions').select('*', queryOptions),
-                    supabase.from('clients').select('*', queryOptions),
-                    supabase.from('products').select('*', queryOptions),
-                    supabase.from('suppliers').select('*', queryOptions),
-                    supabase.from('expenses').select('*', queryOptions),
-                    supabase.from('deliveries').select('*', queryOptions),
-                    supabase.from('raw_materials').select('*', queryOptions)
+                    supabase.from('transactions').select('*', fetchOptions),
+                    supabase.from('clients').select('*', fetchOptions),
+                    supabase.from('products').select('*', fetchOptions),
+                    supabase.from('suppliers').select('*', fetchOptions),
+                    supabase.from('expenses').select('*', fetchOptions),
+                    supabase.from('deliveries').select('*', fetchOptions),
+                    supabase.from('raw_materials').select('*', fetchOptions)
                 ]);
 
                 if (trxRes.data) setTransactions(trxRes.data);
@@ -65,11 +65,14 @@ export default function Dashboard({ profile }) {
     }, [globalView]);
 
     const isToday = (dateString) => {
-        const today = new Date();
-        const date = new Date(dateString);
-        return date.getDate() === today.getDate() &&
-            date.getMonth() === today.getMonth() &&
-            date.getFullYear() === today.getFullYear();
+        if (!dateString) return false;
+        try {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const dateStr = new Date(dateString).toISOString().split('T')[0];
+            return todayStr === dateStr;
+        } catch (e) {
+            return false;
+        }
     };
 
     // BI Calculations
@@ -176,8 +179,12 @@ export default function Dashboard({ profile }) {
         { id: 5, title: "Stock Matières", value: rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).length.toString(), icon: Wheat, color: "var(--secondary-color)", increase: "Alertes" },
     ];
 
-    const stockAlerts = products.filter(p => (p.stock || 0) <= (p.min_stock || 10)).slice(0, 5);
-    const materialAlerts = rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5)).slice(0, 5);
+    const materialAlerts = rawMaterials.filter(rm => (rm.quantity || 0) <= (rm.min_stock || 5));
+    const stockAlerts = products.filter(p => (p.stock || 0) <= (p.min_stock || 10));
+
+    // Si pas d'alertes, on affiche les 5 premiers stocks pour donner de la visibilité
+    const displayMaterials = materialAlerts.length > 0 ? materialAlerts.slice(0, 5) : rawMaterials.slice(0, 5);
+    const displayProducts = stockAlerts.length > 0 ? stockAlerts.slice(0, 5) : products.slice(0, 5);
     const recentDeliveries = (Array.isArray(deliveries) ? deliveries : []).slice(0, 5);
 
     return (
@@ -392,28 +399,28 @@ export default function Dashboard({ profile }) {
                             </div>
                         </div>
                         <div className="alert-list">
-                            {materialAlerts.map(rm => (
-                                <div key={rm.id} className="alert-item danger">
+                            {displayMaterials.map(rm => (
+                                <div key={rm.id} className={`alert-item ${rm.quantity <= rm.min_stock ? 'danger' : 'success'}`}>
                                     <Wheat size={16} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{rm.name}</div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{rm.quantity} {rm.unit} (Seuil: {rm.min_stock})</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{rm.quantity} {rm.unit} {rm.quantity <= rm.min_stock && `(Seuil: ${rm.min_stock})`}</div>
                                     </div>
                                     <div className="status-dot"></div>
                                 </div>
                             ))}
-                            {stockAlerts.map(p => (
-                                <div key={p.id} className="alert-item warning">
+                            {displayProducts.map(p => (
+                                <div key={p.id} className={`alert-item ${p.stock <= p.min_stock ? 'warning' : 'success'}`}>
                                     <Package size={16} />
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{p.name}</div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{p.stock} unités (Seuil: {p.min_stock})</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{p.stock} unités {p.stock <= p.min_stock && `(Seuil: ${p.min_stock})`}</div>
                                     </div>
                                     <div className="status-dot"></div>
                                 </div>
                             ))}
-                            {materialAlerts.length === 0 && stockAlerts.length === 0 && (
-                                <p style={{ textAlign: 'center', opacity: 0.5, padding: '1rem' }}>Aucune alerte de stock.</p>
+                            {displayMaterials.length === 0 && displayProducts.length === 0 && (
+                                <p style={{ textAlign: 'center', opacity: 0.5, padding: '1rem' }}>Chargement ou aucun stock...</p>
                             )}
                         </div>
                     </motion.div>

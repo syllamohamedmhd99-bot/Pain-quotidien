@@ -162,3 +162,4 @@ const localClient = {
 };
 
 export const supabase = isLocalMode ? localClient : realSupabase;
+supabase.isLocal = isLocalMode;
