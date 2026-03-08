@@ -120,10 +120,15 @@ export default function Reports() {
     const handleDownloadPDF = () => {
         const element = reportRef.current;
         const opt = {
-            margin: 10,
+            margin: [10, 5, 10, 5], // Top, Left, Bottom, Right in mm
             filename: `Rapport_Boulangerie_${period}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                width: element.clientWidth // Pin width to element width
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
