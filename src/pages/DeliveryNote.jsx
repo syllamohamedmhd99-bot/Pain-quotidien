@@ -83,6 +83,15 @@ export default function DeliveryNote() {
         }
     };
 
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'Pending': return 'En attente';
+            case 'Out': return 'En cours / Expédié';
+            case 'Delivered': return 'Livré avec succès';
+            default: return status;
+        }
+    };
+
     if (loading) return <div className="loading">Chargement...</div>;
     if (!delivery) return <div className="error">Livraison non trouvée.</div>;
 
@@ -138,9 +147,15 @@ export default function DeliveryNote() {
                     </div>
                 </div>
 
-                <div className="info-section card glass" style={{ marginBottom: '20px', padding: '15px' }}>
-                    <p><strong>Chauffeur:</strong> {delivery.driver_name || 'Non assigné'}</p>
-                    <p><strong>Statut:</strong> {delivery.status}</p>
+                <div className="info-section card glass" style={{ marginBottom: '20px', padding: '15px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+                    <div>
+                        <p style={{ marginBottom: '5px' }}><strong><Truck size={14} style={{ marginRight: '5px' }} /> Chauffeur:</strong> {delivery.driver_name || 'Non assigné'}</p>
+                        <p style={{ marginBottom: '5px' }}><strong><Package size={14} style={{ marginRight: '5px' }} /> Statut:</strong> <span className={`badge ${delivery.status === 'Delivered' ? 'badge-success' : 'badge-warning'}`}>{getStatusLabel(delivery.status)}</span></p>
+                    </div>
+                    <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '15px' }}>
+                        <p style={{ marginBottom: '5px' }}><strong>Frais de livraison:</strong> {delivery.delivery_fee?.toLocaleString('fr-FR') || 0} GNF</p>
+                        <p style={{ marginBottom: '5px' }}><strong>Date d'expédition:</strong> {displayDate.toLocaleDateString('fr-FR')}</p>
+                    </div>
                 </div>
 
                 <div className="table-responsive">
