@@ -101,6 +101,15 @@ export default function Dashboard({ profile }) {
             return total;
         }, 0);
 
+    const totalProductsSoldTotal = (Array.isArray(transactions) ? transactions : [])
+        .filter(t => !t.trx_id?.startsWith('FACT-'))
+        .reduce((total, trx) => {
+            if (trx.items && Array.isArray(trx.items)) {
+                return total + trx.items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+            }
+            return total;
+        }, 0);
+
     // Top Products Calculation
     const getTopProducts = () => {
         const productSales = {};
@@ -173,7 +182,7 @@ export default function Dashboard({ profile }) {
 
     const stats = [
         { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
-        { id: 2, title: "Produits Vendus (Jour)", value: totalProductsSoldToday.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: "Aujourd'hui" },
+        { id: 2, title: "Total Vendus", value: totalProductsSoldTotal.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: `+${totalProductsSoldToday} Aujourd'hui` },
         { id: 3, title: "Livraisons en cours", value: deliveries.filter(d => d.status === 'Out').length.toString(), icon: Truck, color: "var(--warning-color)", increase: "Actives" },
         {
             id: 4,
