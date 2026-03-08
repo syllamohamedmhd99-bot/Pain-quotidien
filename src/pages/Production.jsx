@@ -17,7 +17,9 @@ const itemVariants = {
     visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
-export default function Production() {
+export default function Production({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [productionLogs, setProductionLogs] = useState([]);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);

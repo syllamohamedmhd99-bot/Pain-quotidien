@@ -20,7 +20,9 @@ import {
 import { supabase } from '../supabaseClient';
 import './ProductionCosts.css';
 
-export default function ProductionCosts() {
+export default function ProductionCosts({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [costs, setCosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');

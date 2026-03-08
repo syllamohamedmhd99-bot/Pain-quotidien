@@ -14,7 +14,9 @@ import {
 import { supabase } from '../supabaseClient';
 import './Expenses.css';
 
-export default function Expenses() {
+export default function Expenses({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [expenses, setExpenses] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(true);

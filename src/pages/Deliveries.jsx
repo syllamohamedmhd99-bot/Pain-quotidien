@@ -22,7 +22,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import './Deliveries.css';
 
-export default function Deliveries() {
+export default function Deliveries({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const navigate = useNavigate();
     const [deliveries, setDeliveries] = useState([]);
     const [transactions, setTransactions] = useState([]);

@@ -5,7 +5,9 @@ import { Search, Calendar, Filter, ArrowUpRight, ArrowDownRight, PackagePlus, Us
 import { supabase } from '../supabaseClient';
 import './History.css';
 
-export default function History() {
+export default function History({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [logs, setLogs] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("Tous");

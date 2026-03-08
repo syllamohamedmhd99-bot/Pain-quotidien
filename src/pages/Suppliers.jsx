@@ -4,7 +4,9 @@ import { Search, Plus, Mail, Phone, Package, Star, Trash2, X, Edit2, Printer } f
 import { supabase } from '../supabaseClient';
 import './CRM.css'; // Shared CSS for both CRM pages
 
-export default function Suppliers() {
+export default function Suppliers({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [suppliers, setSuppliers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);

@@ -4,7 +4,9 @@ import { Search, Plus, Mail, Phone, MapPin, Trash2, X, Edit2, Printer } from 'lu
 import { supabase } from '../supabaseClient';
 import './CRM.css'; // Assuming this exists or is shared
 
-export default function Clients() {
+export default function Clients({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [clients, setClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);

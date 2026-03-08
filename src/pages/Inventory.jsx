@@ -7,7 +7,9 @@ import './Inventory.css';
 const categories = ["Tous", "Pains", "Viennoiseries", "Pâtisseries"];
 const productCategories = ["Pains", "Viennoiseries", "Pâtisseries", "Boissons"];
 
-export default function Inventory() {
+export default function Inventory({ profile }) {
+    const isAdmin = profile?.role === 'Administrateur';
+
     const [products, setProducts] = useState([]);
     const [filter, setFilter] = useState("Tous");
     const [searchTerm, setSearchTerm] = useState("");
