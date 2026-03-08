@@ -110,15 +110,21 @@ export default function Deliveries() {
                         quantity: parseFloat(it.quantity)
                     }));
                 if (itemsToSave.length > 0) {
-                    await supabase.from('delivery_items').insert(itemsToSave);
+                    const { error: itemsError } = await supabase.from('delivery_items').insert(itemsToSave);
+                    if (itemsError) {
+                        console.error("Error creating delivery items:", itemsError);
+                        alert("La livraison a été créée mais certains articles n'ont pas pu être enregistrés.");
+                    }
                 }
             }
 
             setIsModalOpen(false);
             setFormData({ destination: '', driver_name: '', delivery_date: new Date().toISOString().split('T')[0], status: 'Pending', delivery_fee: 0, recipient_name: '', observation: '', items: [] });
             fetchData();
+            alert("Livraison créée avec succès !");
         } catch (err) {
             console.error("Error creating delivery:", err);
+            alert("Erreur lors de la création de la livraison: " + err.message);
         }
     };
 

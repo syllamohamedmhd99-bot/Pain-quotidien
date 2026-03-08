@@ -129,33 +129,32 @@ export default function POS() {
 
             // 2.5 Insert Delivery if requested
             if (isDelivery) {
-                const { error: deliveryError } = await supabase
+                const { data: delRow, error: deliveryError } = await supabase
                     .from('deliveries')
                     .insert([{
                         transaction_id: trxData.id,
                         destination: deliveryAddress || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.address : null),
                         recipient_name: recipientName || (selectedClientId ? clients.find(c => c.id === parseInt(selectedClientId))?.name : null),
                         status: 'Pending',
-                        delivery_fee: parseFloat(deliveryFee || 0)
-                    }]);
+                        delivery_fee: parseFloat(deliveryFee || 0),
+                        delivery_date: new Date().toISOString().split('T')[0]
+                    }])
+                    .select()
+                    .single();
 
                 if (deliveryError) {
-                    console.warn("Could not create delivery record:", deliveryError);
-                } else {
+                    console.error("Could not create delivery record:", deliveryError);
+                    alert("Attention: La vente a été enregistrée mais la livraison n'a pas pu être créée: " + deliveryError.message);
+                } else if (delRow && cart.length > 0) {
                     // Create delivery items automatically
-                    const { data: delRow } = await supabase
-                        .from('deliveries')
-                        .select('id')
-                        .eq('transaction_id', trxData.id)
-                        .single();
-
-                    if (delRow && cart.length > 0) {
-                        const deliveryItems = cart.map(item => ({
-                            delivery_id: delRow.id,
-                            product_id: item.id,
-                            quantity: item.qty
-                        }));
-                        await supabase.from('delivery_items').insert(deliveryItems);
+                    const deliveryItems = cart.map(item => ({
+                        delivery_id: delRow.id,
+                        product_id: item.id,
+                        quantity: item.qty
+                    }));
+                    const { error: delItemsError } = await supabase.from('delivery_items').insert(deliveryItems);
+                    if (delItemsError) {
+                        console.error("Error creating delivery items:", delItemsError);
                     }
                 }
             }
