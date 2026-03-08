@@ -149,8 +149,8 @@ export default function POS() {
                     // Create delivery items automatically
                     const deliveryItems = cart.map(item => ({
                         delivery_id: delRow.id,
-                        product_id: item.id,
-                        quantity: item.qty
+                        product_id: parseInt(item.id),
+                        quantity: parseFloat(item.qty)
                     }));
                     const { error: delItemsError } = await supabase.from('delivery_items').insert(deliveryItems);
                     if (delItemsError) {
