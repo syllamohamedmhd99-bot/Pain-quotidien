@@ -83,8 +83,8 @@ export default function Sidebar({ darkMode, toggleDarkMode, theme, setTheme, onL
                         // 2. Check Permissions for Staff (Admins have access to everything)
                         if (profile?.role !== 'Administrateur') {
                             // If user is Staff, they must have the path in their permissions array
-                            // Special case: Profile and Dashboard (/) are usually always accessible
-                            if (item.path === '/' || item.path === '/profile') return true;
+                            // Special case: Profile (/profile) is usually always accessible
+                            if (item.path === '/profile') return true;
 
                             // For other items, check permissions
                             const perms = profile?.permissions || [];

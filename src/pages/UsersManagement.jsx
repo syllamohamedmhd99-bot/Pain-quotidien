@@ -18,6 +18,7 @@ export default function UsersManagement() {
     const [diagResult, setDiagResult] = useState(null); // Pour l'affichage persistant
 
     const availablePages = [
+        { id: '/', name: 'Tableau de bord' },
         { id: '/pos', name: 'Ventes (POS)' },
         { id: '/inventory', name: 'Catalogue & Stock' },
         { id: '/production', name: 'Production' },

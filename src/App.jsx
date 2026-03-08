@@ -104,12 +104,12 @@ function App() {
     if (isAdmin) return children; // L'admin a accès à tout
 
     const perms = profile.permissions || [];
-    if (perms.includes(path) || path === '/' || path === '/profile') {
+    if (perms.includes(path) || path === '/profile') {
       return children;
     }
 
-    // Sinon redirection vers le Dashboard
-    return <Navigate to="/" replace />;
+    // Redirection vers Profile si la page n'est pas autorisée (pour éviter les boucles infinies sur /)
+    return <Navigate to="/profile" replace />;
   };
 
   return (
@@ -125,7 +125,7 @@ function App() {
           session ? (
             <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} theme={theme} setTheme={setTheme} onLogout={handleLogout} profile={profile}>
               <Routes>
-                <Route path="/" element={<Dashboard profile={profile} />} />
+                <Route path="/" element={<ProtectedRoute path="/"><Dashboard profile={profile} /></ProtectedRoute>} />
                 <Route path="/profile" element={<Profile session={session} />} />
 
                 <Route path="/pos" element={<ProtectedRoute path="/pos"><POS /></ProtectedRoute>} />
