@@ -38,6 +38,8 @@ export default function Expenses({ profile }) {
         'Électricité/Eau',
         'Marketing',
         'Maintenance',
+        'Charge Fixe',
+        'Charge Variable',
         'Autre'
     ];
 

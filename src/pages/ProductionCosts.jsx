@@ -46,6 +46,8 @@ export default function ProductionCosts({ profile }) {
         'Emballage',
         'Maintenance Four',
         "Main d'œuvre Production",
+        'Charge Fixe',
+        'Charge Variable',
         'Autre'
     ];
 
@@ -152,6 +154,8 @@ export default function ProductionCosts({ profile }) {
             case 'Énergie/Gaz': return <Flame size={18} />;
             case 'Livraison': return <Truck size={18} />;
             case 'Emballage': return <Package size={18} />;
+            case 'Charge Fixe': return <DollarSign size={18} />;
+            case 'Charge Variable': return <Tag size={18} />;
             default: return <Tag size={18} />;
         }
     };
