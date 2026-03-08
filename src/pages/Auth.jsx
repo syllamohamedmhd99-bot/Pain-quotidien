@@ -142,7 +142,7 @@ export default function Auth({ onLogin }) {
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        style={{ color: 'var(--danger-color)', backgroundColor: 'color-mix(in srgb, var(--danger-color) 10%, transparent)', padding: '0.8rem', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center', fontSize: '0.9rem' }}
+                        style={{ color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '0.8rem', borderRadius: '12px', marginBottom: '1.25rem', textAlign: 'center', fontSize: '0.9rem', border: '1px solid rgba(239, 68, 68, 0.2)', fontWeight: '500' }}
                     >
                         {errorMsg}
                     </motion.div>

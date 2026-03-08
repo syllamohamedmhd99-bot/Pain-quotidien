@@ -45,31 +45,35 @@
 }
 
 .shape-1 {
-    width: 400px;
-    height: 400px;
-    background: var(--primary);
-    top: -100px;
-    left: -100px;
+    width: 450px;
+    height: 450px;
+    background: #FEF3C7;
+    /* Ambre très clair */
+    top: -150px;
+    left: -150px;
     animation-delay: 0s;
 }
 
 .shape-2 {
-    width: 500px;
-    height: 500px;
-    background: var(--secondary);
-    bottom: -150px;
-    right: -100px;
+    width: 550px;
+    height: 550px;
+    background: #FDE68A;
+    /* Ambre clair */
+    bottom: -200px;
+    right: -150px;
     animation-delay: -5s;
 }
 
 .shape-3 {
-    width: 300px;
-    height: 300px;
-    background: var(--accent);
-    top: 50%;
-    left: 50%;
+    width: 350px;
+    height: 350px;
+    background: #FBCFE8;
+    /* Rose poudré / Sucre vanillé */
+    top: 60%;
+    left: 40%;
     transform: translate(-50%, -50%);
     animation-delay: -10s;
+    opacity: 0.3;
 }
 
 @keyframes float {
@@ -109,33 +113,33 @@ body:not(.dark) .particle {
 }
 
 
-/* Main Card Glassmorphism */
+/* Main Card Glassmorphism - Warm Bakery Theme */
 .auth-card {
     position: relative;
     z-index: 10;
     width: 100%;
     max-width: 420px;
     padding: 3rem;
-    border-radius: 24px;
-    background: rgba(15, 23, 42, 0.8);
-    /* Fond Indigo profond semi-transparent */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    /* Bordure Cyan subtile */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 28px;
+    background: rgba(255, 252, 240, 0.85);
+    /* Fond Crème riche */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    /* Bordure Terre d'ombre subtile */
+    box-shadow:
+        0 25px 50px -12px rgba(75, 46, 30, 0.2),
+        0 0 40px rgba(255, 223, 186, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    /* For smooth toggle transitions */
 }
 
 body:not(.dark) .auth-card {
-    background: rgba(255, 255, 255, 0.85);
-    /* Fond clair premium */
-    border: 1px solid rgba(14, 165, 233, 0.4);
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(139, 69, 19, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(75, 46, 30, 0.1);
 }
 
 .auth-header {
@@ -148,27 +152,30 @@ body:not(.dark) .auth-card {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #FFD700, #DAA520);
-    /* Or et Miel */
-    color: #4B2E1E;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    /* Ambre chaleureux */
+    color: #FFF;
     margin-bottom: 1.5rem;
-    box-shadow: 0 10px 20px -10px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 10px 20px -10px rgba(217, 119, 6, 0.4);
 }
 
 .auth-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #4B2E1E;
+    /* Brun Cannelle profond */
     margin: 0 0 0.5rem 0;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.7px;
 }
 
 .auth-subtitle {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    color: #8B4513;
+    /* Cuir / Terre de Sienne */
+    opacity: 0.8;
     margin: 0;
 }
 
@@ -190,45 +197,43 @@ body:not(.dark) .auth-card {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 215, 0, 0.8);
-    /* Or doux pour les icônes */
+    color: #D97706;
+    /* Ambre */
     transition: all 0.3s ease;
     pointer-events: none;
 }
 
 .auth-input {
     width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
-    background: rgba(255, 255, 255, 0.1);
-    /* Fond plus clair */
-    border: 1px solid rgba(255, 215, 0, 0.2);
-    border-radius: 12px;
-    color: #ffffff;
+    padding: 1rem 1rem 1rem 3.2rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    border-radius: 14px;
+    color: #4B2E1E;
     font-size: 1rem;
     transition: all 0.3s ease;
     outline: none;
 }
 
 .auth-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(139, 69, 19, 0.5);
 }
 
 .auth-input:focus {
-    background: var(--bg-primary);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+    background: #ffffff;
+    border-color: #D97706;
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
 }
 
 .auth-input:focus+.input-icon,
 .input-group:focus-within .input-icon {
-    color: var(--primary);
+    color: #B45309;
 }
 
 .forgot-password {
     align-self: flex-end;
-    font-size: 0.85rem;
-    color: #FFD700;
-    /* Or éclatant */
+    font-size: 0.9rem;
+    color: #B45309;
     text-decoration: none;
     font-weight: 600;
     margin-top: -0.5rem;
@@ -236,34 +241,32 @@ body:not(.dark) .auth-card {
 }
 
 .forgot-password:hover {
-    color: var(--accent);
+    color: #D97706;
     text-decoration: underline;
 }
 
 /* Submit Button */
 .auth-submit {
     width: 100%;
-    padding: 1rem;
+    padding: 1.1rem;
     margin-top: 0.5rem;
-    background: linear-gradient(135deg, #FFD700, #CD853F);
-    /* Or et Sucre roux */
-    color: #4B2E1E;
-    /* Texte brun pour le contraste sur l'or */
+    background: linear-gradient(135deg, #D97706, #B45309);
+    color: #ffffff;
     border: none;
-    border-radius: 12px;
-    font-size: 1rem;
+    border-radius: 14px;
+    font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 8px 16px -8px rgba(255, 215, 0, 0.6);
+    box-shadow: 0 8px 20px -8px rgba(180, 83, 9, 0.5);
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .auth-submit:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 24px -8px rgba(255, 215, 0, 0.8),
-        0 0 15px rgba(255, 215, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(180, 83, 9, 0.6);
+    filter: brightness(1.1);
 }
 
 .auth-submit:active {
@@ -275,26 +278,23 @@ body:not(.dark) .auth-card {
     margin-top: 2rem;
     text-align: center;
     font-size: 0.95rem;
-    color: #ffffff;
-    /* Blanc pur pour le footer */
+    color: #4B2E1E;
     font-weight: 500;
 }
 
 .auth-toggle-btn {
     background: none;
     border: none;
-    color: #FFD700;
-    /* Or dynamique */
+    color: #D97706;
     font-weight: 700;
     cursor: pointer;
-    padding: 0 0.25rem;
+    padding: 0 0.3rem;
     font-size: 1rem;
     transition: all 0.2s;
 }
 
 .auth-toggle-btn:hover {
-    color: #FFF;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    color: #B45309;
     text-decoration: underline;
 }
 
