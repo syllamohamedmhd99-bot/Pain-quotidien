@@ -147,14 +147,19 @@ export default function POS() {
                     alert("Attention: La vente a été enregistrée mais la livraison n'a pas pu être créée: " + deliveryError.message);
                 } else if (delRow && cart.length > 0) {
                     // Create delivery items automatically
-                    const deliveryItems = cart.map(item => ({
-                        delivery_id: delRow.id,
-                        product_id: parseInt(item.id),
-                        quantity: parseFloat(item.qty)
-                    }));
-                    const { error: delItemsError } = await supabase.from('delivery_items').insert(deliveryItems);
-                    if (delItemsError) {
-                        console.error("Error creating delivery items:", delItemsError);
+                    const deliveryItems = cart
+                        .filter(item => item.id && !isNaN(parseInt(item.id)))
+                        .map(item => ({
+                            delivery_id: delRow.id,
+                            product_id: parseInt(item.id),
+                            quantity: parseFloat(item.qty)
+                        }));
+                    if (deliveryItems.length > 0) {
+                        const { error: delItemsError } = await supabase.from('delivery_items').insert(deliveryItems);
+                        if (delItemsError) {
+                            console.error("Error creating delivery items:", delItemsError);
+                            alert(`Attention: Vente OK, Livraison OK (${delRow.id}), mais ARTICLES échoués.\nErreur: ${delItemsError.message}`);
+                        }
                     }
                 }
             }

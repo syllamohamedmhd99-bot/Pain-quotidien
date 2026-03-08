@@ -101,7 +101,7 @@ export default function Deliveries() {
 
             if (newDel && formData.items.length > 0) {
                 const itemsToSave = formData.items
-                    .filter(it => it.product_id && it.quantity && !isNaN(parseFloat(it.quantity)))
+                    .filter(it => it.product_id && !isNaN(parseInt(it.product_id)) && it.quantity && !isNaN(parseFloat(it.quantity)))
                     .map(it => ({
                         delivery_id: newDel.id,
                         product_id: parseInt(it.product_id),
@@ -111,7 +111,7 @@ export default function Deliveries() {
                     const { error: itemsError } = await supabase.from('delivery_items').insert(itemsToSave);
                     if (itemsError) {
                         console.error("Error creating delivery items:", itemsError);
-                        alert("La livraison a été créée mais certains articles n'ont pas pu être enregistrés.");
+                        alert(`La livraison a été créée (${newDel.id}) mais les articles n'ont pas pu être enregistrés.\nErreur: ${itemsError.message}\nDétails: ${itemsError.details || 'Aucun'}`);
                     }
                 }
             }
