@@ -36,17 +36,16 @@ export default function Dashboard({ profile }) {
         const fetchData = async () => {
             try {
                 // On ne passe queryOptions que si on est en mode Local (simulé dans supabaseClient)
-                // Pour le mode Supabase, ces options causent des erreurs 400.
                 const fetchOptions = (isAdmin && globalView && supabase.isLocal) ? { all: 'true' } : {};
 
                 const [trxRes, clientRes, prodRes, suppRes, expRes, delRes, rawRes] = await Promise.all([
-                    supabase.from('transactions').select('*', fetchOptions),
-                    supabase.from('clients').select('*', fetchOptions),
-                    supabase.from('products').select('*', fetchOptions),
-                    supabase.from('suppliers').select('*', fetchOptions),
-                    supabase.from('expenses').select('*', fetchOptions),
-                    supabase.from('deliveries').select('*', fetchOptions),
-                    supabase.from('raw_materials').select('*', fetchOptions)
+                    supabase.from('transactions').select('*, items:transaction_items(*)'),
+                    supabase.from('clients').select('*'),
+                    supabase.from('products').select('*'),
+                    supabase.from('suppliers').select('*'),
+                    supabase.from('expenses').select('*'),
+                    supabase.from('deliveries').select('*'),
+                    supabase.from('raw_materials').select('*')
                 ]);
 
                 if (trxRes.data) setTransactions(trxRes.data);
@@ -64,11 +63,12 @@ export default function Dashboard({ profile }) {
         fetchData();
     }, [globalView]);
 
-    const isToday = (dateString) => {
-        if (!dateString) return false;
+    const isToday = (dateString, fallbackDate) => {
+        const d = dateString || fallbackDate;
+        if (!d) return false;
         try {
             const todayStr = new Date().toISOString().split('T')[0];
-            const dateStr = new Date(dateString).toISOString().split('T')[0];
+            const dateStr = new Date(d).toISOString().split('T')[0];
             return todayStr === dateStr;
         } catch (e) {
             return false;
@@ -77,7 +77,6 @@ export default function Dashboard({ profile }) {
 
     // BI Calculations
     const totalRevenue = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => !t.trx_id?.startsWith('FACT-'))
         .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
     const totalExpenses = (Array.isArray(expenses) ? expenses : [])
@@ -86,14 +85,14 @@ export default function Dashboard({ profile }) {
     const netProfit = totalRevenue - totalExpenses;
 
     const totalSalesToday = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => isToday(t.date) && !t.trx_id?.startsWith('FACT-'))
+        .filter(t => isToday(t.date, t.created_at))
         .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
     const todayOrdersCount = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => isToday(t.date) && !t.trx_id?.startsWith('FACT-')).length;
+        .filter(t => isToday(t.date, t.created_at)).length;
 
     const totalProductsSoldToday = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => isToday(t.date) && !t.trx_id?.startsWith('FACT-'))
+        .filter(t => isToday(t.date, t.created_at))
         .reduce((total, trx) => {
             if (trx.items && Array.isArray(trx.items)) {
                 return total + trx.items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
@@ -102,7 +101,6 @@ export default function Dashboard({ profile }) {
         }, 0);
 
     const totalProductsSoldTotal = (Array.isArray(transactions) ? transactions : [])
-        .filter(t => !t.trx_id?.startsWith('FACT-'))
         .reduce((total, trx) => {
             if (trx.items && Array.isArray(trx.items)) {
                 return total + trx.items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
@@ -141,11 +139,10 @@ export default function Dashboard({ profile }) {
 
             const daySales = (Array.isArray(transactions) ? transactions : [])
                 .filter(t => {
-                    const tDate = new Date(t.date);
+                    const tDate = new Date(t.date || t.created_at);
                     return tDate.getDate() === d.getDate() &&
                         tDate.getMonth() === d.getMonth() &&
-                        tDate.getFullYear() === d.getFullYear() &&
-                        !t.trx_id?.startsWith('FACT-');
+                        tDate.getFullYear() === d.getFullYear();
                 })
                 .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 
@@ -165,10 +162,9 @@ export default function Dashboard({ profile }) {
 
             const monthSales = (Array.isArray(transactions) ? transactions : [])
                 .filter(t => {
-                    const tDate = new Date(t.date);
+                    const tDate = new Date(t.date || t.created_at);
                     return tDate.getMonth() === d.getMonth() &&
-                        tDate.getFullYear() === d.getFullYear() &&
-                        !t.trx_id?.startsWith('FACT-');
+                        tDate.getFullYear() === d.getFullYear();
                 })
                 .reduce((sum, t) => sum + (t.total_amount || 0), 0);
 

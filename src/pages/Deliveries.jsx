@@ -124,10 +124,11 @@ export default function Deliveries() {
 
     const filteredDeliveries = useMemo(() => {
         return deliveries.filter(d => {
+            const trx = Array.isArray(d.transactions) ? d.transactions[0] : d.transactions;
             const matchesSearch = d.destination?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 d.driver_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 d.recipient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (Array.isArray(d.transactions) ? d.transactions[0] : d.transactions)?.trx_id?.toLowerCase().includes(searchTerm.toLowerCase());
+                trx?.trx_id?.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'Tous' || d.status === statusFilter;
             return matchesSearch && matchesStatus;
         });
