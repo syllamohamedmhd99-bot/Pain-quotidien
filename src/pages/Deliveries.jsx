@@ -52,7 +52,7 @@ export default function Deliveries() {
         try {
             setLoading(true);
             const [delRes, trxRes, prodRes] = await Promise.all([
-                supabase.from('deliveries').select('*, transactions(*), delivery_items(quantity, products(name))').order('created_at', { ascending: false }),
+                supabase.from('deliveries').select('id, transaction_id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name, created_at, transactions(*), delivery_items(quantity, products(name))').order('created_at', { ascending: false }),
                 supabase.from('transactions').select('*').eq('type', 'Vente').order('date', { ascending: false }),
                 supabase.from('products').select('*').order('name')
             ]);
@@ -60,7 +60,7 @@ export default function Deliveries() {
             let delData = delRes.data;
             if (delRes.error) {
                 console.warn("Fetch with items failed, trying fallback:", delRes.error.message);
-                const { data: fallbackData } = await supabase.from('deliveries').select('*, transactions(*)').order('created_at', { ascending: false });
+                const { data: fallbackData } = await supabase.from('deliveries').select('id, transaction_id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name, created_at, transactions(*)').order('created_at', { ascending: false });
                 delData = fallbackData;
             }
 
@@ -95,7 +95,7 @@ export default function Deliveries() {
                     delivery_fee: formData.delivery_fee,
                     recipient_name: formData.recipient_name
                 }
-            ]).select().single();
+            ]).select('id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name').single();
 
             if (delError) throw delError;
 

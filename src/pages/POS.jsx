@@ -139,7 +139,7 @@ export default function POS() {
                         delivery_fee: parseFloat(deliveryFee || 0),
                         delivery_date: new Date().toISOString().split('T')[0]
                     }])
-                    .select()
+                    .select('id, destination, recipient_name, status, delivery_fee, delivery_date')
                     .single();
 
                 if (deliveryError) {

@@ -22,7 +22,7 @@ export default function DeliveryNote() {
                 // Fetch delivery details
                 const { data: delData, error: delError } = await supabase
                     .from('deliveries')
-                    .select('*, transactions(trx_id, date, clients(name, phone))')
+                    .select('id, transaction_id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name, created_at, transactions(trx_id, date, clients(name, phone))')
                     .eq('id', id)
                     .single();
 
@@ -31,7 +31,7 @@ export default function DeliveryNote() {
                     console.warn("Initial fetch with join failed, attempting fallback:", delError.message);
                     const { data: fallbackDelData, error: fallbackDelError } = await supabase
                         .from('deliveries')
-                        .select('*') // Fetch only from deliveries table
+                        .select('id, transaction_id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name, created_at') // Fetch specific columns
                         .eq('id', id)
                         .single();
 
@@ -149,7 +149,6 @@ export default function DeliveryNote() {
                             <tr>
                                 <th>Désignation Produit</th>
                                 <th className="text-center">Quantité Livrée</th>
-                                <th className="text-center">Observation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -157,7 +156,6 @@ export default function DeliveryNote() {
                                 <tr key={idx}>
                                     <td>{item.products?.name || "Produit"}</td>
                                     <td className="text-center"><strong>{item.quantity}</strong></td>
-                                    <td className="text-center">{delivery.observation || "---"}</td>
                                 </tr>
                             )) : (
                                 <tr>

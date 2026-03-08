@@ -44,7 +44,7 @@ export default function Dashboard({ profile }) {
                     supabase.from('products').select('*'),
                     supabase.from('suppliers').select('*'),
                     supabase.from('expenses').select('*'),
-                    supabase.from('deliveries').select('*'),
+                    supabase.from('deliveries').select('id, transaction_id, destination, driver_name, delivery_date, status, delivery_fee, recipient_name, created_at'),
                     supabase.from('raw_materials').select('*')
                 ]);
 
