@@ -293,9 +293,11 @@ export default function ProductionCosts() {
                                             <button className="edit-btn" onClick={() => openEditModal(cost)}>
                                                 <Edit2 size={16} />
                                             </button>
-                                            <button className="delete-btn" onClick={() => handleDeleteCost(cost.id)}>
-                                                <Trash2 size={16} />
-                                            </button>
+                                            {isAdmin && (
+                                                <button className="delete-btn" onClick={() => handleDeleteCost(cost.id)}>
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

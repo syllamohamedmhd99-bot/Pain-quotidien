@@ -338,9 +338,11 @@ export default function Deliveries() {
                                         <button className="btn btn-outline btn-sm" onClick={() => navigate(`/delivery-note/${d.id}`)} title="Imprimer le bon de livraison" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                             <Printer size={14} /> Bon
                                         </button>
-                                        <button className="btn btn-outline btn-sm btn-delete" onClick={() => deleteDelivery(d.id)} title="Supprimer la livraison" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <Trash2 size={14} />
-                                        </button>
+                                        {isAdmin && (
+                                            <button className="btn btn-outline btn-sm btn-delete" onClick={() => deleteDelivery(d.id)} title="Supprimer la livraison" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

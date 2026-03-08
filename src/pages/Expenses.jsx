@@ -195,9 +195,11 @@ export default function Expenses() {
                                     {exp.amount.toLocaleString()} GNF
                                 </td>
                                 <td>
-                                    <button className="delete-btn" onClick={() => handleDeleteExpense(exp.id)}>
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {isAdmin && (
+                                        <button className="delete-btn" onClick={() => handleDeleteExpense(exp.id)}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

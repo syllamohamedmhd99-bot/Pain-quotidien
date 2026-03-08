@@ -177,7 +177,8 @@ export default function Dashboard({ profile }) {
     const maxVal = Math.max(...chartData.map(d => d.value), 1000);
 
     const stats = [
-        { id: 1, title: "Profit Net", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
+        { id: 0, title: "Ventes Aujourd'hui", value: `${totalSalesToday.toLocaleString()} GNF`, icon: TrendingUp, color: "var(--primary-color)", increase: `+${todayOrdersCount} Commandes` },
+        { id: 1, title: "Profit Net Global", value: `${netProfit.toLocaleString()} GNF`, icon: DollarSign, color: "var(--primary-color)", increase: "+12%" },
         { id: 2, title: "Total Vendus", value: totalProductsSoldTotal.toString(), icon: ShoppingBag, color: "var(--success-color)", increase: `+${totalProductsSoldToday} Aujourd'hui` },
         { id: 3, title: "Livraisons en cours", value: deliveries.filter(d => d.status === 'Out').length.toString(), icon: Truck, color: "var(--warning-color)", increase: "Actives" },
         {

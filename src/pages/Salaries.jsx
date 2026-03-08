@@ -15,7 +15,7 @@ import {
 import { supabase } from '../supabaseClient';
 import './Salaries.css';
 
-export default function Salaries() {
+export default function Salaries({ profile }) {
     const [salaries, setSalaries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,6 +28,8 @@ export default function Salaries() {
         date: new Date().toISOString().split('T')[0],
         payment_mode: 'Espèce'
     });
+
+    const isAdmin = profile?.role === 'Administrateur';
 
     useEffect(() => {
         fetchData();

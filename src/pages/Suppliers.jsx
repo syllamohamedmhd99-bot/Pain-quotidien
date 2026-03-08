@@ -211,9 +211,11 @@ export default function Suppliers() {
                                     <button className="btn-icon" onClick={() => handleOpenModal(supplier)}>
                                         <Edit2 size={16} />
                                     </button>
-                                    <button className="btn-icon delete-action" onClick={() => handleDelete(supplier.id)}>
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {isAdmin && (
+                                        <button className="btn-icon delete-action" onClick={() => handleDelete(supplier.id)}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

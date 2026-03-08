@@ -14,7 +14,7 @@ import {
 import { supabase } from '../supabaseClient';
 import './RawMaterials.css';
 
-export default function RawMaterials() {
+export default function RawMaterials({ profile }) {
     const [materials, setMaterials] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -26,6 +26,8 @@ export default function RawMaterials() {
         unit: 'kg',
         min_stock: 5
     });
+
+    const isAdmin = profile?.role === 'Administrateur';
 
     useEffect(() => {
         fetchMaterials();

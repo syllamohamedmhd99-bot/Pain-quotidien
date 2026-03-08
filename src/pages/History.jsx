@@ -169,7 +169,7 @@ export default function History() {
                                         <Link to={`/invoice/${log.rawId}`} className="btn-icon" title="Voir Facture">
                                             <Receipt size={16} />
                                         </Link>
-                                        {log.deletable && (
+                                        {log.deletable && isAdmin && (
                                             <button className="btn-icon delete-action" onClick={() => handleDelete(log.rawId, log.id)} title="Annuler">
                                                 <Trash2 size={16} />
                                             </button>

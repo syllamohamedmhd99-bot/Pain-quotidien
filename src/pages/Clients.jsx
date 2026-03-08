@@ -214,9 +214,11 @@ export default function Clients() {
                                     <button type="button" className="btn-icon" onClick={(e) => { e.preventDefault(); handleOpenModal(client); }}>
                                         <Edit2 size={16} />
                                     </button>
-                                    <button type="button" className="btn-icon delete-action" onClick={(e) => { e.preventDefault(); handleDelete(client.id); }}>
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {isAdmin && (
+                                        <button type="button" className="btn-icon delete-action" onClick={(e) => { e.preventDefault(); handleDelete(client.id); }}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

@@ -259,7 +259,7 @@ export default function Inventory() {
                                     <span className="product-category">{product.category}</span>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button type="button" className="action-btn" onClick={(e) => { e.preventDefault(); handleOpenModal(product); }}><Edit2 size={16} /></button>
-                                        <button type="button" className="action-btn delete-action" onClick={(e) => { e.preventDefault(); handleDelete(product.id); }}><Trash2 size={16} /></button>
+                                        {isAdmin && <button type="button" className="action-btn delete-action" onClick={(e) => { e.preventDefault(); handleDelete(product.id); }}><Trash2 size={16} /></button>}
                                     </div>
                                 </div>
 

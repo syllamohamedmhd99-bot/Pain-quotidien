@@ -174,9 +174,11 @@ export default function Production() {
                                             <CheckCircle size={14} /> Marquer comme Prêt
                                         </button>
                                     )}
-                                    <button className="btn-icon text-danger" onClick={() => deleteBatch(log.id)}>
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {isAdmin && (
+                                        <button className="btn-icon text-danger" onClick={() => deleteBatch(log.id)}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </motion.div>
                         ))

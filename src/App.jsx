@@ -128,23 +128,23 @@ function App() {
                 <Route path="/" element={<ProtectedRoute path="/"><Dashboard profile={profile} /></ProtectedRoute>} />
                 <Route path="/profile" element={<Profile session={session} />} />
 
-                <Route path="/pos" element={<ProtectedRoute path="/pos"><POS /></ProtectedRoute>} />
-                <Route path="/inventory" element={<ProtectedRoute path="/inventory"><Inventory /></ProtectedRoute>} />
-                <Route path="/clients" element={<ProtectedRoute path="/clients"><Clients /></ProtectedRoute>} />
-                <Route path="/suppliers" element={<ProtectedRoute path="/suppliers"><Suppliers /></ProtectedRoute>} />
-                <Route path="/history" element={<ProtectedRoute path="/history"><History /></ProtectedRoute>} />
-                <Route path="/expenses" element={<ProtectedRoute path="/expenses"><Expenses /></ProtectedRoute>} />
-                <Route path="/production-costs" element={<ProtectedRoute path="/production-costs"><ProductionCosts /></ProtectedRoute>} />
-                <Route path="/production" element={<ProtectedRoute path="/production"><Production /></ProtectedRoute>} />
-                <Route path="/salaries" element={<ProtectedRoute path="/salaries"><Salaries /></ProtectedRoute>} />
+                <Route path="/pos" element={<ProtectedRoute path="/pos"><POS profile={profile} /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute path="/inventory"><Inventory profile={profile} /></ProtectedRoute>} />
+                <Route path="/clients" element={<ProtectedRoute path="/clients"><Clients profile={profile} /></ProtectedRoute>} />
+                <Route path="/suppliers" element={<ProtectedRoute path="/suppliers"><Suppliers profile={profile} /></ProtectedRoute>} />
+                <Route path="/history" element={<ProtectedRoute path="/history"><History profile={profile} /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute path="/expenses"><Expenses profile={profile} /></ProtectedRoute>} />
+                <Route path="/production-costs" element={<ProtectedRoute path="/production-costs"><ProductionCosts profile={profile} /></ProtectedRoute>} />
+                <Route path="/production" element={<ProtectedRoute path="/production"><Production profile={profile} /></ProtectedRoute>} />
+                <Route path="/salaries" element={<ProtectedRoute path="/salaries"><Salaries profile={profile} /></ProtectedRoute>} />
 
                 {/* Facturation et ses sous-pages */}
                 <Route path="/invoices" element={<ProtectedRoute path="/invoices"><Invoices /></ProtectedRoute>} />
                 <Route path="/invoices/new" element={<ProtectedRoute path="/invoices/new"><CreateInvoice /></ProtectedRoute>} />
                 <Route path="/reports" element={<ProtectedRoute path="/reports"><Reports /></ProtectedRoute>} />
 
-                <Route path="/raw-materials" element={<ProtectedRoute path="/raw-materials"><RawMaterials /></ProtectedRoute>} />
-                <Route path="/deliveries" element={<ProtectedRoute path="/deliveries"><Deliveries /></ProtectedRoute>} />
+                <Route path="/raw-materials" element={<ProtectedRoute path="/raw-materials"><RawMaterials profile={profile} /></ProtectedRoute>} />
+                <Route path="/deliveries" element={<ProtectedRoute path="/deliveries"><Deliveries profile={profile} /></ProtectedRoute>} />
 
                 <Route path="/invoice/:id" element={<Invoice />} />
                 <Route path="/delivery-note/:id" element={<DeliveryNote />} />
